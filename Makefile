@@ -1,10 +1,9 @@
 IMG=myos.img
 IPL=ipl.bin
 
-all: ipl.s
-	make ipl
-	make img
-	make run
+.PHONY: ipl img run
+
+all: ipl img run
 
 img: $(IPL)
 	mformat -f 1440 -C -B $(IPL) -i $(IMG) ::
