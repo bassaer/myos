@@ -1,10 +1,10 @@
 IMG=myos.img
 
-.PHONY: ipl img run
+.PHONY: img run clean
 
-all: $(IMG) run
+all: img
 
-$(IMG): boot/ipl.bin kernel/init.bin
+img: boot/ipl.bin kernel/init.bin
 	mformat -f 1440 -C -B boot/ipl.bin -i $(IMG)
 	mcopy kernel/init.bin -i $(IMG) ::
 
