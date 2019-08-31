@@ -1,0 +1,9 @@
+language: c
+branches:
+  only:
+    - master
+addons:
+  apt:
+    packages:
+      - mtools
+script: make
