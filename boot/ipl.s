@@ -1,3 +1,10 @@
+#  __  __        ___  ____
+# |  \/  |_   _ / _ \/ ___|
+# | |\/| | | | | | | \___ \
+# | |  | | |_| | |_| |___) |
+# |_|  |_|\__, |\___/|____/
+#         |___/
+
 # シリンダ数
 .equ CYLS,  10
 .text
@@ -27,7 +34,7 @@
 
 
 #============================================
-# 各レジスタ                                ;     
+# 各レジスタ                                ;
 # ax : accumulator                          ;
 # cx : counter                              ;
 # dx : data                                 ;
@@ -52,6 +59,14 @@ entry:
     movw    %ax,        %ds
     movw    %ax,        %es
 
+#  画面クリア
+    movw    $0x0003,    %ax
+    int     $0x10
+
+#   起動メッセージ表示
+    movw    $boot_msg,  %si
+    call    print
+
 # ディスク読み込み
 # 1枚のディスクは512バイトのセクタが1シリンダに18, 1ヘッドに80シリンダ、ヘッドが２ある
 # 512 x 18 x 80 x 2 = 1440 KB
@@ -61,6 +76,9 @@ entry:
     movb    $0x00,      %ch   # シリンダ : 0
     movb    $0x00,      %dh   # ヘッド : 0
     movb    $0x02,      %cl   # セクタ : 2 (セクタ1はブートセクタを格納するため、2から)
+
+    movw    $load_msg,  %si
+    call    print
 
 readloop:
     movw    $0x00,      %si   # 失敗回数をカウント
@@ -98,6 +116,10 @@ next:
     cmpb    $CYLS,      %ch   # 事前定義シリンダ数と比較
     jb      readloop          # 想定シリンダまで完了していなければ、readloop
 
+    movw    $done_msg,  %si
+    call    print
+
+# init.sへjmp
     movb    $CYLS,      (0x0ff0)
     jmp     0xc200
 
@@ -105,30 +127,33 @@ fin:
     hlt                       # CPU停止
     jmp fin                   # 無限ループで待機状態にする
 
-putloop:
+print:
     movb    (%si),      %al
     add     $1,         %si
     cmpb    $0,         %al
-    je      fin
+    je      print_ret
     movb    $0x0e,      %ah
     movw    $15,        %bx
     int     $0x10             # call Video BIOS
-    jmp     putloop
+    jmp     print
+
+print_ret:
+    ret
 
 error:
-    movw    $msg,       %si
+    movw    $err_msg,       %si
 
-msg:
-    .byte   0x0a,       0x0a  # 改行2つ
-    .string "load error"
+boot_msg:
+    .string "Booting MyOS...\r\n\n"
+
+load_msg:
+    .string "Loading from disk...\r\n\n"
+
+done_msg:
+    .string "Finished Loading data.\r\n\n"
+
+err_msg:
+    .string "load error\r\n"
 
     .org    0x1fe
 	.byte   0x55,       0xaa
-
-
-# bootsector 以外
-
-#    .byte   0xf0, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00
-#    .org    .+4600
-#    .byte   0xf0, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00
-#    .org    .+1469432
