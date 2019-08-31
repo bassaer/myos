@@ -2,5 +2,6 @@ language: c
 branches:
   only:
     - master
-install: apt -y install mtools
+install: 
+  - sudo apt -y install mtools
 script: make
