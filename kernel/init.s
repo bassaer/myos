@@ -6,7 +6,7 @@
 #.equ        VRAM,        0xff8  # グラフィックバッファの開始番地
 #
     .text
-    .code16
+    .code32
 #    movb    $0x13,       %al
 #    movb    $0x00,       %ah
 #    int     $0x10
@@ -16,12 +16,13 @@
 #    movw    $0x000a0000, (VRAM)
 #
 
+#
 # キービードの状態をBIOSから取得
 #keystatus:
 #    movb    $0x02,       %ah
 #    int     $0x16
 #    movb    $al          (LEDS)
-    movw    $init_msg,  %si
+#    movw    $init_msg,  %si
 
 print:
     movb    (%si),      %al
