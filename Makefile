@@ -10,8 +10,8 @@ img: boot/ipl.bin kernel/init.bin
 	mformat -f 1440 -C -B boot/ipl.bin -i $(IMG)
 	mcopy kernel/init.bin -i $(IMG) ::
 
-#%.o: %.c
-#	gcc $(CFLAGS) -o $@ $*.c
+%.o: %.c
+	gcc $(CFLAGS) -o $@ $*.c
 
 %.bin: %.o
 	ld $^ -T $*.ld -o $@
