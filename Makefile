@@ -8,13 +8,10 @@ img: boot/ipl.bin kernel/init.bin
 	mformat -f 1440 -C -B boot/ipl.bin -i $(IMG)
 	mcopy kernel/init.bin -i $(IMG) ::
 
-boot/ipl.bin: boot/ipl.o
-	ld $^ -T boot/ipl.ld -o boot/ipl.bin
+%.bin: %.o
+	ld $^ -T $*.ld -o $@
 
-kernel/init.bin: kernel/init.o
-	ld $^ -T kernel/init.ld -o $@
-
-run: $(IMG)
+run: img
 	qemu-system-i386 -localtime -fda ./$(IMG)
 
 clean:

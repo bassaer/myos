@@ -131,13 +131,13 @@ print:
     movb    (%si),      %al
     add     $1,         %si
     cmpb    $0,         %al
-    je      print_ret
+    je      return
     movb    $0x0e,      %ah
     movw    $15,        %bx
     int     $0x10             # call Video BIOS
     jmp     print
 
-print_ret:
+return:
     ret
 
 error:
