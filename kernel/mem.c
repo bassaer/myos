@@ -1,4 +1,4 @@
-void MyosMain(void) {
+void main(void) {
 fin:
   goto fin;
 }
