@@ -2,9 +2,8 @@ language: c
 branches:
   only:
     - master
-before_install:
-  - curl http://repo.varnish-cache.org/debian/GPG-key.txt | sudo apt-key add -
-  - echo "deb http://repo.varnish-cache.org/ubuntu/ precise varnish-3.0" | sudo tee -a /etc/apt/sources.list
-install: 
-  - sudo apt -y install mtools
+addons:
+  apt:
+    packages:
+      - mtools
 script: make
