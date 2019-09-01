@@ -47,10 +47,9 @@
 
 # メモリマップ
 # 0x7c00 - 0x7dff : ブートセクタ
-# 0x7e00 - 0x7fff : 空き
-# 0x8000 - 0x81ff : ブートセクタ
-# 0x8200 - 0x83ff : ファイル読み込み
-# 0x8400 - 0x9bff : 空き
+# 0x7e00 - 0x7fff : ファイル読み込み
+# 0x8000 - 0x81ff : (ブートセクタ)
+# 0x8200 - 0x9bff : 空き
 
 entry:
     movw    $0,         %ax
@@ -71,7 +70,7 @@ entry:
 # 1枚のディスクは512バイトのセクタが1シリンダに18, 1ヘッドに80シリンダ、ヘッドが２ある
 # 512 x 18 x 80 x 2 = 1440 KB
 
-    movw    $0x0820,    %ax
+    movw    $0x820,    %ax
     movw    %ax,        %es
     movb    $0x00,      %ch   # シリンダ : 0
     movb    $0x00,      %dh   # ヘッド : 0
@@ -100,7 +99,7 @@ retry:
 
 next:
     movw    %es,        %ax   # アドレスを0x20進める
-    addw    $0x0020,    %ax
+    addw    $0x20,      %ax   # 512/16 -> 0x20
     movw    %ax,        %es   # addw $0x020, %es は無理？
     addb    $0x01,      %cl   # セクタ番号をインクリメント
     cmpb    $18,        %cl   # セクタ番号と18を比較
@@ -119,13 +118,24 @@ next:
     movw    $done_msg,  %si
     call    print
 
-# init.sへjmp
+# キービードの状態をBIOSから取得
+#keystatus:
+#    movb    $0x02,      %ah
+#    int     $0x16
+#    movb    $al         (0x0ff1)
+#    ret
+
+
+# kernel/init.sへ
     movb    $CYLS,      (0x0ff0)
-    jmp     0xc200
+#movw    $0x0001,    %ax
+#    lmsw    %ax
+    jmp     0xc200            # 0x8200 + 0x4200(プロブラムの配置位置) = 0xc200
 
 fin:
     hlt                       # CPU停止
     jmp fin                   # 無限ループで待機状態にする
+
 
 print:
     movb    (%si),      %al
@@ -144,13 +154,14 @@ error:
     movw    $err_msg,       %si
 
 boot_msg:
-    .string "Booting MyOS...\r\n\n"
+    .string "Booting MyOS...\r\n"
 
 load_msg:
-    .string "Loading from disk...\r\n\n"
+    .string "Loading from disk...\r\n"
 
 done_msg:
-    .string "Finished Loading data.\r\n\n"
+    .ascii "Finished Loading data!\r\n"
+    .byte  0
 
 err_msg:
     .string "load error\r\n"
@@ -158,4 +169,5 @@ err_msg:
     .org    0x1fe
 # 511, 512バイト目がそれぞれ0x55, 0xAAの場合0x7c00に最初のセクタがコピーされ、それ以外の場合は次のセクタを読見込む
 # 0x7c00にブートローダがコピーされると0x7c00から処理を開始する
-	.byte   0x55,       0xaa
+    .byte   0x55
+    .byte   0xaa
