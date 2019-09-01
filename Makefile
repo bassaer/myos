@@ -1,6 +1,6 @@
-VER=$(shell cat CHANGELOG.md | awk 'tolower($$0) ~/^\#\#\sversion\s.*/ {print $$3}')
-IMG=myos-$(VER).img
-CFLAGS = -c -m32 -nostdlib -fno-builtin
+VER    = $(shell cat CHANGELOG.md | awk 'tolower($$0) ~/^\#\#\sversion\s.*/ {print $$3}')
+IMG    = myos-$(VER).img
+CFLAGS = -c -nostdlib -fno-builtin
 
 .PHONY: img run clean
 
@@ -16,11 +16,14 @@ img: boot/ipl.bin kernel/init.bin
 %.bin: %.o
 	ld $^ -T $*.ld -o $@
 
+kernel/init.bin: kernel/init.o kernel/main.o
+	ld $^ -T kernel/init.ld -o $@
+
 run: img
 	qemu-system-i386 -localtime -fda ./$(IMG)
 
 clean:
-	find . \( -name *.img -or -name *.bin -or -name *.o \) | xargs rm -f
+	find . \( -name '*.img' -or -name '*.bin' -or -name '*.o' \) | xargs rm -f
 
 # Makefile memo
 # B=$(A:%.bin=%.o) -> A=aaa.binのとき B=aaa.o となる

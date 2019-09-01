@@ -1,43 +1,32 @@
-#.equ        CYLS,        0xff0  # ブートセクタ
-#.equ        LEDS,        0xff1  # 謎
-#.equ        VMODE,       0xff2  # 色に関する情報
-#.equ        SCRNX,       0xff4  # 解像度 X
-#.equ        SCRNY,       0xff6  # 解像度 Y
-#.equ        VRAM,        0xff8  # グラフィックバッファの開始番地
-#
+    .code16
     .text
-    .code32
-#    movb    $0x13,       %al
-#    movb    $0x00,       %ah
-#    int     $0x10
-#    movb    $0x08,       (VMODE)
-#    movw    $320,        (SCRNX)
-#    movw    $200,        (SCRNY)
-#    movw    $0x000a0000, (VRAM)
-#
+    .global main
 
-#
-# キービードの状態をBIOSから取得
-#keystatus:
-#    movb    $0x02,       %ah
-#    int     $0x16
-#    movb    $al          (LEDS)
-#    movw    $init_msg,  %si
-
-print:
-    movb    (%si),      %al
-    add     $1,         %si
-    cmpb    $0,         %al
-    je      fin
-    movb    $0x0e,      %ah
-    movw    $15,        %bx
-    int     $0x10             # call Video BIOS
-    jmp     print
+    movw    $init_msg,  %si
+    call    print
+    pushl   $main
+    movw    $done_msg,  %si
+    call    print
 
 fin:
     hlt
     jmp     fin
 
+print:
+    movb    (%si),      %al
+    add     $1,         %si
+    cmpb    $0,         %al
+    je      print_ret
+    movb    $0x0e,      %ah
+    movw    $15,        %bx
+    int     $0x10             # call Video BIOS
+    jmp     print
+
+print_ret:
+    ret
+
 init_msg:
-    .ascii "start kernel\r\n"
-    .byte    0
+    .string "Start kernel\r\n"
+
+done_msg:
+    .string "done.\r\n"

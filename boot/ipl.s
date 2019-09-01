@@ -47,7 +47,7 @@
 
 # メモリマップ
 # 0x7c00 - 0x7dff : ブートセクタ
-# 0x7e00 - 0x7fff : 空き
+# 0x7e00 - 0x7fff : カーネル
 # 0x8000 - 0x81ff : ブートセクタ
 # 0x8200 - 0x83ff : ファイル読み込み
 # 0x8400 - 0x9bff : 空き
@@ -119,13 +119,24 @@ next:
     movw    $done_msg,  %si
     call    print
 
-# init.sへjmp
+# キービードの状態をBIOSから取得
+#keystatus:
+#    movb    $0x02,      %ah
+#    int     $0x16
+#    movb    $al         (0x0ff1)
+#    ret
+
+
+# kernel/init.sへ
     movb    $CYLS,      (0x0ff0)
+#movw    $0x0001,    %ax
+#    lmsw    %ax
     jmp     0xc200
 
 fin:
     hlt                       # CPU停止
     jmp fin                   # 無限ループで待機状態にする
+
 
 print:
     movb    (%si),      %al
@@ -144,13 +155,14 @@ error:
     movw    $err_msg,       %si
 
 boot_msg:
-    .string "Booting MyOS...\r\n\n"
+    .string "Booting MyOS...\r\n"
 
 load_msg:
-    .string "Loading from disk...\r\n\n"
+    .string "Loading from disk...\r\n"
 
 done_msg:
-    .string "Finished Loading data.\r\n\n"
+    .ascii "Finished Loading data!\r\n"
+    .byte  0
 
 err_msg:
     .string "load error\r\n"
