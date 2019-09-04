@@ -1,4 +1,4 @@
-    .code16
+    .code32
     .text
     .global main
 
@@ -19,7 +19,7 @@ print:
     je      print_ret
     movb    $0x0e,      %ah
     movw    $15,        %bx
-    int     $0x10             # call Video BIOS
+    int     $0x10 
     jmp     print
 
 print_ret:
