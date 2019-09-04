@@ -6,7 +6,7 @@
 #         |___/
 
 # シリンダ数
-.equ CYLS,  10
+.equ CYLS,  20
 .text
 .code16
 
@@ -54,7 +54,7 @@
 entry:
     movw    $0,         %ax
     movw    %ax,        %ss
-    movw    $0x7c00,    %sp
+    movw    $0x07c0,    %sp
     movw    %ax,        %ds
     movw    %ax,        %es
 
@@ -70,7 +70,7 @@ entry:
 # 1枚のディスクは512バイトのセクタが1シリンダに18, 1ヘッドに80シリンダ、ヘッドが２ある
 # 512 x 18 x 80 x 2 = 1440 KB
 
-    movw    $0x820,    %ax
+    movw    $0x0820,    %ax
     movw    %ax,        %es
     movb    $0x00,      %ch   # シリンダ : 0
     movb    $0x00,      %dh   # ヘッド : 0
@@ -118,24 +118,12 @@ next:
     movw    $done_msg,  %si
     call    print
 
-# キービードの状態をBIOSから取得
-#keystatus:
-#    movb    $0x02,      %ah
-#    int     $0x16
-#    movb    $al         (0x0ff1)
-#    ret
-
-
-# kernel/init.sへ
-    movb    $CYLS,      (0x0ff0)
-#movw    $0x0001,    %ax
-#    lmsw    %ax
-    jmp     0xc200            # 0x8200 + 0x4200(プロブラムの配置位置) = 0xc200
+    movb    $CYLS, (0x0ff0)
+    jmp     0xc200
 
 fin:
-    hlt                       # CPU停止
-    jmp fin                   # 無限ループで待機状態にする
-
+    hlt
+    jmp fin
 
 print:
     movb    (%si),      %al
@@ -144,7 +132,7 @@ print:
     je      return
     movb    $0x0e,      %ah
     movw    $15,        %bx
-    int     $0x10             # call Video BIOS
+    int     $0x10
     jmp     print
 
 return:
