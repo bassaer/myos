@@ -1,6 +1,6 @@
 VER     = $(shell cat CHANGELOG.md | awk 'tolower($$0) ~/^\#\#\sversion\s.*/ {print $$3}')
 IMG     = myos-$(VER).img
-CFLAGS  = -c -m32 -nostdlib -fno-builtin -fno-pie
+CFLAGS  = -Iinclude -c -m32 -nostdlib -fno-builtin -fno-pie
 
 .PHONY: img run clean
 
@@ -26,7 +26,7 @@ boot/ipl.bin: boot/ipl.o
 boot/loader.bin: boot/loader.o
 	ld $^ -T boot/loader.ld -o $@
 
-kernel/init.bin: kernel/main.o kernel/func.o
+kernel/init.bin: kernel/main.o kernel/func.o kernel/dsctbl.o
 	ld $^ -T kernel/init.ld -o $@
 
 run: img
