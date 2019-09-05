@@ -56,8 +56,8 @@ entry:
     int     $0x10
 
 #   起動メッセージ表示
-    movw    $boot_msg,  %si
-    call    print
+#    movw    $boot_msg,  %si
+#    call    print
 
 # ディスク読み込み
 # 1枚のディスクは512バイトのセクタが1シリンダに18, 1ヘッドに80シリンダ、ヘッドが２ある
@@ -69,8 +69,8 @@ entry:
     movb    $0x00,      %dh   # ヘッド : 0
     movb    $0x02,      %cl   # セクタ : 2 (セクタ1はブートセクタを格納するため、2から)
 
-    movw    $load_msg,  %si
-    call    print
+#    movw    $load_msg,  %si
+#    call    print
 
 readloop:
     movw    $0x00,      %si   # 失敗回数をカウント
@@ -108,8 +108,8 @@ next:
     cmpb    $CYLS,      %ch   # 事前定義シリンダ数と比較
     jb      readloop          # 想定シリンダまで完了していなければ、readloop
 
-    movw    $done_msg,  %si
-    call    print
+#    movw    $done_msg,  %si
+#    call    print
 
     movb    $CYLS, (0x0ff0)
     jmp     0xc200
