@@ -7,8 +7,8 @@
 .text
 .code16
 
-    movw    $init_msg,  %si
-    call    print
+#    movw    $init_msg,  %si
+#    call    print
 
 keystatus:
     movb $0x02, %ah
