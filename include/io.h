@@ -7,6 +7,17 @@
 void io_hlt(void);
 
 /**
+ * STI(set interrupt flag) : 割り込み有効化
+ */
+void io_sti(void);
+
+/**
+  * 割り込み有効 + HLT
+  * STIとHLTの間の割り込みで取りこぼしを防ぐ
+ */
+void io_stihlt(void);
+
+/**
  * CLI(clear interrupt flag) : 割り込み命令無視
  */
 void io_cli(void);
@@ -29,9 +40,19 @@ void load_idtr(int limit, int addr);
 void outb_p(int port, int data);
 
 /**
+ * ポート指定でレジスタ読み込み
+ */
+int io_in(int port);
+
+/**
  * kernel/io.c
  * インラインアセンブラで書いているが後でまとめる
  */
-void outb(unsigned short port, unsigned char value);
+//void outb(unsigned short port, unsigned char value);
+
+/**
+ * 割り込みハンドラ
+ */
+void asm_handle_intr(void);
 
 #endif

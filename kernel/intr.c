@@ -1,5 +1,8 @@
-#include <pic.h>
+#include <intr.h>
 #include <io.h>
+
+#include <color.h>
+#include <console.h>
 
 /**
  * PIC(programmable interrupt controller) : 設定可能な割り込みコントロら
@@ -24,4 +27,20 @@ void init_pic() {
 
   outb_p(PIC0_IMR, 0xfb);    // PIC1以外すべて禁止
   outb_p(PIC1_IMR, 0xff);    // すべての割り込みを拒否
+}
+
+/**
+ * 割り込みハンドラ
+ * 入力をバッファに, 空き状態をフラグで保持
+ */
+void handle_intr(int *esp) {
+  //char data;
+  //outb_p(PIC0_OCW2, 0x61); // IRQ-01受付完了をPICに通知
+  //data = io_in(PORT_KEYDAT);
+  //if (keybuf.flag == 0) {
+  //  keybuf.data = data;
+  //  keybuf.flag = 1;
+  //}
+  char in[] = "keydown";
+  put_str(in, WHITE);
 }

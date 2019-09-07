@@ -1,6 +1,23 @@
 #ifndef MYOS_DSCTBL_H
 #define MYOS_DSCTBL_H
 
+/**
+ * IDTの属性設定
+ * 割り込み設定が有効であることを示す
+ */
+#define AR_INTGATE32  0x008e
+
+#define AR_DATA32_RW  0x4092
+#define AR_CODE32_ER  0x409a
+
+#define KRN_ADDR      0x00280000
+#define KRN_LIMIT     0x0007ffff
+
+#define GDT_ADDR      0x00270000
+#define GDT_LIMIT     0x0000ffff
+#define IDT_ADDR      0x0026f800
+#define IDT_LIMIT     0x000007ff
+
 struct SEGMENT_DESCRIPTOR {
   short limit_low;
   short base_low;
