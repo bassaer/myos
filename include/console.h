@@ -8,6 +8,6 @@ void move_cursor(unsigned int x, unsigned int y);
 void put_char_pos(char c, unsigned char x, unsigned char y, unsigned short color);
 void put_char(char c, unsigned short color);
 void put_str(char *str, unsigned short color);
-void init_screen();
+void init_console();
 
 #endif

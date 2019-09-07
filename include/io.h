@@ -4,9 +4,10 @@
 /**
  * kernel/func.s
  */
+void hlt(void);
 void load_gdtr(int limit, int addr);
 void load_idtr(int limit, int addr);
-void hlt(void);
+void outb_p(int port, int data);
 
 /**
  * kernel/io.c
