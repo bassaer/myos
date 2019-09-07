@@ -27,7 +27,7 @@ boot/loader.bin: boot/loader.o
 	ld $^ -T boot/loader.ld -o $@
 
 kernel/init.bin: kernel/main.o kernel/func.o kernel/dsctbl.o kernel/console.o
-	ld $^ -T kernel/init.ld -o $@
+	ld $^ -T kernel/init.ld -Map init.map -o $@
 
 run: img
 	qemu-system-i386 -localtime -fda ./$(IMG)
