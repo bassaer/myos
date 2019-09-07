@@ -1,6 +1,7 @@
-VER     = $(shell cat CHANGELOG.md | awk 'tolower($$0) ~/^\#\#\sversion\s.*/ {print $$3}')
-IMG     = myos-$(VER).img
-CFLAGS  = -Iinclude -c -m32 -fno-pie -nostdlib -fno-builtin
+VER      = $(shell cat CHANGELOG.md | awk 'tolower($$0) ~/^\#\#\sversion\s.*/ {print $$3}')
+IMG      = myos-$(VER).img
+CFLAGS   = -Iinclude -c -m32 -fno-pie -nostdlib -fno-builtin
+KERN_OBJ = kernel/main.o kernel/func.o kernel/dsctbl.o kernel/console.o kernel/io.o kernel/pic.o
 
 .PHONY: img run clean
 
@@ -26,7 +27,7 @@ boot/ipl.bin: boot/ipl.o
 boot/loader.bin: boot/loader.o
 	ld $^ -T boot/loader.ld -o $@
 
-kernel/kernel.bin: kernel/main.o kernel/func.o kernel/dsctbl.o kernel/console.o kernel/io.o
+kernel/kernel.bin: $(KERN_OBJ)
 	ld $^ -T kernel/kernel.ld -Map kernel.map -o $@
 
 run: img

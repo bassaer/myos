@@ -49,7 +49,7 @@ void put_str(char *str, unsigned short color) {
   }
 }
 
-void init_screen() {
+void init_console() {
   move_cursor(0, 0);
   char osname[6][34] = {
     "  __  ____   _____  ____       \n",
@@ -61,6 +61,6 @@ void init_screen() {
 
   int i;
   for (i = 0; i < 6; ++i) {
-    put_str(osname[i], WHITE);
+    put_str(osname[i], GRAY);
   }
 }

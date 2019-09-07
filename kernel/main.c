@@ -7,18 +7,19 @@
 |         |___/              |
 *---------------------------*/
 
-#include <dsctbl.h>
-#include <console.h>
 #include <color.h>
-
-void io_hlt(void);
+#include <console.h>
+#include <dsctbl.h>
+#include <io.h>
+#include <pic.h>
 
 void main(void) {
   init_gdtidt();
-  init_screen();
+  init_pic();
+  init_console();
   char prompt[] = ">";
   while(1) {
-    put_str(prompt, GRAY);
-    io_hlt();
+    put_str(prompt, GREEN);
+    hlt();
   }
 }
