@@ -1,5 +1,5 @@
-#ifndef MYOS_PIC_H
-#define MYOS_PIC_H
+#ifndef MYOS_INTR_H
+#define MYOS_INTR_H
 
 #define PIC0_ICW1 0x0020
 #define PIC0_OCW2 0x0020
@@ -14,6 +14,14 @@
 #define PIC1_ICW3 0x00a1
 #define PIC1_ICW4 0x00a1
 
+#define PORT_KEYDAT 0x0060
+
+struct KEYBUF {
+  char data;
+  unsigned char flag;
+} keybuf;
+
 void init_pic();
+void hanlde_intr(int *esp);
 
 #endif

@@ -2,22 +2,28 @@
 #include <io.h>
 
 void init_gdtidt() {
-  struct SEGMENT_DESCRIPTOR *gdt = (struct SEGMENT_DESCRIPTOR *) 0x00270000;
-  struct GATE_DESCRIPTOR    *idt = (struct GATE_DESCRIPTOR    *) 0x0026f800;
+  struct SEGMENT_DESCRIPTOR *gdt = (struct SEGMENT_DESCRIPTOR *) GDT_ADDR;
+  struct GATE_DESCRIPTOR    *idt = (struct GATE_DESCRIPTOR    *) IDT_ADDR;
 
   int i;
-  for (i = 0; i < 8192; i++) {
+  for (i = 0; i < GDT_LIMIT / 8; i++) {
     set_segmdesc(gdt + i, 0, 0 , 0);
   }
-  set_segmdesc(gdt + 1, 0xffffffff, 0x00000000, 0x4092);
-  set_segmdesc(gdt + 2, 0x0007ffff, 0x00280000, 0x409a);
-  load_gdtr(0xffff, 0x00270000);
+  set_segmdesc(gdt + 1, 0xffffffff, 0x00000000, AR_DATA32_RW);
+  set_segmdesc(gdt + 2, KRN_LIMIT, KRN_ADDR, AR_CODE32_ER);
+  load_gdtr(GDT_LIMIT, GDT_ADDR);
 
-  for (i = 0; i < 256; i++) {
+  for (i = 0; i < IDT_LIMIT / 8; i++) {
     set_gatedesc(idt + i, 0, 0, 0);
   }
-  load_idtr(0x7ff, 0x0026f800);
-  return;
+  load_idtr(IDT_LIMIT, IDT_ADDR);
+
+  // IDTの設定
+  // 2*8 -> 2番目のセグメント
+  // セグメント番号の下位3bitを0にするため8倍
+  // キーボードはIRQ1なのでINT 0x21
+  // 割り込み発生でasm_handle_intrをcall
+  set_gatedesc(idt + 0x21, (int)asm_handle_intr, 2 * 8, AR_INTGATE32);
 }
 
 void set_segmdesc(struct SEGMENT_DESCRIPTOR *sd, unsigned int limit, int base, int ar) {
@@ -31,7 +37,6 @@ void set_segmdesc(struct SEGMENT_DESCRIPTOR *sd, unsigned int limit, int base, i
   sd->access_right = ar & 0xff;
   sd->limit_high = ((limit >> 16) & 0x0f) | ((ar >> 8) & 0xf0);
   sd->base_high = (base >> 24) & 0x0ff;
-  return;
 }
 
 void set_gatedesc(struct GATE_DESCRIPTOR *gd, int offset, int selector, int ar) {
@@ -40,5 +45,4 @@ void set_gatedesc(struct GATE_DESCRIPTOR *gd, int offset, int selector, int ar) 
   gd->dw_count = (ar >> 8) & 0xff;
   gd->access_right = ar & 0xff;
   gd->offset_high = (offset >> 16) & 0xffff;
-  return;
 }

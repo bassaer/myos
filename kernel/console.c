@@ -11,10 +11,10 @@ void move_cursor(unsigned int x, unsigned int y) {
     cursor.x = x;
     cursor.y = y;
     unsigned short pos = y * COLUMNS + x;
-    outb(0x3D4, 14);
-    outb(0x3D5, pos >> 8);
-    outb(0x3D4, 15);
-    outb(0x3D5, pos);
+    outb_p(0x3D4, 14);
+    outb_p(0x3D5, pos >> 8);
+    outb_p(0x3D4, 15);
+    outb_p(0x3D5, pos);
 }
 
 void put_char_pos(char c, unsigned char x, unsigned char y, unsigned short color) {
