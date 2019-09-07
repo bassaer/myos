@@ -9,14 +9,16 @@
 
 #include <dsctbl.h>
 #include <console.h>
+#include <color.h>
 
 void io_hlt(void);
-void init_console();
 
 void main(void) {
   init_gdtidt();
   init_screen();
   char prompt[] = ">";
-  put_str(prompt);
-  while(1);
+  while(1) {
+    put_str(prompt, GRAY);
+    io_hlt();
+  }
 }
