@@ -45,8 +45,27 @@ void put_char(char c) {
 }
 
 void put_str(char *str) {
-  while(*str != '\0') {
+  while (*str != '\0') {
     put_char(*str);
     str++;
   }
+}
+
+void init_screen() {
+  move_cursor(0, 0);
+  char frame [] = "-----------------------------\n";
+  char osname[6][34] = {
+    "|  __  ____   _____  ____   |\n",
+    "| |  \\/  \\ \\ / / _ \\/ ___|  |\n",
+    "| | |\\/| |\\ V / | | \\___ \\  |\n",
+    "| | |  | | | || |_| |___) | |\n",
+    "| |_|  |_| |_| \\___/|____/  |\n"
+  };
+
+  int i;
+  put_str(frame);
+  for (i = 0; i < 6; ++i) {
+    put_str(osname[i]);
+  }
+  put_str(frame);
 }

@@ -11,11 +11,12 @@
 #include <console.h>
 
 void io_hlt(void);
+void init_console();
 
 void main(void) {
   init_gdtidt();
-  move_cursor(0, 0);
-  char str[] = "hello\nworld";
-  put_str(str);
+  init_screen();
+  char prompt[] = ">";
+  put_str(prompt);
   while(1);
 }
