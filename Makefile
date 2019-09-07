@@ -26,7 +26,7 @@ boot/ipl.bin: boot/ipl.o
 boot/loader.bin: boot/loader.o
 	ld $^ -T boot/loader.ld -o $@
 
-kernel/init.bin: kernel/main.o kernel/func.o kernel/dsctbl.o kernel/console.o
+kernel/init.bin: kernel/main.o kernel/func.o kernel/dsctbl.o kernel/console.o kernel/io.o
 	ld $^ -T kernel/init.ld -Map init.map -o $@
 
 run: img

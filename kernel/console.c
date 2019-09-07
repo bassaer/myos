@@ -1,14 +1,11 @@
 #include <console.h>
 #include <color.h>
+#include <io.h>
 
 struct {
   unsigned int x;
   unsigned int y;
 } cursor;
-
-void outb(unsigned short port, unsigned char value) {
-    asm volatile ("outb %1, %0" : : "dN" (port), "a" (value));
-}
 
 void move_cursor(unsigned int x, unsigned int y) {
     cursor.x = x;

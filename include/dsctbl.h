@@ -1,3 +1,6 @@
+#ifndef MYOS_DSCTBL_H
+#define MYOS_DSCTBL_H
+
 struct SEGMENT_DESCRIPTOR {
   short limit_low;
   short base_low;
@@ -21,4 +24,5 @@ void set_gatedesc(struct GATE_DESCRIPTOR *gd, int offset, int selector, int ar);
 
 void load_gdtr(int limit, int addr);
 void load_idtr(int limit, int addr);
-//void put_str(char *str);
+
+#endif
