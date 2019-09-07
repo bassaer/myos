@@ -1,5 +1,5 @@
 #include <dsctbl.h>
-
+#include <io.h>
 
 void init_gdtidt() {
   struct SEGMENT_DESCRIPTOR *gdt = (struct SEGMENT_DESCRIPTOR *) 0x00270000;

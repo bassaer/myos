@@ -10,15 +10,14 @@
 #include <dsctbl.h>
 #include <console.h>
 #include <color.h>
-
-void io_hlt(void);
+#include <io.h>
 
 void main(void) {
   init_gdtidt();
   init_screen();
   char prompt[] = ">";
   while(1) {
-    put_str(prompt, GRAY);
-    io_hlt();
+    put_str(prompt, GREEN);
+    hlt();
   }
 }

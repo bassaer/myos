@@ -61,6 +61,6 @@ void init_screen() {
 
   int i;
   for (i = 0; i < 6; ++i) {
-    put_str(osname[i], WHITE);
+    put_str(osname[i], GRAY);
   }
 }

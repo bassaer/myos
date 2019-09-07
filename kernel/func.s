@@ -1,11 +1,10 @@
 .code32
-.global io_hlt, load_gdtr, load_idtr
+.global hlt, load_gdtr, load_idtr
 .text
 
-
-io_hlt:
+hlt:
     hlt
-    jmp     io_hlt
+    jmp     hlt
 
 
 load_gdtr:
