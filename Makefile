@@ -30,7 +30,7 @@ kernel/init.bin: kernel/main.o kernel/func.o kernel/dsctbl.o kernel/console.o
 	ld $^ -T kernel/init.ld -Map init.map -o $@
 
 run: img
-	qemu-system-i386 -localtime -fda ./$(IMG)
+	qemu-system-i386 -name myos -localtime -fda ./$(IMG)
 
 clean:
 	find . \( -name '*.img' -or -name '*.bin' -or -name '*.o' \) | xargs rm -f

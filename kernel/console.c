@@ -1,4 +1,5 @@
 #include <console.h>
+#include <color.h>
 
 struct {
   unsigned int x;
@@ -19,13 +20,13 @@ void move_cursor(unsigned int x, unsigned int y) {
     outb(0x3D5, pos);
 }
 
-void put_char_pos(char c, unsigned char x, unsigned char y) {
+void put_char_pos(char c, unsigned char x, unsigned char y, unsigned short color) {
   unsigned char *pos;
   pos = (unsigned char *)(SCREEN_START + (((y * COLUMNS) + x) * 2));
-  *(unsigned short *)pos = (unsigned short)((COLOR << 8) | c);
+  *(unsigned short *)pos = (unsigned short)((color << 8) | c);
 }
 
-void put_char(char c) {
+void put_char(char c, unsigned short color) {
   switch(c) {
     case '\r':
       move_cursor(0, cursor.y);
@@ -34,7 +35,7 @@ void put_char(char c) {
       move_cursor(0, cursor.y + 1);
       break;
     default:
-      put_char_pos(c, cursor.x, cursor.y);
+      put_char_pos(c, cursor.x, cursor.y, color);
       if (cursor.x < COLUMNS - 1) {
         move_cursor(cursor.x + 1, cursor.y);
       } else {
@@ -44,28 +45,25 @@ void put_char(char c) {
   }
 }
 
-void put_str(char *str) {
+void put_str(char *str, unsigned short color) {
   while (*str != '\0') {
-    put_char(*str);
+    put_char(*str, color);
     str++;
   }
 }
 
 void init_screen() {
   move_cursor(0, 0);
-  char frame [] = "-----------------------------\n";
   char osname[6][34] = {
-    "|  __  ____   _____  ____   |\n",
-    "| |  \\/  \\ \\ / / _ \\/ ___|  |\n",
-    "| | |\\/| |\\ V / | | \\___ \\  |\n",
-    "| | |  | | | || |_| |___) | |\n",
-    "| |_|  |_| |_| \\___/|____/  |\n"
+    "  __  ____   _____  ____       \n",
+    " |  \\/  \\ \\ / / _ \\/ ___|  \n",
+    " | |\\/| |\\ V / | | \\___ \\  \n",
+    " | |  | | | || |_| |___) |     \n",
+    " |_|  |_| |_| \\___/|____/   \n\n"
   };
 
   int i;
-  put_str(frame);
   for (i = 0; i < 6; ++i) {
-    put_str(osname[i]);
+    put_str(osname[i], WHITE);
   }
-  put_str(frame);
 }
