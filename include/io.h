@@ -1,2 +1,6 @@
-#define outb(value, port)        \
-__asm__ ("outb %%al,%%dx"::"a" (value),"d" (port))
+#ifndef MYOS_IO_H
+#define MYOS_IO_H
+
+void outb(unsigned short port, unsigned char value);
+
+#endif

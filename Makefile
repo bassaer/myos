@@ -6,10 +6,10 @@ CFLAGS  = -Iinclude -c -m32 -fno-pie -nostdlib -fno-builtin
 
 all: img
 
-img: boot/ipl.bin boot/loader.bin kernel/init.bin
+img: boot/ipl.bin boot/loader.bin kernel/kernel.bin
 	mformat -f 1440 -C -B boot/ipl.bin -i $(IMG) ::
 	mcopy boot/loader.bin -i $(IMG) ::
-	mcopy kernel/init.bin -i $(IMG) ::
+	mcopy kernel/kernel.bin -i $(IMG) ::
 
 %.o: %.c
 	gcc $(CFLAGS) -o $@ $*.c
@@ -26,8 +26,8 @@ boot/ipl.bin: boot/ipl.o
 boot/loader.bin: boot/loader.o
 	ld $^ -T boot/loader.ld -o $@
 
-kernel/init.bin: kernel/main.o kernel/func.o kernel/dsctbl.o kernel/console.o
-	ld $^ -T kernel/init.ld -Map init.map -o $@
+kernel/kernel.bin: kernel/main.o kernel/func.o kernel/dsctbl.o kernel/console.o kernel/io.o
+	ld $^ -T kernel/kernel.ld -Map kernel.map -o $@
 
 run: img
 	qemu-system-i386 -name myos -localtime -fda ./$(IMG)
