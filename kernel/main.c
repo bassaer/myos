@@ -20,6 +20,6 @@ void main(void) {
   char prompt[] = ">";
   while(1) {
     put_str(prompt, GREEN);
-    hlt();
+    io_hlt();
   }
 }

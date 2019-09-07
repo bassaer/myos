@@ -1,10 +1,14 @@
 .code32
-.global hlt, load_gdtr, load_idtr, outb_p
+.global io_cli, io_hlt, load_gdtr, load_idtr, outb_p
 .text
 
-hlt:
+io_hlt:
     hlt
-    jmp     hlt
+    jmp     io_hlt
+
+io_cli:
+    cli
+    ret
 
 
 load_gdtr:
