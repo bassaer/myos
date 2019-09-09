@@ -58,6 +58,18 @@ pipelineflush:
     subl $512/4, %ecx
     call memcpy
 
+    movl $KERNEL, %ebx
+    movl $0x11a8, %ebx
+    addl  $3,      %ecx
+    shrl $2,      %ecx
+    jz   skip
+    movl $0x10c8, %edi
+    addl %ebx,     %esi
+    movl $0x00310000, %edi
+    call memcpy
+
+skip:
+    movl    $0x00310000,   %esp
     ljmpl   $2*8, $KERNEL
 
 waitkbout:
@@ -88,6 +100,7 @@ print:
 return:
     ret
 
+    .align  8
 GDT0:
     .skip   8, 0x00
     .word   0xffff, 0x0000, 0x9200, 0x00cf
@@ -101,4 +114,5 @@ GDTR0:
 init_msg:
     .string "second loader..\r\n"
 
+    .align  8
 kernel_entry:

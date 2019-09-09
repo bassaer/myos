@@ -1,13 +1,13 @@
 .code32
 .global io_cli, io_sti, io_stihlt, io_hlt
 .global load_gdtr, load_idtr, outb_p, io_in
-.global asm_handle_intr
-.extern handle_intr
+.global asm_handle_intr, asm_handle_intr27
+.extern handle_intr, handle_intr27
 .text
 
 io_hlt:
     hlt
-    jmp     io_hlt
+    ret
 
 io_sti:
     sti
@@ -49,17 +49,33 @@ io_in:
     ret
 
 asm_handle_intr:
-    pushw   %es
-    pushw   %ds
+    push    %es
+    push    %ds
     pusha
-    movl    %esp,       %eax
+    mov     %esp,       %eax
     push    %eax
-    movw    %ss,        %ax
-    movw    %ax,        %ds
-    movw    %ax,        %es
+    mov     %ss,        %ax
+    mov     %ax,        %ds
+    mov     %ax,        %es
     call    handle_intr
-    popl    %eax
+    pop     %eax
     popa
-    popw    %ds
-    popw    %es
+    pop     %ds
+    pop     %es
+    iret                        # 割り込み処理からの復帰
+
+asm_handle_intr27:
+    push    %es
+    push    %ds
+    pusha
+    mov     %esp,       %eax
+    push    %eax
+    mov     %ss,        %ax
+    mov     %ax,        %ds
+    mov     %ax,        %es
+    call    handle_intr27
+    pop     %eax
+    popa
+    pop     %ds
+    pop     %es
     iret
