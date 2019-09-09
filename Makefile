@@ -8,9 +8,9 @@ KERN_OBJ = kernel/main.o kernel/func.o kernel/dsctbl.o kernel/console.o kernel/i
 all: img
 
 img: boot/ipl.bin boot/loader.bin kernel/kernel.bin
+	cat boot/loader.bin kernel/kernel.bin > sys.bin
 	mformat -f 1440 -C -B boot/ipl.bin -i $(IMG) ::
-	mcopy boot/loader.bin -i $(IMG) ::
-	mcopy kernel/kernel.bin -i $(IMG) ::
+	mcopy sys.bin -i $(IMG) ::
 
 %.o: %.c
 	gcc $(CFLAGS) -o $@ $*.c
