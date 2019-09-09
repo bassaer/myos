@@ -12,8 +12,8 @@ void init_gdtidt() {
   // メモリ全体
   set_segmdesc(gdt + 1, 0xffffffff, 0x00000000, AR_DATA32_RW);
   // カーネル
-  //set_segmdesc(gdt + 2, KRN_LIMIT, KRN_ADDR, AR_CODE32_ER);
-  set_segmdesc(gdt + 2, 0xffffffff, 0x00000000, AR_CODE32_ER);
+  set_segmdesc(gdt + 2, KRN_LIMIT, KRN_ADDR, AR_CODE32_ER);
+  //set_segmdesc(gdt + 2, 0xffffffff, 0x00000000, AR_CODE32_ER);
   load_gdtr(GDT_LIMIT, GDT_ADDR);
 
   for (i = 0; i <= IDT_LIMIT / 8; i++) {
@@ -32,8 +32,8 @@ void init_gdtidt() {
 
 void set_segmdesc(struct SEGMENT_DESCRIPTOR *sd, unsigned int limit, int base, int ar) {
   if (limit > 0xfffff) {
-    ar |= 0x8000;
-    limit /= 0x1000;
+    ar |= 0x8000;    // Gビットフラグを1すると
+    limit /= 0x1000; // バイト単位 -> ページ単位に変更(4GBになる)
   }
   sd->limit_low = limit & 0xffff;
   sd->base_low = base & 0xffff;

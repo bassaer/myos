@@ -19,11 +19,14 @@ extern struct Queue key_queue;
 void main(void) {
   struct BOOTINFO *binfo = (struct BOOTINFO *)ADR_BOOTINFO;
   init_gdtidt();
+  show_status("OK", "GDT");
   init_pic();
+  show_status("OK", "PIC");
   io_sti();
-  init_console();
-  char prompt[] = ">";
+  char *prompt = ">";
   outb_p(PIC0_IMR, 0xf9);
+  show_status("OK", "Start MyOS");
+  init_console();
   while(1) {
     put_str(prompt, GREEN);
     io_cli();

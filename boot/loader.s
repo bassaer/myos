@@ -85,8 +85,8 @@ pipelineflush:
 
 # カーネルに移動
 skip:
-    movl    $0x00310000,    %esp
-    ljmpl   $2*8,           $KERNEL   # セグメント2(カーネル)に移動
+    movl    $0x00310000,    %esp   # スタック初期値
+    ljmpl   $2*8,           $0x00  # セグメント2(カーネル), 仮想アドレス0x00
 
 # キーボード制御回路が制御命令を受付可能になるまで待つ
 waitkbout:
@@ -111,7 +111,7 @@ memcpy:
 GDT0:
     .skip   8, 0x00                         # ヌルセレクタ
     .word   0xffff, 0x0000, 0x9200, 0x00cf  # 読み書き可能な32bit
-    .word   0xffff, 0x0000, 0x9a00, 0x00cf  # 実行可能なセグメント32bit, カーネル用
+    .word   0xffff, 0x0000, 0x9a28, 0x0047  # 実行可能なセグメント32bit, カーネル用
     .word   0x0000
 
 # LGDT命令でGDT0にGDTが存在することを示す

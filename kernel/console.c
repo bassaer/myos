@@ -50,17 +50,22 @@ void put_str(char *str, unsigned short color) {
 }
 
 void init_console() {
-  move_cursor(0, 0);
-  char osname[6][34] = {
-    "  __  ____   _____  ____       \n",
-    " |  \\/  \\ \\ / / _ \\/ ___|  \n",
-    " | |\\/| |\\ V / | | \\___ \\  \n",
-    " | |  | | | || |_| |___) |     \n",
-    " |_|  |_| |_| \\___/|____/   \n\n"
-  };
+  move_cursor(0, 3);
+  char *os =
+    "  __  __        ___  ____     \n"
+    " |  \\/  |_   _ / _ \\/ ___|  \n"
+    " | |\\/| | | | | | | \\___ \\ \n"
+    " | |  | | |_| | |_| |___) |   \n"
+    " |_|  |_|\\__, |\\___/|____/  \n"
+    "         |___/              \n\n";
 
-  int i;
-  for (i = 0; i < 6; ++i) {
-    put_str(osname[i], GRAY);
-  }
+  put_str(os, GRAY);
+}
+
+void show_status(char *status, char *msg) {
+  put_str("[", WHITE);
+  put_str(status, GREEN);
+  put_str("] ", WHITE);
+  put_str(msg, WHITE);
+  put_str("\n", WHITE);
 }
