@@ -6,14 +6,17 @@ void init_gdtidt() {
   struct GATE_DESCRIPTOR    *idt = (struct GATE_DESCRIPTOR    *) IDT_ADDR;
 
   int i;
-  for (i = 0; i < GDT_LIMIT / 8; i++) {
+  for (i = 0; i <= GDT_LIMIT / 8; i++) {
     set_segmdesc(gdt + i, 0, 0 , 0);
   }
+  // メモリ全体
   set_segmdesc(gdt + 1, 0xffffffff, 0x00000000, AR_DATA32_RW);
-  set_segmdesc(gdt + 2, KRN_LIMIT, KRN_ADDR, AR_CODE32_ER);
+  // カーネル
+  //set_segmdesc(gdt + 2, KRN_LIMIT, KRN_ADDR, AR_CODE32_ER);
+  set_segmdesc(gdt + 2, 0xffffffff, 0x00000000, AR_CODE32_ER);
   load_gdtr(GDT_LIMIT, GDT_ADDR);
 
-  for (i = 0; i < IDT_LIMIT / 8; i++) {
+  for (i = 0; i <= IDT_LIMIT / 8; i++) {
     set_gatedesc(idt + i, 0, 0, 0);
   }
   load_idtr(IDT_LIMIT, IDT_ADDR);
@@ -23,7 +26,8 @@ void init_gdtidt() {
   // セグメント番号の下位3bitを0にするため8倍
   // キーボードはIRQ1なのでINT 0x21
   // 割り込み発生でasm_handle_intrをcall
-  set_gatedesc(idt + 0x21, (int)asm_handle_intr, 2 * 8, AR_INTGATE32);
+  set_gatedesc(idt + 0x21, (int) asm_handle_intr, 2 * 8, AR_INTGATE32);
+  set_gatedesc(idt + 0x27, (int) asm_handle_intr27, 2 * 8, AR_INTGATE32);
 }
 
 void set_segmdesc(struct SEGMENT_DESCRIPTOR *sd, unsigned int limit, int base, int ar) {

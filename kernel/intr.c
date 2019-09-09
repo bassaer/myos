@@ -1,8 +1,11 @@
 #include <intr.h>
 #include <io.h>
+#include <queue.h>
 
 #include <color.h>
 #include <console.h>
+
+struct Queue key_queue;
 
 /**
  * PIC(programmable interrupt controller) : 設定可能な割り込みコントロら
@@ -34,13 +37,14 @@ void init_pic() {
  * 入力をバッファに, 空き状態をフラグで保持
  */
 void handle_intr(int *esp) {
-  //char data;
-  //outb_p(PIC0_OCW2, 0x61); // IRQ-01受付完了をPICに通知
-  //data = io_in(PORT_KEYDAT);
-  //if (keybuf.flag == 0) {
-  //  keybuf.data = data;
-  //  keybuf.flag = 1;
-  //}
-  char in[] = "keydown";
-  put_str(in, WHITE);
+  char data;
+  outb_p(PIC0_OCW2, 0x61); // IRQ-01受付完了をPICに通知
+  data = io_in(PORT_KEYDAT);
+  queue_put(&key_queue, data);
+}
+
+
+void handle_intr27(int *esp) {
+  outb_p(PIC0_OCW2, 0x67);
+  return;
 }

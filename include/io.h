@@ -54,5 +54,6 @@ int io_in(int port);
  * 割り込みハンドラ
  */
 void asm_handle_intr(void);
+void asm_handle_intr27(void);
 
 #endif
