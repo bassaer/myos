@@ -29,8 +29,8 @@ int queue_get(struct Queue *queue) {
     return -1;
   }
   int data = queue->buf[queue->next_r];
-  queue->next_r;
-  if (queue->next_r == queue->next_r) {
+  queue->next_r++;
+  if (queue->next_r == queue->size) {
     queue->next_r = 0;
   }
   queue->free++;

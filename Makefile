@@ -1,6 +1,6 @@
 VER      = $(shell cat CHANGELOG.md | awk 'tolower($$0) ~/^\#\#\sversion\s.*/ {print $$3}')
 IMG      = myos-$(VER).img
-CFLAGS   = -Iinclude -I/usr/include -c -m32 -fno-pie -fno-builtin -nostdlib
+CFLAGS   = -c -m32 -Wall -Iinclude -fno-pie -fno-builtin -nostdlib
 KERN_OBJ = kernel/main.o \
            kernel/func.o \
            kernel/dsctbl.o \
@@ -37,7 +37,7 @@ kernel/kernel.bin: $(KERN_OBJ)
 	ld $^ -T kernel/kernel.ld -Map kernel.map -o $@
 
 run: img
-	qemu-system-i386 -name myos -localtime -fda ./$(IMG)
+	qemu-system-i386 -name myos -localtime -monitor stdio -fda ./$(IMG)
 
 clean:
 	find . \( -name '*.img' -or -name '*.bin' -or -name '*.o' \) | xargs rm -f
