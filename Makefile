@@ -1,7 +1,13 @@
 VER      = $(shell cat CHANGELOG.md | awk 'tolower($$0) ~/^\#\#\sversion\s.*/ {print $$3}')
 IMG      = myos-$(VER).img
-CFLAGS   = -Iinclude -c -m32 -fno-pie -fno-builtin -nostdlib
-KERN_OBJ = kernel/main.o kernel/func.o kernel/dsctbl.o kernel/console.o kernel/intr.o kernel/queue.o
+CFLAGS   = -Iinclude -I/usr/include -c -m32 -fno-pie #-fno-builtin -nostdlib
+KERN_OBJ = kernel/main.o \
+           kernel/func.o \
+           kernel/dsctbl.o \
+           kernel/console.o \
+           kernel/intr.o \
+           kernel/queue.o \
+           kernel/keyboard.o
 
 .PHONY: img run clean
 
@@ -9,7 +15,7 @@ all: img
 
 img: boot/ipl.bin boot/loader.bin kernel/kernel.bin
 	cat boot/loader.bin kernel/kernel.bin > sys.bin
-	mformat -f 1440 -C -B boot/ipl.bin -i $(IMG) ::
+	mformat -f 1440 -C -B boot/ipl.bin -i $(IMG)
 	mcopy sys.bin -i $(IMG) ::
 
 %.o: %.c

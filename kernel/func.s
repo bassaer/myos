@@ -2,7 +2,7 @@
 .global io_cli, io_sti, io_stihlt, io_hlt
 .global load_gdtr, load_idtr, outb_p, io_in
 .global asm_handle_intr, asm_handle_intr27
-.extern handle_intr, handle_intr27
+.extern handle_keyboard, handle_intr27
 .text
 
 io_hlt:
@@ -57,7 +57,7 @@ asm_handle_intr:
     mov     %ss,        %ax
     mov     %ax,        %ds
     mov     %ax,        %es
-    call    handle_intr
+    call    handle_keyboard
     pop     %eax
     popa
     pop     %ds

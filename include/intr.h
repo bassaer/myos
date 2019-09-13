@@ -14,15 +14,6 @@
 #define PIC1_ICW3     0x00a1
 #define PIC1_ICW4     0x00a1
 
-#define PORT_KEYDAT   0x0060
-
-struct KEYBUF {
-  char data;
-  unsigned char flag;
-} keybuf;
-
 void init_pic();
-void handle_intr(int *esp);
-void handle_intr27(int *esp);
 
 #endif
