@@ -18,8 +18,7 @@
 
 extern struct Queue key_queue;
 
-void main(void) {
-  struct BOOTINFO *binfo = (struct BOOTINFO *)ADR_BOOTINFO;
+int main(void) {
   init_gdtidt();
   show_status("OK", "GDT");
   init_pic();
@@ -42,4 +41,5 @@ void main(void) {
     }
     io_hlt();
   }
+  return 0;
 }
