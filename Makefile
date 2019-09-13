@@ -1,6 +1,6 @@
 VER      = $(shell cat CHANGELOG.md | awk 'tolower($$0) ~/^\#\#\sversion\s.*/ {print $$3}')
 IMG      = myos-$(VER).img
-CFLAGS   = -Iinclude -I/usr/include -c -m32 -fno-pie #-fno-builtin -nostdlib
+CFLAGS   = -Iinclude -I/usr/include -c -m32 -fno-pie -fno-builtin -nostdlib
 KERN_OBJ = kernel/main.o \
            kernel/func.o \
            kernel/dsctbl.o \
