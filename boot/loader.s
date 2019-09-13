@@ -26,7 +26,6 @@ keystatus:
     call    waitkbout
     movb    $0xdf,          %al       # AT20をON
     outb    %al,            $0x60
-    cli
     call    waitkbout
 
 # プロテクトモード移行
@@ -105,11 +104,11 @@ memcpy:
     jnz     memcpy
     ret
 
-    .align  8                         # GDT0ラベルが8の倍数になるようにゼロ埋め
+    .align  8                      # GDT0ラベルが8の倍数になるようにゼロ埋め
 
 # 暫定GDT
 GDT0:
-    .skip   8, 0x00                         # ヌルセレクタ
+    .skip   8,      0x00                    # ヌルセレクタ
     .word   0xffff, 0x0000, 0x9200, 0x00cf  # 読み書き可能な32bit
     .word   0xffff, 0x0000, 0x9a28, 0x0047  # 実行可能なセグメント32bit, カーネル用
     .word   0x0000
@@ -119,7 +118,7 @@ GDTR0:
     .word   8*3-1
     .int    GDT0
 
-    .align  8
+    .align 8
 
 # ２次ブートローダのあとにカーネルを配置
 kernel_entry:

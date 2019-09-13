@@ -55,10 +55,6 @@ entry:
     movw    $0x0003,    %ax
     int     $0x10
 
-#   起動メッセージ表示
-#    movw    $boot_msg,  %si
-#    call    print
-
 # ディスク読み込み
 # 1枚のディスクは512バイトのセクタが1シリンダに18, 1ヘッドに80シリンダ、ヘッドが２ある
 # 512 x 18 x 80 x 2 = 1440 KB
@@ -68,9 +64,6 @@ entry:
     movb    $0x00,      %ch   # シリンダ : 0
     movb    $0x00,      %dh   # ヘッド : 0
     movb    $0x02,      %cl   # セクタ : 2 (セクタ1はブートセクタを格納するため、2から)
-
-#    movw    $load_msg,  %si
-#    call    print
 
 readloop:
     movw    $0x00,      %si   # 失敗回数をカウント
@@ -108,41 +101,15 @@ next:
     cmpb    $CYLS,      %ch   # 事前定義シリンダ数と比較
     jb      readloop          # 想定シリンダまで完了していなければ、readloop
 
-#    movw    $done_msg,  %si
-#    call    print
-
-    movb    $CYLS, (0x0ff0)
+    movb    $CYLS,      (0x0ff0)
     jmp     0xc200
 
 fin:
     hlt
     jmp fin
 
-print:
-    movb    (%si),      %al
-    add     $1,         %si
-    cmpb    $0,         %al
-    je      return
-    movb    $0x0e,      %ah
-    movw    $15,        %bx
-    int     $0x10
-    jmp     print
-
-return:
-    ret
-
 error:
     movw    $err_msg,       %si
-
-boot_msg:
-    .string "Booting MyOS...\r\n"
-
-load_msg:
-    .string "Loading from disk...\r\n"
-
-done_msg:
-    .ascii "Finished Loading data!\r\n"
-    .byte  0
 
 err_msg:
     .string "load error\r\n"

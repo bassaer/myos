@@ -7,11 +7,13 @@
 |         |___/              |
 *---------------------------*/
 #include <main.h>
+
 #include <color.h>
 #include <console.h>
 #include <dsctbl.h>
 #include <intr.h>
 #include <io.h>
+#include <keyboard.h>
 #include <queue.h>
 
 extern struct Queue key_queue;
@@ -25,7 +27,8 @@ void main(void) {
   io_sti();
   char *prompt = ">";
   outb_p(PIC0_IMR, 0xf9);
-  show_status("OK", "Start MyOS");
+  init_keyboard();
+  show_status("OK", "Keyboad");
   init_console();
   while(1) {
     put_str(prompt, GREEN);
