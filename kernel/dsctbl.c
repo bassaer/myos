@@ -1,7 +1,6 @@
 #include <dsctbl.h>
 #include <io.h>
 #include <console.h>
-#include <stdio.h>
 
 void init_gdtidt() {
   struct SEGMENT_DESCRIPTOR *gdt = (struct SEGMENT_DESCRIPTOR *) GDT_ADDR;
