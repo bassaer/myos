@@ -15,6 +15,8 @@ struct KEYBUF {
   unsigned char flag;
 } keybuf;
 
+void get_key(char *key, unsigned char code);
+
 void wait_keyboard();
 void init_keyboard(struct Queue *q);
 
