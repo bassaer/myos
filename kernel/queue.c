@@ -1,6 +1,6 @@
 #include <queue.h>
 
-void init_queue(struct Queue *queue, int size, unsigned char *buf) {
+void init_queue(struct Queue *queue, int size, char *buf) {
   queue->size = size;
   queue->buf = buf;
   queue->free = size;
@@ -9,7 +9,7 @@ void init_queue(struct Queue *queue, int size, unsigned char *buf) {
   queue->next_r = 0;
 }
 
-int enqueue(struct Queue *queue, unsigned char data) {
+int enqueue(struct Queue *queue, char data) {
   if (queue->free == 0) {
     queue->flags |= FLAGS_OVERRUN;
     return -1;
@@ -23,18 +23,18 @@ int enqueue(struct Queue *queue, unsigned char data) {
   return 0;
 }
 
-int dequeue(struct Queue *queue) {
+int dequeue(struct Queue *queue, char *data) {
   if (queue->free == queue->size) {
     // バッファが空
     return -1;
   }
-  int data = queue->buf[queue->next_r];
+  *data = queue->buf[queue->next_r];
   queue->next_r++;
   if (queue->next_r == queue->size) {
     queue->next_r = 0;
   }
   queue->free++;
-  return data;
+  return 0;
 }
 
 int queue_status(struct Queue *queue) {
