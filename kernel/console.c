@@ -25,6 +25,8 @@ void put_char_pos(char c, unsigned char x, unsigned char y, unsigned short color
 
 void put_char(char c, unsigned short color) {
   switch(c) {
+    case '\0':
+      break;
     case '\r':
       move_cursor(0, cursor.y);
       break;
