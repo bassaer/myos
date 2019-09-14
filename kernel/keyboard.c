@@ -35,7 +35,7 @@ void init_keyboard(struct Queue *q) {
 void handle_keyboard(int *esp) {
   outb_p(PIC0_OCW2, 0x61); // IRQ-01受付完了をPICに通知
   unsigned char data = io_in(PORT_KEYDAT);
-  queue_put(queue, data);
+  enqueue(queue, data);
 }
 
 

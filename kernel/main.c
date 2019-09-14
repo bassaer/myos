@@ -42,7 +42,7 @@ int main(void) {
     if (queue_status(&queue) == 0) {
       io_stihlt(); // 割り込み有効化 + HLT
     } else {
-      int input = queue_get(&queue);
+      int input = dequeue(&queue);
       io_sti(); // 割り込み有効化
       if (input == 0x1e) {
         put_str("A\n", GRAY);
