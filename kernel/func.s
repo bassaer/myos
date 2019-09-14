@@ -1,7 +1,7 @@
 .code32
 .global io_cli, io_sti, io_stihlt, io_hlt
 .global load_gdtr, load_idtr, outb_p, io_in
-.global asm_handle_intr, asm_handle_intr27
+.global asm_handle_intr, asm_handle_intr27, foobar
 .extern handle_keyboard, handle_intr27
 .text
 
@@ -27,7 +27,6 @@ load_gdtr:
     movw    %ax,        6(%esp)
     lgdt    6(%esp)
     ret
-
 
 load_idtr:
     movw    4(%esp),    %ax
@@ -79,3 +78,7 @@ asm_handle_intr27:
     pop     %ds
     pop     %es
     iret
+
+foobar:
+    movl $0x07690748,0xb8000
+    ret

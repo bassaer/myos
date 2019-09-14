@@ -3,7 +3,10 @@
 #include <intr.h>
 #include <queue.h>
 
-struct Queue key_queue;
+#include <console.h>
+#include <color.h>
+
+struct Queue *queue;
 
 /**
  * キーボードコントローラがデータ送信可能になるまで待つ
@@ -17,7 +20,8 @@ void wait_keyboard() {
 }
 
 
-void init_keyboard() {
+void init_keyboard(struct Queue *q) {
+  queue = q;
   wait_keyboard();
   outb_p(PORT_KEYCMD, KEYCMD_WRITE);
   wait_keyboard();
@@ -29,10 +33,9 @@ void init_keyboard() {
  * 入力をバッファに, 空き状態をフラグで保持
  */
 void handle_keyboard(int *esp) {
-  char data;
   outb_p(PIC0_OCW2, 0x61); // IRQ-01受付完了をPICに通知
-  data = io_in(PORT_KEYDAT);
-  queue_put(&key_queue, data);
+  unsigned char data = io_in(PORT_KEYDAT);
+  queue_put(queue, data);
 }
 
 

@@ -28,10 +28,10 @@ img: boot/ipl.bin boot/loader.bin kernel/kernel.bin
 	as --32 -o $@ $<
 
 boot/ipl.bin: boot/ipl.o
-	ld $^ -T boot/ipl.ld -o $@
+	ld $^ -T boot/ipl.ld -Map ipl.map -o $@
 
 boot/loader.bin: boot/loader.o
-	ld $^ -T boot/loader.ld -o $@
+	ld $^ -T boot/loader.ld -Map loader.map -o $@
 
 kernel/kernel.bin: $(KERN_OBJ)
 	ld $^ -T kernel/kernel.ld -Map kernel.map -o $@
@@ -40,7 +40,7 @@ run: img
 	qemu-system-i386 -name myos -localtime -monitor stdio -fda ./$(IMG)
 
 clean:
-	find . \( -name '*.img' -or -name '*.bin' -or -name '*.o' \) | xargs rm -f
+	find . \( -name '*.img' -or -name '*.bin' -or -name '*.o' -or -name '*.map' \) | xargs rm -f
 
 # Makefile memo
 # B=$(A:%.bin=%.o) -> A=aaa.binのとき B=aaa.o となる

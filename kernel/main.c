@@ -16,30 +16,40 @@
 #include <keyboard.h>
 #include <queue.h>
 
-extern struct Queue key_queue;
 
 int main(void) {
   init_gdtidt();
   show_status("OK", "GDT");
+
   init_pic();
   show_status("OK", "PIC");
+
   io_sti();
-  char *prompt = ">";
   outb_p(PIC0_IMR, 0xf9);
-  init_keyboard();
+
+  struct Queue queue;
+  unsigned char keybuf[32];
+  init_queue(&queue, 32, keybuf);
+  init_keyboard(&queue);
   show_status("OK", "Keyboad");
+
   init_console();
+  char *prompt = ">";
+  put_str(prompt, GREEN);
+
   while(1) {
-    put_str(prompt, GREEN);
-    io_cli();
-    if (queue_status(&key_queue) == 0) {
-      io_stihlt();
+    io_cli(); // 割り込み無効化
+    if (queue_status(&queue) == 0) {
+      io_stihlt(); // 割り込み有効化 + HLT
     } else {
-      int input = queue_get(&key_queue);
-      io_sti();
-      put_char((char)input, WHITE);
+      int input = queue_get(&queue);
+      io_sti(); // 割り込み有効化
+      if (input == 0x1e) {
+        put_str("A\n", GRAY);
+      } else {
+        put_str("NOT A\n", GRAY);
+      }
     }
-    io_hlt();
   }
   return 0;
 }

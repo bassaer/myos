@@ -56,4 +56,6 @@ int io_in(int port);
 void asm_handle_intr(void);
 void asm_handle_intr27(void);
 
+void foobar(void);
+
 #endif

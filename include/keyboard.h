@@ -8,13 +8,15 @@
 #define KEYCMD_WRITE      0x60
 #define KBC_MODE          0x47
 
+#include <queue.h>
+
 struct KEYBUF {
   char data;
   unsigned char flag;
 } keybuf;
 
 void wait_keyboard();
-void init_keyboard();
+void init_keyboard(struct Queue *q);
 
 void handle_intr(int *esp);
 void handle_intr27(int *esp);

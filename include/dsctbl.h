@@ -22,17 +22,17 @@ struct SEGMENT_DESCRIPTOR {
   short limit_low;
   short base_low;
   char base_mid;
-  char base_high;
   char access_right;
   char limit_high;
+  char base_high;
 };
 
 struct GATE_DESCRIPTOR {
   short offset_low;
-  short offset_high;
   short selector;
   char dw_count;
   char access_right;
+  short offset_high;
 };
 
 void init_gdtidt();
