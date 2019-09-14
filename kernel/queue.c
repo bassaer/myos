@@ -9,7 +9,7 @@ void init_queue(struct Queue *queue, int size, unsigned char *buf) {
   queue->next_r = 0;
 }
 
-int queue_put(struct Queue *queue, unsigned char data) {
+int enqueue(struct Queue *queue, unsigned char data) {
   if (queue->free == 0) {
     queue->flags |= FLAGS_OVERRUN;
     return -1;
@@ -23,7 +23,7 @@ int queue_put(struct Queue *queue, unsigned char data) {
   return 0;
 }
 
-int queue_get(struct Queue *queue) {
+int dequeue(struct Queue *queue) {
   if (queue->free == queue->size) {
     // バッファが空
     return -1;

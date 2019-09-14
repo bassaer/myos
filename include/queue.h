@@ -14,9 +14,9 @@ struct Queue {
 
 void init_queue(struct Queue *queue, int size, unsigned char *buf);
 
-int queue_put(struct Queue *queue, unsigned char data);
+int enqueue(struct Queue *queue, unsigned char data);
 
-int queue_get(struct Queue *queue);
+int dequeue(struct Queue *queue);
 
 int queue_status(struct Queue *queue);
 
