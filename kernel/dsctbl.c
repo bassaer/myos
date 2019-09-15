@@ -13,8 +13,7 @@ void init_gdtidt() {
   // メモリ全体
   set_segmdesc(gdt + 1, 0xffffffff, 0x00000000, AR_DATA32_RW);
   // カーネル
-  //set_segmdesc(gdt + 2, KRN_LIMIT, KRN_ADDR, AR_CODE32_ER);
-  set_segmdesc(gdt + 2, 0xffffffff, 0x00000000, AR_CODE32_ER);
+  set_segmdesc(gdt + 2, KERN_LIMIT, KERN_ADDR, AR_CODE32_ER);
   load_gdtr(GDT_LIMIT, GDT_ADDR);
 
   for (i = 0; i <= IDT_LIMIT / 8; i++) {
