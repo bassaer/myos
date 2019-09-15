@@ -10,8 +10,8 @@
 #define AR_DATA32_RW  0x4092
 #define AR_CODE32_ER  0x409a
 
-#define KRN_ADDR      0x00280000
-#define KRN_LIMIT     0x0007ffff
+#define KERN_ADDR     0x00000000
+#define KERN_LIMIT    0xffffffff
 
 #define GDT_ADDR      0x00270000
 #define GDT_LIMIT     0x0000ffff
