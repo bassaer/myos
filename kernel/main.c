@@ -16,6 +16,9 @@
 #include <keyboard.h>
 #include <queue.h>
 
+#define KEYBUF_LIMIT   32
+#define CMD_LIMIT      256
+
 
 int main(void) {
   init_gdtidt();
@@ -28,14 +31,13 @@ int main(void) {
   outb_p(PIC0_IMR, 0xf9);
 
   struct Queue queue;
-  char keybuf[32];
-  init_queue(&queue, 32, keybuf);
+  char keybuf[KEYBUF_LIMIT];
+  init_queue(&queue, KEYBUF_LIMIT, keybuf);
   init_keyboard(&queue);
   show_status("OK", "Keyboad");
 
-  init_console();
-  char *prompt = ">";
-  put_str(prompt, GREEN);
+  char cmdline[CMD_LIMIT];
+  init_console(&cmdline, CMD_LIMIT);
 
   while(1) {
     io_cli(); // 割り込み無効化
@@ -45,7 +47,7 @@ int main(void) {
       char key;
       dequeue(&queue, &key);
       io_sti(); // 割り込み有効化
-      put_char(key, GRAY);
+      input_key(key);
     }
   }
   return 0;

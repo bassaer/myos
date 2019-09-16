@@ -1,11 +1,25 @@
 #include <console.h>
 #include <color.h>
 #include <io.h>
+#include <util.h>
+
+#define PROMPT        "> "
+
+#define EXIT_SUCCESS  0
+#define EXIT_FAILURE  1
 
 struct {
   unsigned int x;
   unsigned int y;
 } cursor;
+
+struct {
+  char *buf;
+  int size;
+  int index;
+} entry;
+
+int exit_status = EXIT_SUCCESS;
 
 void move_cursor(unsigned int x, unsigned int y) {
     cursor.x = x;
@@ -51,7 +65,11 @@ void put_str(char *str, unsigned short color) {
   }
 }
 
-void init_console() {
+void init_console(char *buf, int size) {
+  entry.buf = buf;
+  entry.size = size;
+  entry.index = 0;
+
   move_cursor(0, 3);
   char *os =
     "  __  __        ___  ____     \n"
@@ -62,6 +80,8 @@ void init_console() {
     "         |___/              \n\n";
 
   put_str(os, GRAY);
+
+  put_str(PROMPT, GREEN);
 }
 
 void show_status(char *status, char *msg) {
@@ -70,4 +90,45 @@ void show_status(char *status, char *msg) {
   put_str("] ", WHITE);
   put_str(msg, WHITE);
   put_str("\n", WHITE);
+}
+
+void input_key(char key) {
+  if (key == '\0') {
+    return;
+  }
+  if (key == '\n') {
+    exec_cmd();
+    newline();
+    return;
+  }
+  if (entry.size <= entry.index + 1) {
+    // 入力サイズオーバー
+    // 終端文字も含めるため+1
+    return;
+  }
+  entry.buf[entry.index] = key;
+  entry.index++;
+  put_char(key, GRAY);
+}
+
+void newline() {
+  move_cursor(0, cursor.y + 1);
+  if (exit_status == EXIT_SUCCESS) {
+    put_str(PROMPT, GREEN);
+  } else {
+    put_str(PROMPT, RED);
+  }
+}
+
+void exec_cmd() {
+  move_cursor(0, cursor.y + 1);
+  entry.buf[entry.index] = '\0';
+  if (strcmp(entry.buf, "echo") == 0) {
+    put_str(entry.buf, GRAY);
+    exit_status = EXIT_SUCCESS;
+  } else {
+    put_str("command not found", GRAY);
+    exit_status = EXIT_FAILURE;
+  }
+  entry.index = 0;
 }

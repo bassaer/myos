@@ -7,7 +7,8 @@ KERN_OBJ = kernel/main.o \
            kernel/console.o \
            kernel/intr.o \
            kernel/queue.o \
-           kernel/keyboard.o
+           kernel/keyboard.o \
+           kernel/util.o
 
 .PHONY: img run clean
 
