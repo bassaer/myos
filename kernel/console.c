@@ -1,9 +1,12 @@
 #include <console.h>
 #include <color.h>
 #include <io.h>
-#include<util.h>
+#include <util.h>
 
-#define PROMPT "> "
+#define PROMPT        "> "
+
+#define EXIT_SUCCESS  0
+#define EXIT_FAILURE  1
 
 struct {
   unsigned int x;
@@ -15,6 +18,8 @@ struct {
   int size;
   int index;
 } entry;
+
+int exit_status = EXIT_SUCCESS;
 
 void move_cursor(unsigned int x, unsigned int y) {
     cursor.x = x;
@@ -108,7 +113,11 @@ void input_key(char key) {
 
 void newline() {
   move_cursor(0, cursor.y + 1);
-  put_str(PROMPT, GREEN);
+  if (exit_status == EXIT_SUCCESS) {
+    put_str(PROMPT, GREEN);
+  } else {
+    put_str(PROMPT, RED);
+  }
 }
 
 void exec_cmd() {
@@ -116,8 +125,10 @@ void exec_cmd() {
   entry.buf[entry.index] = '\0';
   if (strcmp(entry.buf, "echo") == 0) {
     put_str(entry.buf, GRAY);
+    exit_status = EXIT_SUCCESS;
   } else {
     put_str("command not found", GRAY);
+    exit_status = EXIT_FAILURE;
   }
   entry.index = 0;
 }
