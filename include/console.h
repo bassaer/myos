@@ -10,5 +10,8 @@ void put_char(char c, unsigned short color);
 void put_str(char *str, unsigned short color);
 void init_console();
 void show_status(char *status, char *msg);
+void input_key(char key);
+void newline();
+void exec_cmd();
 
 #endif
