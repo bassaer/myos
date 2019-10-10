@@ -118,17 +118,28 @@ void newline() {
   } else {
     put_str(PROMPT, RED);
   }
+  entry.index = 0;
+  entry.buf[entry.index] = '\0';
 }
 
 void exec_cmd() {
   move_cursor(0, cursor.y + 1);
   entry.buf[entry.index] = '\0';
-  if (strcmp(entry.buf, "echo") == 0) {
-    put_str(entry.buf, GRAY);
+  char *args[entry.size];
+  // スペースで分割し、コマンドを取得
+  int split_count = split(entry.buf, args, ' ');
+  if (split_count != 2) {
+    put_str("command not found", GRAY);
+    exit_status = EXIT_FAILURE;
+    return;
+  }
+  char *cmd = args[0];
+  char *arg = args[1];
+  if (strcmp(cmd, "echo") == 0) {
+    put_str(arg, GRAY);
     exit_status = EXIT_SUCCESS;
   } else {
     put_str("command not found", GRAY);
     exit_status = EXIT_FAILURE;
   }
-  entry.index = 0;
 }

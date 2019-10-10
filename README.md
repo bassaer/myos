@@ -10,4 +10,4 @@
 ❯ make run
 ```
 
-![screenshot](https://github.com/bassaer/myos/blob/master/screenshot.png)
+![screenshot](https://github.com/bassaer/myos/blob/master/screen.gif)
