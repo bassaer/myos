@@ -6,4 +6,9 @@
  */
 int strcmp(char *first, char *second);
 
+/**
+ * 指定文字で分割し、分割数を返す
+ */
+int split(char *src, char *dst[], char delim);
+
 #endif
