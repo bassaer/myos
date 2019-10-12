@@ -13,6 +13,7 @@ void init_console();
 void show_status(char *status, char *msg);
 void input_code(unsigned char code);
 void input_key(char key);
+void backspace();
 void newline();
 void exec_cmd();
 
