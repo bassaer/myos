@@ -31,7 +31,7 @@ int main(void) {
   outb_p(PIC0_IMR, 0xf9);
 
   struct Queue queue;
-  char keybuf[KEYBUF_LIMIT];
+  unsigned char keybuf[KEYBUF_LIMIT];
   init_queue(&queue, KEYBUF_LIMIT, keybuf);
   init_keyboard(&queue);
   show_status("OK", "Keyboad");
@@ -44,10 +44,10 @@ int main(void) {
     if (queue_status(&queue) == 0) {
       io_stihlt(); // 割り込み有効化 + HLT
     } else {
-      char key;
-      dequeue(&queue, &key);
+      unsigned char code;
+      dequeue(&queue, &code);
       io_sti(); // 割り込み有効化
-      input_key(key);
+      input_code(code);
     }
   }
   return 0;

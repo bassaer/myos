@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## ver 1.1.0
+- support backspace key
+
 ## ver 1.0.0
 - first stable release
 

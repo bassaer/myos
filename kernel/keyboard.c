@@ -8,19 +8,6 @@
 
 struct Queue *queue;
 
-static char keytable[0x54] = {
-  0,   0,   '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '^', 0,   0,
-  'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '@', '[', '\n',   0,   'a', 's',
-  'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', ':', 0,   0,   ']', 'z', 'x', 'c', 'v',
-  'b', 'n', 'm', ',', '.', '/', 0,   '*', 0,   ' ', 0,   0,   0,   0,   0,   0,
-  0,   0,   0,   0,   0,   0,   0,   '7', '8', '9', '-', '4', '5', '6', '+', '1',
-  '2', '3', '0', '.'
-};
-
-void get_key(char *key, unsigned char code) {
-  *key = keytable[code];
-}
-
 /**
  * キーボードコントローラがデータ送信可能になるまで待つ
  */
@@ -31,7 +18,6 @@ void wait_keyboard() {
     }
   }
 }
-
 
 void init_keyboard(struct Queue *q) {
   queue = q;
@@ -48,9 +34,7 @@ void init_keyboard(struct Queue *q) {
 void handle_keyboard(int *esp) {
   outb_p(PIC0_OCW2, 0x61); // IRQ-01受付完了をPICに通知
   unsigned char code = io_in(PORT_KEYDAT);
-  char key;
-  get_key(&key, code);
-  enqueue(queue, key);
+  enqueue(queue, code);
 }
 
 void handle_intr27(int *esp) {

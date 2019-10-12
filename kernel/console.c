@@ -3,7 +3,7 @@
 #include <io.h>
 #include <util.h>
 
-#define PROMPT        "> "
+#define PROMPT        "myos> "
 
 #define EXIT_SUCCESS  0
 #define EXIT_FAILURE  1
@@ -20,6 +20,20 @@ struct {
 } entry;
 
 int exit_status = EXIT_SUCCESS;
+int char_color = GRAY;
+
+static unsigned char keytable[0x54] = {
+  0,   0,   '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '^', 0,   0,
+  'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '@', '[', '\n',   0,   'a', 's',
+  'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', ':', 0,   0,   ']', 'z', 'x', 'c', 'v',
+  'b', 'n', 'm', ',', '.', '/', 0,   '*', 0,   ' ', 0,   0,   0,   0,   0,   0,
+  0,   0,   0,   0,   0,   0,   0,   '7', '8', '9', '-', '4', '5', '6', '+', '1',
+  '2', '3', '0', '.'
+};
+
+void get_key(char *key, unsigned char code) {
+  *key = keytable[code];
+}
 
 void move_cursor(unsigned int x, unsigned int y) {
     cursor.x = x;
@@ -79,7 +93,7 @@ void init_console(char *buf, int size) {
     " |_|  |_|\\__, |\\___/|____/  \n"
     "         |___/              \n\n";
 
-  put_str(os, GRAY);
+  put_str(os, char_color);
 
   put_str(PROMPT, GREEN);
 }
@@ -92,12 +106,26 @@ void show_status(char *status, char *msg) {
   put_str("\n", WHITE);
 }
 
+void input_code(unsigned char code) {
+  char key;
+  switch(code) {
+  case 0x0E:
+    backspace();
+    break;
+  default:
+    get_key(&key, code);
+    input_key(key);
+  }
+}
+
 void input_key(char key) {
   if (key == '\0') {
     return;
   }
   if (key == '\n') {
-    exec_cmd();
+    if (entry.index > 0) {
+      exec_cmd();
+    }
     newline();
     return;
   }
@@ -108,7 +136,16 @@ void input_key(char key) {
   }
   entry.buf[entry.index] = key;
   entry.index++;
-  put_char(key, GRAY);
+  put_char(key, char_color);
+}
+
+void backspace() {
+  if (entry.index == 0) {
+    return;
+  }
+  put_char_pos(' ', cursor.x - 1, cursor.y, char_color);
+  move_cursor(cursor.x - 1, cursor.y);
+  entry.buf[--entry.index] = '\0';
 }
 
 void newline() {
@@ -129,17 +166,17 @@ void exec_cmd() {
   // スペースで分割し、コマンドを取得
   int split_count = split(entry.buf, args, ' ');
   if (split_count != 2) {
-    put_str("command not found", GRAY);
+    put_str("command not found", char_color);
     exit_status = EXIT_FAILURE;
     return;
   }
   char *cmd = args[0];
   char *arg = args[1];
   if (strcmp(cmd, "echo") == 0) {
-    put_str(arg, GRAY);
+    put_str(arg, char_color);
     exit_status = EXIT_SUCCESS;
   } else {
-    put_str("command not found", GRAY);
+    put_str("command not found", char_color);
     exit_status = EXIT_FAILURE;
   }
 }
