@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## ver 1.1.1
+- rename boot dir
+
 ## ver 1.1.0
 - support backspace key
 
