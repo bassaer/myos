@@ -15,6 +15,7 @@ void input_code(unsigned char code);
 void input_key(char key);
 void backspace();
 void newline();
+void shutdown();
 void exec_cmd();
 
 #endif

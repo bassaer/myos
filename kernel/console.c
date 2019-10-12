@@ -159,22 +159,36 @@ void newline() {
   entry.buf[entry.index] = '\0';
 }
 
+void shutdown() {
+  outb_p(0x8900, 'S');
+  outb_p(0x8900, 'h');
+  outb_p(0x8900, 'u');
+  outb_p(0x8900, 't');
+  outb_p(0x8900, 'd');
+  outb_p(0x8900, 'o');
+  outb_p(0x8900, 'w');
+  outb_p(0x8900, 'n');
+  outb_p(0x501, 0x31);
+}
+
 void exec_cmd() {
   move_cursor(0, cursor.y + 1);
   entry.buf[entry.index] = '\0';
   char *args[entry.size];
   // スペースで分割し、コマンドを取得
   int split_count = split(entry.buf, args, ' ');
-  if (split_count != 2) {
-    put_str("command not found", char_color);
-    exit_status = EXIT_FAILURE;
-    return;
-  }
   char *cmd = args[0];
-  char *arg = args[1];
   if (strcmp(cmd, "echo") == 0) {
+    if (split_count != 2) {
+      put_str("command not found", char_color);
+      exit_status = EXIT_FAILURE;
+      return;
+    }
+    char *arg = args[1];
     put_str(arg, char_color);
     exit_status = EXIT_SUCCESS;
+  } else if (strcmp(cmd, "shutdown") == 0 || strcmp(cmd, "exit") == 0) {
+    shutdown();
   } else {
     put_str("command not found", char_color);
     exit_status = EXIT_FAILURE;
