@@ -7,3 +7,7 @@ addons:
     packages:
       - mtools
 script: make
+deploy:
+  provider: script
+  script: scripts/release.sh
+  skip_cleanup: true

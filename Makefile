@@ -1,4 +1,4 @@
-VER      = $(shell cat CHANGELOG.md | awk 'tolower($$0) ~/^\#\#\sversion\s.*/ {print $$3}')
+VER      = $(shell ./scripts/changelog.sh -v)
 IMG      = myos-$(VER).img
 CFLAGS   = -c -m32 -Wall -Iinclude -fno-pie -fno-builtin -nostdlib
 KERN_OBJ = kernel/main.o \
@@ -10,9 +10,9 @@ KERN_OBJ = kernel/main.o \
            kernel/keyboard.o \
            kernel/util.o
 
-.PHONY: img run clean
+.PHONY: img run package clean
 
-all: img
+all: package
 
 img: boot/ipl.bin boot/loader.bin kernel/kernel.bin
 	cat boot/loader.bin kernel/kernel.bin > sys.bin
@@ -40,8 +40,14 @@ kernel/kernel.bin: $(KERN_OBJ)
 run: img
 	qemu-system-i386 -name myos -localtime -monitor stdio -fda ./$(IMG)
 
+package: img
+	rm -rf ./release
+	mkdir release
+	tar zcvf release/myos-$(VER).tag.gz ${IMG}
+
 clean:
 	find . \( -name '*.img' -or -name '*.bin' -or -name '*.o' -or -name '*.map' \) | xargs rm -f
+	rm -rf ./release
 
 # Makefile memo
 # B=$(A:%.bin=%.o) -> A=aaa.binのとき B=aaa.o となる
