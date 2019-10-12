@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## ver 1.2.0
+- support shutdown
+
 ## ver 1.1.1
 - rename boot dir
 

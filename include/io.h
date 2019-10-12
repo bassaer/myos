@@ -37,18 +37,12 @@ void load_idtr(int limit, int addr);
 /**
  * ポート指定でのレジスタ書き込み
  */
-void outb_p(int port, int data);
+void outb_p(int port, unsigned char data);
 
 /**
  * ポート指定でレジスタ読み込み
  */
 int io_in(int port);
-
-/**
- * kernel/io.c
- * インラインアセンブラで書いているが後でまとめる
- */
-//void outb(unsigned short port, unsigned char value);
 
 /**
  * 割り込みハンドラ

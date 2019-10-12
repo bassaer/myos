@@ -1,7 +1,7 @@
 .code32
 .global io_cli, io_sti, io_stihlt, io_hlt
 .global load_gdtr, load_idtr, outb_p, io_in
-.global asm_handle_intr, asm_handle_intr27, foobar
+.global asm_handle_intr, asm_handle_intr27
 .extern handle_keyboard, handle_intr27
 .text
 
@@ -34,7 +34,6 @@ load_idtr:
     lidt    6(%esp)
     ret
 
-# void outb_p(int port, int data)
 outb_p:
     movl    4(%esp),    %edx      # port
     movb    8(%esp),    %al       # data
@@ -78,7 +77,3 @@ asm_handle_intr27:
     pop     %ds
     pop     %es
     iret
-
-foobar:
-    movl $0x07690748,0xb8000
-    ret

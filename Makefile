@@ -38,7 +38,7 @@ kernel/kernel.bin: $(KERN_OBJ)
 	ld $^ -T kernel/kernel.ld -Map kernel.map -o $@
 
 run: img
-	qemu-system-i386 -name myos -localtime -monitor stdio -fda ./$(IMG)
+	qemu-system-i386 -name myos -localtime -monitor stdio -device isa-debug-exit -fda ./$(IMG) || true
 
 package: img
 	rm -rf ./release
