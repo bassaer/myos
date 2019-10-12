@@ -14,9 +14,9 @@ KERN_OBJ = kernel/main.o \
 
 all: package
 
-img: boot/ipl.bin boot/loader.bin kernel/kernel.bin
-	cat boot/loader.bin kernel/kernel.bin > sys.bin
-	mformat -f 1440 -C -B boot/ipl.bin -i $(IMG)
+img: init/ipl.bin init/head.bin kernel/kernel.bin
+	cat init/head.bin kernel/kernel.bin > sys.bin
+	mformat -f 1440 -C -B init/ipl.bin -i $(IMG)
 	mcopy sys.bin -i $(IMG) ::
 
 %.o: %.c
@@ -28,11 +28,11 @@ img: boot/ipl.bin boot/loader.bin kernel/kernel.bin
 .s.o:
 	as --32 -o $@ $<
 
-boot/ipl.bin: boot/ipl.o
-	ld $^ -T boot/ipl.ld -Map ipl.map -o $@
+init/ipl.bin: init/ipl.o
+	ld $^ -T init/ipl.ld -Map ipl.map -o $@
 
-boot/loader.bin: boot/loader.o
-	ld $^ -T boot/loader.ld -Map loader.map -o $@
+init/head.bin: init/head.o
+	ld $^ -T init/head.ld -Map head.map -o $@
 
 kernel/kernel.bin: $(KERN_OBJ)
 	ld $^ -T kernel/kernel.ld -Map kernel.map -o $@
