@@ -79,25 +79,6 @@ void put_str(char *str, unsigned short color) {
   }
 }
 
-void init_console(char *buf, int size) {
-  entry.buf = buf;
-  entry.size = size;
-  entry.index = 0;
-
-  move_cursor(0, 3);
-  char *os =
-    "  __  __        ___  ____     \n"
-    " |  \\/  |_   _ / _ \\/ ___|  \n"
-    " | |\\/| | | | | | | \\___ \\ \n"
-    " | |  | | |_| | |_| |___) |   \n"
-    " |_|  |_|\\__, |\\___/|____/  \n"
-    "         |___/              \n\n";
-
-  put_str(os, char_color);
-
-  put_str(PROMPT, GREEN);
-}
-
 void show_status(char *status, char *msg) {
   put_str("[", WHITE);
   put_str(status, GREEN);
@@ -150,13 +131,23 @@ void backspace() {
 
 void newline() {
   move_cursor(0, cursor.y + 1);
+  put_prompt();
+  entry.index = 0;
+  entry.buf[entry.index] = '\0';
+}
+
+void put_prompt() {
   if (exit_status == EXIT_SUCCESS) {
     put_str(PROMPT, GREEN);
   } else {
     put_str(PROMPT, RED);
   }
+}
+
+void init_console(char *buf, int size) {
   entry.index = 0;
-  entry.buf[entry.index] = '\0';
+  entry.buf = buf;
+  entry.size = size;
 }
 
 void shutdown() {

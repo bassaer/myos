@@ -10,6 +10,8 @@ KERN_OBJ = kernel/main.o \
            kernel/keyboard.o \
            kernel/util.o
 
+BIN_OBJ  = bin/sh.o
+
 .PHONY: img run package clean
 
 all: package
@@ -34,7 +36,8 @@ init/ipl.bin: init/ipl.o
 init/head.bin: init/head.o
 	ld $^ -T init/head.ld -Map head.map -o $@
 
-kernel/kernel.bin: $(KERN_OBJ)
+# TODO : ひとまずkernelにすべてリンクするが、あとでユーザ空間を分ける
+kernel/kernel.bin: $(KERN_OBJ) $(BIN_OBJ)
 	ld $^ -T kernel/kernel.ld -Map kernel.map -o $@
 
 run: img

@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## ver 1.3.0
+- add bin dir
+
 ## ver 1.2.0
 - support shutdown
 
