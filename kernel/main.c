@@ -8,47 +8,20 @@
 *---------------------------*/
 #include <main.h>
 
-#include <color.h>
-#include <console.h>
 #include <dsctbl.h>
 #include <intr.h>
 #include <io.h>
-#include <keyboard.h>
-#include <queue.h>
-
-#define KEYBUF_LIMIT   32
-#define CMD_LIMIT      256
+#include <sh.h>
 
 
 int main(void) {
   init_gdtidt();
-  show_status("OK", "GDT");
-
   init_pic();
-  show_status("OK", "PIC");
 
   io_sti();
   outb_p(PIC0_IMR, 0xf9);
 
-  struct Queue queue;
-  unsigned char keybuf[KEYBUF_LIMIT];
-  init_queue(&queue, KEYBUF_LIMIT, keybuf);
-  init_keyboard(&queue);
-  show_status("OK", "Keyboad");
+  start_shell();
 
-  char cmdline[CMD_LIMIT];
-  init_console(&cmdline, CMD_LIMIT);
-
-  while(1) {
-    io_cli(); // 割り込み無効化
-    if (queue_status(&queue) == 0) {
-      io_stihlt(); // 割り込み有効化 + HLT
-    } else {
-      unsigned char code;
-      dequeue(&queue, &code);
-      io_sti(); // 割り込み有効化
-      input_code(code);
-    }
-  }
   return 0;
 }
