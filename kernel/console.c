@@ -72,14 +72,4 @@ void put_str(char *str, unsigned short color) {
   }
 }
 
-void shutdown() {
-  outb_p(0x8900, 'S');
-  outb_p(0x8900, 'h');
-  outb_p(0x8900, 'u');
-  outb_p(0x8900, 't');
-  outb_p(0x8900, 'd');
-  outb_p(0x8900, 'o');
-  outb_p(0x8900, 'w');
-  outb_p(0x8900, 'n');
-  outb_p(0x501, 0x31);
-}
+

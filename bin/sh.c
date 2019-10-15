@@ -2,12 +2,13 @@
 
 #include <console.h>
 #include <color.h>
+#include <echo.h>
+#include <exit.h>
 #include <queue.h>
+#include <shutdown.h>
 #include <util.h>
 
 #define PROMPT        "myos> "
-#define EXIT_SUCCESS  0
-#define EXIT_FAILURE  1
 
 int exit_status = EXIT_SUCCESS;
 int char_color = GRAY;
@@ -87,16 +88,9 @@ void exec_cmd() {
   int split_count = split(entry.buf, args, ' ');
   char *cmd = args[0];
   if (strcmp(cmd, "echo") == 0) {
-    if (split_count != 2) {
-      put_str("command not found", char_color);
-      exit_status = EXIT_FAILURE;
-      return;
-    }
-    char *arg = args[1];
-    put_str(arg, char_color);
-    exit_status = EXIT_SUCCESS;
+    exit_status = echo(args, split_count);
   } else if (strcmp(cmd, "shutdown") == 0 || strcmp(cmd, "exit") == 0) {
-    shutdown();
+    exit_status = shutdown(args, split_count);
   } else {
     put_str("command not found", char_color);
     exit_status = EXIT_FAILURE;

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## ver 1.3.4
+- move shutdown(exit) from kernel/console.c to bin/shutdown.c
+- fix #36
+
 ## ver 1.3.3
 - move entry data from console to sh
 
