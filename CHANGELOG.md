@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## ver 1.3.1
+- fix loop process
+
 ## ver 1.3.0
 - add bin dir
 
