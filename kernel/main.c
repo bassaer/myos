@@ -34,9 +34,7 @@ int main(void) {
   init_keyboard(&queue);
 
   char cmdline[CMD_LIMIT];
-  init_console(cmdline, CMD_LIMIT);
-
-  init_shell();
+  init_shell(cmdline, CMD_LIMIT);
 
   while(1) {
     io_cli(); // 割り込み無効化
