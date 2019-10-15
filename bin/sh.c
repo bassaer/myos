@@ -2,7 +2,6 @@
 
 #include <console.h>
 #include <color.h>
-#include <io.h>
 #include <queue.h>
 
 
@@ -22,6 +21,5 @@ void init_shell() {
 void start_shell(struct Queue *queue) {
   unsigned char code;
   dequeue(queue, &code);
-  io_sti(); // 割り込み有効化
   input_code(code);
 }

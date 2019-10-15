@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## ver 1.3.2
+- move io_sti
+
 ## ver 1.3.1
 - fix loop process
 
