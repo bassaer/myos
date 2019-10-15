@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## ver 1.3.3
+- move entry data from console to sh
+
 ## ver 1.3.2
 - move io_sti
 
