@@ -10,7 +10,8 @@ KERN_OBJ = kernel/main.o \
            kernel/keyboard.o \
            kernel/util.o
 
-BIN_OBJ  = bin/sh.o
+BIN_OBJ  = bin/sh.o \
+           bin/echo.o \
 
 .PHONY: img run package clean
 
