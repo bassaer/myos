@@ -5,6 +5,7 @@
 #include <echo.h>
 #include <exit.h>
 #include <queue.h>
+#include <shutdown.h>
 #include <util.h>
 
 #define PROMPT        "myos> "
@@ -89,7 +90,7 @@ void exec_cmd() {
   if (strcmp(cmd, "echo") == 0) {
     exit_status = echo(args, split_count);
   } else if (strcmp(cmd, "shutdown") == 0 || strcmp(cmd, "exit") == 0) {
-    shutdown();
+    exit_status = shutdown(args, split_count);
   } else {
     put_str("command not found", char_color);
     exit_status = EXIT_FAILURE;

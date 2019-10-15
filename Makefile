@@ -12,6 +12,7 @@ KERN_OBJ = kernel/main.o \
 
 BIN_OBJ  = bin/sh.o \
            bin/echo.o \
+           bin/shutdown.o
 
 .PHONY: img run package clean
 
