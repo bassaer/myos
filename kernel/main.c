@@ -44,6 +44,7 @@ int main(void) {
       io_stihlt(); // 割り込み有効化 + HLT
     } else {
       start_shell(&queue);
+      io_sti(); // 割り込み有効化
     }
   }
 
