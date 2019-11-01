@@ -14,9 +14,13 @@ BIN_OBJ  = bin/sh.o \
            bin/echo.o \
            bin/shutdown.o
 
-.PHONY: img run package clean
+.PHONY: install img run package clean
+
 
 all: package
+
+install:
+	sudo apt install -y gcc mtools qemu-system-i386
 
 img: init/ipl.bin init/head.bin kernel/kernel.bin
 	cat init/head.bin kernel/kernel.bin > sys.bin
