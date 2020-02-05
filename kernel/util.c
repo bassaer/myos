@@ -57,9 +57,8 @@ int itoa(int src, char *dst, int base) {
   int digit = len;
 
   while(len) {
-    //*(dst++) = buf[--len] + 0x30;
     --len;
-    *(dst++) = (buf[len] < 10) ? (buf[len] + 0x30) : (buf[len] - 9 + 0x60);
+    *(dst++) = buf[len] < 10 ? buf[len] + 0x30 : buf[len] - 9 + 0x60;
   }
 
   return digit;
