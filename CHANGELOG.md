@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## ver 1.4.0
+- add sprintf #46
+
 ## ver 1.3.4
 - move shutdown(exit) from kernel/console.c to bin/shutdown.c
 - fix #36
