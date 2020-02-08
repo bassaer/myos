@@ -10,8 +10,11 @@ KERN_OBJ = kernel/main.o \
            kernel/keyboard.o \
            kernel/util.o
 
+MM_OBJ   = mm/memory.o
+
 BIN_OBJ  = bin/sh.o \
            bin/echo.o \
+           bin/free.o \
            bin/shutdown.o
 
 .PHONY: install img run package clean
@@ -43,7 +46,7 @@ init/head.bin: init/head.o
 	ld $^ -T init/head.ld -Map head.map -o $@
 
 # TODO : ひとまずkernelにすべてリンクするが、あとでユーザ空間を分ける
-kernel/kernel.bin: $(KERN_OBJ) $(BIN_OBJ)
+kernel/kernel.bin: $(KERN_OBJ) $(BIN_OBJ) $(MM_OBJ)
 	ld $^ -T kernel/kernel.ld -Map kernel.map -o $@
 
 run: img

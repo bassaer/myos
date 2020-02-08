@@ -36,6 +36,7 @@ int main(void) {
   char cmdline[CMD_LIMIT];
   init_shell(cmdline, CMD_LIMIT);
 
+
   while(1) {
     io_cli(); // 割り込み無効化
     if (queue_status(&queue) == 0) {

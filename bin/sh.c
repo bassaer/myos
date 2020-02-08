@@ -3,6 +3,7 @@
 #include <console.h>
 #include <color.h>
 #include <echo.h>
+#include <free.h>
 #include <exit.h>
 #include <queue.h>
 #include <shutdown.h>
@@ -89,6 +90,8 @@ void exec_cmd() {
   char *cmd = args[0];
   if (strcmp(cmd, "echo") == 0) {
     exit_status = echo(args, split_count);
+  } else if (strcmp(cmd, "free") == 0) {
+    exit_status = free();
   } else if (strcmp(cmd, "shutdown") == 0 || strcmp(cmd, "exit") == 0) {
     exit_status = shutdown(args, split_count);
   } else {

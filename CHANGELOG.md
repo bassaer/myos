@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## ver 1.5.0
+- add mm dir
+- add temporary free command
+
 ## ver 1.4.0
 - add sprintf #46
 
