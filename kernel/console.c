@@ -1,6 +1,9 @@
 #include <console.h>
+
 #include <io.h>
 #include <util.h>
+
+#include <stdarg.h>
 
 struct {
   unsigned int x;
@@ -71,5 +74,66 @@ void put_str(char *str, unsigned short color) {
     put_char(*str, color);
     str++;
   }
+}
+
+int itoa(int src, char *dst, int base) {
+  int len = 0;
+  int buf[10];
+
+  while(1) {
+    buf[len++] = src % base;
+    if (src < base) {
+      break;
+    }
+    src /= base;
+  }
+
+  // 桁
+  int digit = len;
+
+  while(len) {
+    --len;
+    *(dst++) = buf[len] < 10 ? buf[len] + 0x30 : buf[len] - 9 + 0x60;
+  }
+
+  return digit;
+}
+
+void printf(char *format, ...) {
+  char buf[256];
+  char *str = buf;
+  va_list list;
+  int len = -1;
+  char *s_arg;
+  va_start(list, format);
+  while(*format) {
+    if (*format == '%') {
+      ++format;
+      switch(*format) {
+        case 'd':
+          len = itoa(va_arg(list, int), str, 10);
+          break;
+        case 'x':
+          len = itoa(va_arg(list, int), str, 16);
+          break;
+        case 's':
+          s_arg = va_arg(list, char*);
+          while(*s_arg) {
+            *(str++) = *(s_arg++);
+          }
+          break;
+      }
+      if (len > 0) {
+        str += len;
+      }
+      format++;
+    } else {
+      *(str++) = *(format++);
+    }
+  }
+  // NULL終端
+  *str = 0x00;
+  put_str(buf, CHAR_COLOR);
+  va_end(list);
 }
 
