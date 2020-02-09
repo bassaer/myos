@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## ver 1.6.0
+- support %s for sprintf
+- add debug command
+- add margin on the left side screen
+
 ## ver 1.5.0
 - add mm dir
 - add temporary free command

@@ -5,6 +5,7 @@
 
 #define SCREEN_START    0xb8000
 #define COLUMNS         80
+#define CONSOLE_OFFSET  1
 #define CHAR_COLOR      GRAY
 
 void get_key(char *key, unsigned char code);
