@@ -8,6 +8,15 @@
 #define KEYCMD_WRITE      0x60
 #define KBC_MODE          0x47
 
+/**
+ * 特殊キー
+ */
+enum Key {
+  UP        = 0x48,
+  DOWN      = 0x50,
+  BACKSPACE = 0x0E
+};
+
 #include <queue.h>
 
 struct KEYBUF {

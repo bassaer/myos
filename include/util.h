@@ -11,4 +11,9 @@ int strcmp(char *first, char *second);
  */
 int split(char *src, char *dst[], char delim);
 
+/**
+ * 文字列のコピー
+ */
+void strcpy(char *src, char *dist);
+
 #endif

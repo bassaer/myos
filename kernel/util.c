@@ -40,3 +40,7 @@ int split(char *src, char *dst[], char delim) {
   return count;
 }
 
+void strcpy(char *src, char *dst) {
+  while ((*dst++ = *src++) != '\0');
+  *(dst++) = '\0';
+}

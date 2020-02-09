@@ -5,6 +5,6 @@
 #include <util.h>
 
 int debug() {
-  printf("hello, %s", "world");
+  printf("hello, %c%s", 'w', "orld!");
   return EXIT_SUCCESS;
 }

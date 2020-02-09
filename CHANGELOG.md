@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## ver 1.7.0
+- support command history
+- support %c for printf
+
 ## ver 1.6.0
 - support %s for sprintf
 - add debug command
