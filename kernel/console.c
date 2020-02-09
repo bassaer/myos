@@ -103,7 +103,6 @@ void printf(char *format, ...) {
   char buf[256];
   char *str = buf;
   va_list list;
-  int len = -1;
   char *s_arg;
   va_start(list, format);
   while(*format) {
@@ -111,10 +110,13 @@ void printf(char *format, ...) {
       ++format;
       switch(*format) {
         case 'd':
-          len = itoa(va_arg(list, int), str, 10);
+          str += itoa(va_arg(list, int), str, 10);
           break;
         case 'x':
-          len = itoa(va_arg(list, int), str, 16);
+          str += itoa(va_arg(list, int), str, 16);
+          break;
+        case 'c':
+          *(str++) = va_arg(list, int);
           break;
         case 's':
           s_arg = va_arg(list, char*);
@@ -122,9 +124,6 @@ void printf(char *format, ...) {
             *(str++) = *(s_arg++);
           }
           break;
-      }
-      if (len > 0) {
-        str += len;
       }
       format++;
     } else {
