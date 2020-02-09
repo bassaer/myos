@@ -66,7 +66,8 @@ int itoa(int src, char *dst, int base) {
 
 void sprintf(char *str, char *format, ...) {
   va_list list;
-  int len;
+  int len = -1;
+  char *s_arg;
   va_start(list, format);
   while(*format) {
     if (*format == '%') {
@@ -78,8 +79,16 @@ void sprintf(char *str, char *format, ...) {
         case 'x':
           len = itoa(va_arg(list, int), str, 16);
           break;
+        case 's':
+          s_arg = va_arg(list, char*);
+          while(*s_arg) {
+            *(str++) = *(s_arg++);
+          }
+          break;
       }
-      str += len;
+      if (len > 0) {
+        str += len;
+      }
       format++;
     } else {
       *(str++) = *(format++);

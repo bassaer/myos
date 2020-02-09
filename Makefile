@@ -12,9 +12,10 @@ KERN_OBJ = kernel/main.o \
 
 MM_OBJ   = mm/memory.o
 
-BIN_OBJ  = bin/sh.o \
+BIN_OBJ  = bin/debug.o \
            bin/echo.o \
            bin/free.o \
+           bin/sh.o \
            bin/shutdown.o
 
 .PHONY: install img run package clean

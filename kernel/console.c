@@ -1,5 +1,6 @@
 #include <console.h>
 #include <io.h>
+#include <util.h>
 
 struct {
   unsigned int x;
@@ -22,7 +23,7 @@ void get_key(char *key, unsigned char code) {
 void move_cursor(unsigned int x, unsigned int y) {
     cursor.x = x;
     cursor.y = y;
-    unsigned short pos = y * COLUMNS + x;
+    unsigned short pos = y * COLUMNS + x + CONSOLE_OFFSET;
     outb_p(0x3D4, 14);
     outb_p(0x3D5, pos >> 8);
     outb_p(0x3D4, 15);
@@ -31,7 +32,7 @@ void move_cursor(unsigned int x, unsigned int y) {
 
 void put_char_pos(char c, unsigned char x, unsigned char y, unsigned short color) {
   unsigned char *pos;
-  pos = (unsigned char *)(SCREEN_START + (((y * COLUMNS) + x) * 2));
+  pos = (unsigned char *)(SCREEN_START + (((y * COLUMNS) + x + CONSOLE_OFFSET) * 2));
   *(unsigned short *)pos = (unsigned short)((color << 8) | c);
 }
 
@@ -71,5 +72,4 @@ void put_str(char *str, unsigned short color) {
     str++;
   }
 }
-
 

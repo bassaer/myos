@@ -2,6 +2,7 @@
 
 #include <console.h>
 #include <color.h>
+#include <debug.h>
 #include <echo.h>
 #include <free.h>
 #include <exit.h>
@@ -94,6 +95,8 @@ void exec_cmd() {
     exit_status = free();
   } else if (strcmp(cmd, "shutdown") == 0 || strcmp(cmd, "exit") == 0) {
     exit_status = shutdown(args, split_count);
+  } else if (strcmp(cmd, "debug") == 0) {
+    exit_status = debug();
   } else {
     put_str("command not found", char_color);
     exit_status = EXIT_FAILURE;
