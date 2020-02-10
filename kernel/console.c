@@ -33,6 +33,10 @@ void get_key(char *key, unsigned char code) {
   *key = keytable[code];
 }
 
+/**
+ * BIOSを使用しないカーソル移動
+ * https://wiki.osdev.org/Text_Mode_Cursor#Enabling_the_Cursor_2
+ */
 void move_cursor(unsigned int x, unsigned int y) {
     cursor.x = x;
     cursor.y = y;
@@ -43,6 +47,11 @@ void move_cursor(unsigned int x, unsigned int y) {
     outb_p(0x3D5, pos);
 }
 
+/**
+ * テキストモードでVRAMの0x8B000(=SCREEN_START)を基準に
+ * 文字、色を書き込むことで画面にテキストを出力する
+ * https://wiki.osdev.org/Printing_To_Screen
+ */
 void put_char_pos(char c, unsigned char x, unsigned char y, unsigned short color) {
   unsigned char *pos;
   pos = (unsigned char *)(SCREEN_START + (((y * COLUMNS) + x + CONSOLE_OFFSET) * 2));
