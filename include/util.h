@@ -12,8 +12,8 @@ int strcmp(char *first, char *second);
 int split(char *src, char *dst[], char delim);
 
 /**
- * 書式指定変換した出力を文字列に格納する
+ * 文字列のコピー
  */
-void sprintf(char *str, char *format, ...);
+void strcpy(char *src, char *dist);
 
 #endif

@@ -4,8 +4,9 @@
 #include <color.h>
 #include <debug.h>
 #include <echo.h>
-#include <free.h>
 #include <exit.h>
+#include <free.h>
+#include <keyboard.h>
 #include <queue.h>
 #include <shutdown.h>
 #include <util.h>
@@ -14,17 +15,41 @@
 
 int exit_status = EXIT_SUCCESS;
 int char_color = GRAY;
+int cur_line = 0;
+int selected_line = 0;
+int max_width = 0;
 
-struct {
-  char *buf;
-  int size;
+/**
+ * 入力情報
+ */
+struct entry {
+  /**
+   * 入力文字列
+   */
+  char buf[CMD_LIMIT];
+  /**
+   * 現在の入力位置
+   */
   int index;
-} entry;
+};
 
-void init_shell(char *buf, int size) {
-  entry.index = 0;
-  entry.buf = buf;
-  entry.size = size;
+struct entry entries[SCREEN_HEIGHT];
+
+/**
+ * 入力履歴一時保存用
+ */
+struct entry cache_entry;
+
+void init_shell() {
+  cur_line = 0;
+  selected_line = 0;
+  int i;
+  for (i = 0; i < SCREEN_HEIGHT; ++i) {
+    entries[i].index = 0;
+    entries[i].buf[0] = '\0';
+  }
+
+  max_width = 256;
 
   char *os =
     "  __  __        ___  ____     \n"
@@ -46,48 +71,83 @@ void put_prompt() {
   }
 }
 
-void clear_entry() {
-  entry.index = 0;
-  entry.buf[entry.index] = '\0';
+void init_entry() {
+  cur_line++;
+  selected_line = cur_line;
+}
+
+void copy_entry(struct entry *src, struct entry *dst) {
+    dst->index = src->index;
+    strcpy(src->buf, dst->buf);
 }
 
 void input_code(unsigned char code) {
-  if (code == 0x0E && entry.index > 0) {
-    entry.buf[--entry.index] = '\0';
+  if (code == BACKSPACE && entries[cur_line].index > 0) {
+    entries[cur_line].buf[--(entries[cur_line].index)] = '\0';
     backspace();
     return;
   }
+  switch(code) {
+    // 入力履歴補完
+    case UP:
+      if(selected_line > 0) {
+        if (cur_line == selected_line) {
+          // 未実行の入力を一時保存
+          copy_entry(&entries[cur_line], &cache_entry);
+        }
+        clear();
+        put_prompt();
+        selected_line--;
+        entries[cur_line].index = entries[selected_line].index;
+        strcpy(entries[selected_line].buf, entries[cur_line].buf);
+        put_str(entries[cur_line].buf, CHAR_COLOR);
+      }
+      return;
+    case DOWN:
+      if (cur_line > selected_line ) {
+        clear();
+        put_prompt();
+        selected_line++;
+        if (cur_line == selected_line) {
+          copy_entry(&cache_entry, &entries[cur_line]);
+        } else {
+          entries[cur_line].index = entries[selected_line].index;
+          strcpy(entries[selected_line].buf, entries[cur_line].buf);
+        }
+        put_str(entries[cur_line].buf, CHAR_COLOR);
+      }
+      return;
+  }
   char key;
   get_key(&key, code);
-  if (key == '\0') {
+  if (key == '\0' || key == 0) {
     return;
   }
   if (key == '\n') {
-    if (entry.index > 0) {
+    if (entries[cur_line].index > 0) {
       newline();
       exec_cmd();
+      init_entry();
     }
     newline();
-    clear_entry();
     put_prompt();
     return;
   }
-  if (entry.size <= entry.index + 1) {
+  if (max_width <= entries[cur_line].index + 1) {
     // 入力サイズオーバー
     // 終端文字も含めるため+1
     return;
   }
-  entry.buf[entry.index] = key;
-  entry.index++;
-  entry.buf[entry.index] = '\0';
+  entries[cur_line].buf[entries[cur_line].index++] = key;
+  entries[cur_line].buf[entries[cur_line].index] = '\0';
   put_char(key, char_color);
 }
 
 void exec_cmd() {
-  entry.buf[entry.index] = '\0';
-  char *args[entry.size];
+  entries[cur_line].buf[entries[cur_line].index] = '\0';
+  char *args[max_width];
   // スペースで分割し、コマンドを取得
-  int split_count = split(entry.buf, args, ' ');
+  int split_count = split(entries[cur_line].buf, args, ' ');
   char *cmd = args[0];
   if (strcmp(cmd, "echo") == 0) {
     exit_status = echo(args, split_count);

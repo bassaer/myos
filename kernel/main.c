@@ -16,9 +16,7 @@
 #include <queue.h>
 #include <sh.h>
 
-#define KEYBUF_LIMIT   32
-#define CMD_LIMIT      256
-
+#define KEYBUF_LIMIT    32
 
 int main(void) {
   init_gdtidt();
@@ -33,9 +31,7 @@ int main(void) {
   init_queue(&queue, KEYBUF_LIMIT, keybuf);
   init_keyboard(&queue);
 
-  char cmdline[CMD_LIMIT];
-  init_shell(cmdline, CMD_LIMIT);
-
+  init_shell();
 
   while(1) {
     io_cli(); // 割り込み無効化

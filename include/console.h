@@ -15,6 +15,8 @@ void put_char(char c, unsigned short color);
 void put_str(char *str, unsigned short color);
 void backspace();
 void newline();
+void clear();
 void put_prompt();
+void printf(char *format, ...);
 
 #endif

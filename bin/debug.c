@@ -5,8 +5,6 @@
 #include <util.h>
 
 int debug() {
-  char str[128];
-  sprintf(str, "hello, %s", "world");
-  put_str(str, CHAR_COLOR);
+  printf("hello, %c%s", 'w', "orld!");
   return EXIT_SUCCESS;
 }
