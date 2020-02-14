@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## ver 1.8.0
+- support scroll
+- add sprintf
+- add debug message on top
+
 ## ver 1.7.0
 - support command history
 - support %c for printf
