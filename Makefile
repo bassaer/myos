@@ -12,9 +12,9 @@ KERN_OBJ = kernel/main.o \
 
 MM_OBJ   = mm/memory.o
 
-BIN_OBJ  = bin/debug.o \
-           bin/echo.o \
+BIN_OBJ  = bin/echo.o \
            bin/free.o \
+           bin/ls.o \
            bin/sh.o \
            bin/shutdown.o
 

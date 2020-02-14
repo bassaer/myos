@@ -2,11 +2,11 @@
 
 #include <console.h>
 #include <color.h>
-#include <debug.h>
 #include <echo.h>
 #include <exit.h>
 #include <free.h>
 #include <keyboard.h>
+#include <ls.h>
 #include <queue.h>
 #include <shutdown.h>
 #include <util.h>
@@ -41,6 +41,7 @@ struct entry entries[SCREEN_HEIGHT];
 struct entry cache_entry;
 
 void init_shell() {
+  init_console();
   cur_line = 0;
   selected_line = 0;
   int i;
@@ -95,7 +96,7 @@ void input_code(unsigned char code) {
           // 未実行の入力を一時保存
           copy_entry(&entries[cur_line], &cache_entry);
         }
-        clear();
+        clear_line();
         put_prompt();
         selected_line--;
         entries[cur_line].index = entries[selected_line].index;
@@ -105,7 +106,7 @@ void input_code(unsigned char code) {
       return;
     case DOWN:
       if (cur_line > selected_line ) {
-        clear();
+        clear_line();
         put_prompt();
         selected_line++;
         if (cur_line == selected_line) {
@@ -130,7 +131,15 @@ void input_code(unsigned char code) {
       init_entry();
     }
     newline();
+
+    int diff = get_y() + 1 - ROWS;
+    while(diff > 0) {
+      scroll();
+      diff--;
+    }
+
     put_prompt();
+
     return;
   }
   if (max_width <= entries[cur_line].index + 1) {
@@ -155,8 +164,8 @@ void exec_cmd() {
     exit_status = free();
   } else if (strcmp(cmd, "shutdown") == 0 || strcmp(cmd, "exit") == 0) {
     exit_status = shutdown(args, split_count);
-  } else if (strcmp(cmd, "debug") == 0) {
-    exit_status = debug();
+  } else if (strcmp(cmd, "ls") == 0) {
+    exit_status = ls();
   } else {
     put_str("command not found", char_color);
     exit_status = EXIT_FAILURE;
