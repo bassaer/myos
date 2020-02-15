@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## ver 1.8.1
+- fix cursor bug
+
 ## ver 1.8.0
 - support scroll
 - add sprintf

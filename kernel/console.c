@@ -32,10 +32,11 @@ static unsigned char keytable[KEY_TABLE_SIZE] = {
 };
 
 void init_vram() {
+  unsigned short white_space = (unsigned short)((CHAR_COLOR << 8) | ' ');
   unsigned char x, y;
   for(y = 0; y < ROWS*2; ++y) {
     for(x = 0; x < COLUMNS*2; ++x) {
-      write_vram(' ', x, y);
+      write_vram(white_space, x, y);
     }
   }
 }
