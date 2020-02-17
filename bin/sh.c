@@ -155,8 +155,13 @@ void input_code(unsigned char code) {
 void exec_cmd() {
   entries[cur_line].buf[entries[cur_line].index] = '\0';
   char *args[max_width];
+
+  // 元の文字列を操作するため、一時配列を用意
+  char tmp[strlen(entries[cur_line].buf)];
+  strcpy(entries[cur_line].buf, tmp);
+
   // スペースで分割し、コマンドを取得
-  int split_count = split(entries[cur_line].buf, args, ' ');
+  int split_count = split(tmp, args, ' ');
   char *cmd = args[0];
   if (strcmp(cmd, "echo") == 0) {
     exit_status = echo(args, split_count);

@@ -7,6 +7,11 @@
 int strcmp(char *first, char *second);
 
 /**
+ * 文字列の長さを返す
+ */
+int strlen(char *str);
+
+/**
  * 指定文字で分割し、分割数を返す
  */
 int split(char *src, char *dst[], char delim);

@@ -12,6 +12,14 @@ int strcmp(char *first, char *second) {
   return 1;
 }
 
+int strlen(char *str) {
+  int len = 0;
+  while(*str++ != '\0') {
+    len++;
+  }
+  return len;
+}
+
 
 int split(char *src, char *dst[], char delim) {
   int count = 0;
