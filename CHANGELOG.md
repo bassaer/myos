@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## ver 1.8.2
+- fix command history bug
+- add strlen
+
 ## ver 1.8.1
 - fix cursor bug
 
