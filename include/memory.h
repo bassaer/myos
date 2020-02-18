@@ -12,4 +12,9 @@ struct MEM_INFO {
  */
 void stats(struct MEM_INFO *mem);
 
+/**
+ * 指定したアドレス間で使用可能なメモリサイズを返す
+ */
+int calc_mem(unsigned int start, unsigned int end);
+
 #endif

@@ -50,6 +50,26 @@ int io_in(int port);
 void asm_handle_intr(void);
 void asm_handle_intr27(void);
 
+/**
+ * EFLAGS読み込み
+ */
+int io_load_eflags(void);
+
+/**
+ * EFLAGS書き込み
+ */
+void io_store_eflags(int eflags);
+
+/**
+ * CR0読み込み
+ */
+int load_cr0(void);
+
+/**
+ * CR0書き込み
+ */
+void store_cr0(int cr0);
+
 void foobar(void);
 
 #endif
