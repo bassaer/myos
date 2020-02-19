@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## ver 1.9.0
+- add available memory scan
+
 ## ver 1.8.2
 - fix command history bug
 - add strlen
