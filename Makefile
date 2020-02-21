@@ -19,10 +19,12 @@ BIN_OBJ  = bin/echo.o \
            bin/shutdown.o
 
 ARCH     = arch/x86/boot
-
-.PHONY: img run package clean
+.PHONY: install img run package clean
 
 all: package
+
+install:
+	sudo apt install -y gcc mtools qemu-system-i386
 
 img: $(ARCH)/ipl.bin $(ARCH)/head.bin kernel/kernel.bin
 	cat $(ARCH)/head.bin kernel/kernel.bin > sys.bin
