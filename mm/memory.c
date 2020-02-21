@@ -44,8 +44,7 @@ void stats(struct MEM_INFO *mm) {
     cr0 &= ~CR0_CACHE_DISABLE; // キャッシュ有効化
     store_cr0(cr0);
   }
-  mm->used = 0;
-  mm->free = 0;
+  mm->free = mm->total - mm->used;
 }
 
 /**

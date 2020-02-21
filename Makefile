@@ -18,17 +18,17 @@ BIN_OBJ  = bin/echo.o \
            bin/sh.o \
            bin/shutdown.o
 
+ARCH     = arch/x86/boot
 .PHONY: install img run package clean
-
 
 all: package
 
 install:
 	sudo apt install -y gcc mtools qemu-system-i386
 
-img: init/ipl.bin init/head.bin kernel/kernel.bin
-	cat init/head.bin kernel/kernel.bin > sys.bin
-	mformat -f 1440 -C -B init/ipl.bin -i $(IMG)
+img: $(ARCH)/ipl.bin $(ARCH)/head.bin kernel/kernel.bin
+	cat $(ARCH)/head.bin kernel/kernel.bin > sys.bin
+	mformat -f 1440 -C -B $(ARCH)/ipl.bin -i $(IMG)
 	mcopy sys.bin -i $(IMG) ::
 
 %.o: %.c
@@ -40,11 +40,11 @@ img: init/ipl.bin init/head.bin kernel/kernel.bin
 .s.o:
 	as --32 -o $@ $<
 
-init/ipl.bin: init/ipl.o
-	ld $^ -T init/ipl.ld -Map ipl.map -o $@
+$(ARCH)/ipl.bin: $(ARCH)/ipl.o
+	ld $^ -T $(ARCH)/ipl.ld -Map ipl.map -o $@
 
-init/head.bin: init/head.o
-	ld $^ -T init/head.ld -Map head.map -o $@
+$(ARCH)/head.bin: $(ARCH)/head.o
+	ld $^ -T $(ARCH)/head.ld -Map head.map -o $@
 
 # TODO : ひとまずkernelにすべてリンクするが、あとでユーザ空間を分ける
 kernel/kernel.bin: $(KERN_OBJ) $(BIN_OBJ) $(MM_OBJ)
