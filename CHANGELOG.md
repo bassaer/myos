@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## ver 1.10.0
+- rename dir
+- fix free output format
+
 ## ver 1.9.0
 - add available memory scan
 
