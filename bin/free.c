@@ -7,8 +7,9 @@
 
 int free() {
   char *fmt =
-    "      total     used  free\n"
-    "Mem:  %dMB      %d      %d";
+    "total : %dMB\n"
+    "free  : %dMB\n"
+    "used  : %dMB";
 
   struct MEM_INFO mem = {
     0, 0, 0
