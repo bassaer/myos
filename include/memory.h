@@ -39,6 +39,20 @@ void remove_bit(unsigned int bit);
 unsigned int get_bit(unsigned int bit);
 
 /**
+ * 割当可能なブロックを探索する
+ */
+int find_free_block(unsigned int *block);
+
+/**
+ * 1ブロックの割当
+ */
+void* alloc_single_block();
+/**
+ * 1ブロックの開放
+ */
+void free_single_block(void *addr);
+
+/**
  * 物理メモリ情報の初期化
  */
 void init_mem_info();

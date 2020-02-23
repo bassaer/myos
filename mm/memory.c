@@ -10,6 +10,8 @@
 #define ATTEMPT_VALUE       0xaa55aa55
 #define REVERSE_VALUE       0x55aa55aa
 
+#define NULL                0x00000000
+
 /**
  * 物理メモリの管理情報
  */
@@ -70,6 +72,34 @@ int find_free_block(unsigned int *block) {
     }
   }
   return 0;
+}
+
+/**
+ * 1ブロックの割当
+ */
+void* alloc_single_block() {
+  if (mem.free_blocks <= 0) {
+    return NULL;
+  } 
+  unsigned int block;
+  if (!find_free_block(&block)) {
+    return NULL;
+  }
+  set_bit(block);
+  void *addr = (void *)(block * BLOCK_SIZE);
+  mem.used_blocks++;
+  mem.free_blocks--;
+  return addr;
+}
+
+/**
+ * 1ブロック開放
+ */
+void free_single_block(void *addr) {
+  unsigned int block = (unsigned int) addr / BLOCK_SIZE;
+  remove_bit(block);
+  mem.used_blocks--;
+  mem.free_blocks++;
 }
 
 /**
