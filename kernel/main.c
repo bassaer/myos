@@ -13,6 +13,7 @@
 #include <intr.h>
 #include <io.h>
 #include <keyboard.h>
+#include <memory.h>
 #include <queue.h>
 #include <sh.h>
 
@@ -30,6 +31,8 @@ int main(void) {
 
   init_queue(&queue, KEYBUF_LIMIT, keybuf);
   init_keyboard(&queue);
+
+  init_mem_info();
 
   init_shell();
 

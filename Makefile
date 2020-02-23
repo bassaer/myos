@@ -10,7 +10,8 @@ KERN_OBJ = kernel/main.o \
            kernel/keyboard.o \
            kernel/util.o
 
-MM_OBJ   = mm/memory.o
+MM_OBJ   = mm/memory.o \
+           mm/pgtable.o
 
 BIN_OBJ  = bin/echo.o \
            bin/free.o \

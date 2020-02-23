@@ -249,7 +249,7 @@ void printf(char *format, ...) {
 }
 
 /**
- * 画面右上に40時以内のデバッグ情報を出力する
+ * 画面右上に40字以内のデバッグ情報を出力する
  */
 void debug(char *format, ...) {
   va_list list;

@@ -11,11 +11,11 @@ int free() {
     "free  : %dMB\n"
     "used  : %dMB";
 
-  struct MEM_INFO mem = {
-    0, 0, 0
+  struct mem_info mem = {
+    0, 0, 0, 0, 0, 0
   };
   stats(&mem);
 
-  printf(fmt, mem.total, mem.used, mem.free);
+  printf(fmt, mem.total_bytes, mem.used_bytes, mem.free_bytes);
   return EXIT_SUCCESS;
 }

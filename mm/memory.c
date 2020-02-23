@@ -11,9 +11,71 @@
 #define REVERSE_VALUE       0x55aa55aa
 
 /**
+ * 物理メモリの管理情報
+ */
+struct mem_info mem;
+
+void init_mem_info() {
+  mem.total_bytes = 0;
+  mem.total_blocks = 0;
+  mem.used_bytes = 0;
+  mem.used_blocks = 0;
+  mem.free_bytes = 0;
+  mem.free_blocks = 0;
+
+  stats(&mem);
+
+  mem.total_blocks = mem.total_bytes / BLOCK_SIZE;
+  mem.bitmap = (unsigned int *) KERN_MEM_START;
+  // 全ブロックの状態をbitで表現するため、intの(32bit)で割る
+  mem.bitmap_size = mem.total_blocks / 32;
+}
+
+
+/**
+ * nビット目に1をセットする
+ */
+void set_bit(unsigned int bit) {
+  mem.bitmap[bit / 32] |= (1 << (bit % 32));
+}
+
+/**
+ * nビット目に0セットする
+ */
+void remove_bit(unsigned int bit) {
+  mem.bitmap[bit / 32] &= ~(1 << (bit % 32));
+}
+
+/**
+ * nビット目を取得する
+ */
+unsigned int get_bit(unsigned int bit) {
+  return mem.bitmap[bit / 32] & (1 << (bit % 32));
+}
+
+/**
+ * 割当可能なブロックを探索する
+ * bitが0の最初のブロック番号をblcokに格納
+ */
+int find_free_block(unsigned int *block) {
+  unsigned int i;
+  for (i = 0; i < mem.bitmap_size; ++i) {
+    if (mem.bitmap[i] == 0xffffffff) {
+      continue;
+    }
+    unsigned int bit;
+    for (bit = 0; bit < 32; ++bit) {
+      *block = i * sizeof(unsigned int) * 8 + bit;
+      return 1;
+    }
+  }
+  return 0;
+}
+
+/**
  * メモリの利用状況を取得する
  */
-void stats(struct MEM_INFO *mm) {
+void stats(struct mem_info *mm) {
   // CPUが 386 or 486 以降かを判定
   char is486 = 0;
   unsigned int eflg = io_load_eflags();
@@ -38,13 +100,13 @@ void stats(struct MEM_INFO *mm) {
     store_cr0(cr0);
   }
 
-  mm->total = scan_mem(0x00400000, 0xbfffffff) / (1024*1024);
+  mm->total_bytes = scan_mem(0x00400000, 0xbfffffff) / (1024*1024);
   if (is486) {
     cr0 = load_cr0();
     cr0 &= ~CR0_CACHE_DISABLE; // キャッシュ有効化
     store_cr0(cr0);
   }
-  mm->free = mm->total - mm->used;
+  mm->free_bytes = mm->total_bytes - mm->used_bytes;
 }
 
 /**
