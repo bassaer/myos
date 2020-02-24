@@ -31,10 +31,9 @@ int main(void) {
 
   init_queue(&queue, KEYBUF_LIMIT, keybuf);
   init_keyboard(&queue);
-
-  init_mem_info();
-
-  init_shell();
+  if (init_mem_info() == MEM_SUCCESS) {
+    init_shell();
+  }
 
   while(1) {
     io_cli(); // 割り込み無効化

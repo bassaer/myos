@@ -15,9 +15,7 @@
  */
 struct mem_info mem;
 
-int mem_result = 999;
-
-void init_mem_info() {
+int init_mem_info() {
   mem.total_bytes = 0;
   mem.total_blocks = 0;
   mem.used_bytes = 0;
@@ -28,22 +26,24 @@ void init_mem_info() {
   stats(&mem);
 
   mem.total_blocks = mem.total_bytes / BLOCK_SIZE;
+  mem.free_blocks = mem.total_blocks;
   mem.bitmap = (unsigned int *) PMEM_USER_START;
   // 全ブロックの状態をbitで表現するため、intの(32bit)で割る
   mem.bitmap_size = mem.total_blocks / 32;
+  // すべての領域でビットマップ0とし、開放する
+  set_mem((void *)mem.bitmap, 0x00, mem.bitmap_size);
 
-  mem_result = init_pg_table();
+  return init_pg_table();
 }
 
-int get_init_result() {
-  return mem_result;
+unsigned int get_kernel_size() {
+  return (unsigned int)(&_KERN_END - PMEM_KERN_START);
 }
 
 int init_pg_table() {
   page_table_entry *user_table = (page_table_entry *)alloc_single_block();
   page_table_entry *kernel_table = (page_table_entry *)alloc_single_block();
   if (user_table == NULL || kernel_table == NULL) {
-    debug("error at 42");
     return MEM_ERROR;
   }
   set_mem(user_table, 0x00, BLOCK_SIZE);
@@ -161,8 +161,10 @@ int find_free_block(unsigned int *block) {
     }
     unsigned int bit;
     for (bit = 0; bit < 32; ++bit) {
-      *block = i * sizeof(unsigned int) * 8 + bit;
-      return 1;
+      if (!get_bit(bit)) {
+        *block = i * sizeof(unsigned int) * 8 + bit;
+        return 1;
+      }
     }
   }
   return 0;
@@ -180,10 +182,11 @@ void* alloc_single_block() {
     return NULL;
   }
   set_bit(block);
-  void *addr = (void *)(block * BLOCK_SIZE);
+  void *paddr = (void *)(block * BLOCK_SIZE);
   mem.used_blocks++;
   mem.free_blocks--;
-  return addr;
+  printf("\nblock : %d\nalloced addr : %x",block, (unsigned long)paddr);
+  return paddr;
 }
 
 /**
@@ -224,7 +227,7 @@ void stats(struct mem_info *mm) {
     store_cr0(cr0);
   }
 
-  mm->total_bytes = scan_mem(0x00400000, 0xbfffffff) / (1024*1024);
+  mm->total_bytes = scan_mem(0x00400000, 0xbfffffff);
   if (is486) {
     cr0 = load_cr0();
     cr0 &= ~CR0_CACHE_DISABLE; // キャッシュ有効化

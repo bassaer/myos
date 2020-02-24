@@ -3,7 +3,7 @@
 
 #define BLOCK_SIZE        4096
 
-#define PMEM_KERN_START   0x28000000
+#define PMEM_KERN_START   0x00200000
 #define PMEM_USER_START   0x00400000
 
 #define VMEM_USER_START   0x00000000
@@ -15,7 +15,7 @@
 #define MEM_SUCCESS       0
 #define MEM_ERROR         (-1)
 
-int get_init_result();
+extern unsigned int _KERN_END;
 
 struct mem_info {
   /** 総メモリサイズ*/
@@ -35,6 +35,8 @@ struct mem_info {
   /** ビットマップ長 */
   unsigned int bitmap_size;
 };
+
+unsigned int get_kernel_size();
 
 /**
  * nビット目に1をセットする
@@ -68,7 +70,7 @@ void free_single_block(void *addr);
 /**
  * 物理メモリ情報の初期化
  */
-void init_mem_info();
+int init_mem_info();
 
 int init_pg_table();
 

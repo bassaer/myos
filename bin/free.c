@@ -16,6 +16,7 @@ int free() {
   };
   stats(&mem);
 
-  printf(fmt, mem.total_bytes, mem.used_bytes, mem.free_bytes);
+  int mb = 1024*1024;
+  printf(fmt, mem.total_bytes/mb, mem.used_bytes/mb, mem.free_bytes/mb);
   return EXIT_SUCCESS;
 }
