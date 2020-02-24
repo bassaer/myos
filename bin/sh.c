@@ -7,9 +7,9 @@
 #include <free.h>
 #include <keyboard.h>
 #include <ls.h>
-#include <queue.h>
 #include <shutdown.h>
-#include <string.h>
+#include <lib/queue.h>
+#include <lib/string.h>
 
 #define PROMPT        "myos> "
 

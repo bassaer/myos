@@ -1,8 +1,8 @@
-#include <memory.h>
+#include <mm/memory.h>
 
 #include <console.h>
 #include <io.h>
-#include <pgtable.h>
+#include <mm/pgtable.h>
 
 #define EFLAGS_AC_BIT       0x00040000
 #define CR0_CACHE_DISABLE   0x60000000

@@ -1,6 +1,6 @@
-#include <pgtable.h>
+#include <mm/pgtable.h>
 
-#include <memory.h>
+#include <mm/memory.h>
 
 page_directory_entry *curr_pd;
 

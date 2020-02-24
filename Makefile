@@ -1,15 +1,15 @@
 VER      = $(shell ./scripts/changelog.sh -v)
 IMG      = myos-$(VER).img
-CFLAGS   = -c -m32 -Wall -Iinclude -fno-pie -fno-builtin -nostdlib
+CFLAGS   = -c -m32 -Wall -Iinclude -Ibin/include -fno-pie -fno-builtin -nostdlib
 KERN_OBJ = kernel/main.o \
            kernel/func.o \
            kernel/dsctbl.o \
            kernel/console.o \
            kernel/intr.o \
-           kernel/queue.o \
            kernel/keyboard.o
 
-LIB_OBJ  = lib/string.o
+LIB_OBJ  = lib/queue.o \
+           lib/string.o
 
 MM_OBJ   = mm/memory.o \
            mm/pgtable.o

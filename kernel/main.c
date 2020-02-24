@@ -13,9 +13,9 @@
 #include <intr.h>
 #include <io.h>
 #include <keyboard.h>
-#include <memory.h>
-#include <queue.h>
+#include <mm/memory.h>
 #include <sh.h>
+#include <lib/queue.h>
 
 #define KEYBUF_LIMIT    32
 

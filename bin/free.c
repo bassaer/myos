@@ -2,8 +2,8 @@
 
 #include <console.h>
 #include <exit.h>
-#include <memory.h>
-#include <string.h>
+#include <mm/memory.h>
+#include <lib/string.h>
 
 int free() {
   char *fmt =

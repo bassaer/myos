@@ -1,4 +1,4 @@
-#include <queue.h>
+#include <lib/queue.h>
 
 void init_queue(struct Queue *queue, int size, unsigned char *buf) {
   queue->size = size;

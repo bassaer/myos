@@ -1,7 +1,6 @@
 #include <keyboard.h>
 #include <io.h>
 #include <intr.h>
-#include <queue.h>
 
 #include <console.h>
 #include <color.h>
