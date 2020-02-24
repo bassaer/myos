@@ -3,7 +3,7 @@
 #include <console.h>
 #include <exit.h>
 #include <memory.h>
-#include <util.h>
+#include <string.h>
 
 int free() {
   char *fmt =

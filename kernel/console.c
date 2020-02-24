@@ -1,7 +1,6 @@
 #include <console.h>
 
 #include <io.h>
-#include <util.h>
 
 #include <stdarg.h>
 

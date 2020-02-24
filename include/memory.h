@@ -13,7 +13,9 @@
 
 #define NULL              ((void*)0)
 #define MEM_SUCCESS       0
-#define MEM_ERROR         -1
+#define MEM_ERROR         (-1)
+
+int get_init_result();
 
 struct mem_info {
   /** 総メモリサイズ*/

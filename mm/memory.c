@@ -3,7 +3,6 @@
 #include <console.h>
 #include <io.h>
 #include <pgtable.h>
-#include <util.h>
 
 #define EFLAGS_AC_BIT       0x00040000
 #define CR0_CACHE_DISABLE   0x60000000
@@ -11,11 +10,12 @@
 #define ATTEMPT_VALUE       0xaa55aa55
 #define REVERSE_VALUE       0x55aa55aa
 
-
 /**
  * 物理メモリの管理情報
  */
 struct mem_info mem;
+
+int mem_result = 999;
 
 void init_mem_info() {
   mem.total_bytes = 0;
@@ -32,13 +32,18 @@ void init_mem_info() {
   // 全ブロックの状態をbitで表現するため、intの(32bit)で割る
   mem.bitmap_size = mem.total_blocks / 32;
 
-  init_pg_table();
+  mem_result = init_pg_table();
+}
+
+int get_init_result() {
+  return mem_result;
 }
 
 int init_pg_table() {
   page_table_entry *user_table = (page_table_entry *)alloc_single_block();
   page_table_entry *kernel_table = (page_table_entry *)alloc_single_block();
   if (user_table == NULL || kernel_table == NULL) {
+    debug("error at 42");
     return MEM_ERROR;
   }
   set_mem(user_table, 0x00, BLOCK_SIZE);
@@ -64,6 +69,7 @@ int init_pg_table() {
 
   page_directory_entry *pd_table = (page_directory_entry *)alloc_single_block();
   if (pd_table == NULL) {
+    debug("error at 67");
     return MEM_ERROR;
   }
 
@@ -83,12 +89,14 @@ int init_pg_table() {
   // ページングを有効化
   enable_paging();
 
+  debug("mem_init ok");
   return MEM_SUCCESS;
 }
 
 int map_page(unsigned long paddr, unsigned long vaddr) {
   page_directory_entry *curr_pd = get_curr_pd();
   if (curr_pd == NULL) {
+    debug("error at 94");
     return MEM_ERROR;
   }
   page_directory_entry *pde = get_pde(curr_pd, vaddr);
@@ -98,6 +106,7 @@ int map_page(unsigned long paddr, unsigned long vaddr) {
   } else {
     pg_table = (page_table_entry *)alloc_single_block();
     if (pg_table == NULL) {
+      debug("error at 102");
       return MEM_ERROR;
     }
     //.ブロック初期化

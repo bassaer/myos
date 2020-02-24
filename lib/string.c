@@ -1,4 +1,4 @@
-#include <util.h>
+#include <string.h>
 
 int strcmp(char *first, char *second) {
   for (; *first != '\0' && *second != '\0'; ++first, ++second) {

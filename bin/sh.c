@@ -9,7 +9,7 @@
 #include <ls.h>
 #include <queue.h>
 #include <shutdown.h>
-#include <util.h>
+#include <string.h>
 
 #define PROMPT        "myos> "
 
