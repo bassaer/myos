@@ -2,7 +2,18 @@
 #define MYOS_MEMORY_H
 
 #define BLOCK_SIZE        4096
-#define KERN_MEM_START    0x00400000
+
+#define PMEM_KERN_START   0x28000000
+#define PMEM_USER_START   0x00400000
+
+#define VMEM_USER_START   0x00000000
+#define VMEM_USER_END     0xbfffffff
+#define VMEM_KERN_START   0xc0000000
+#define VMEM_KERN_END     0xffffffff
+
+#define NULL              ((void*)0)
+#define MEM_SUCCESS       0
+#define MEM_ERROR         -1
 
 struct mem_info {
   /** 総メモリサイズ*/
@@ -56,6 +67,11 @@ void free_single_block(void *addr);
  * 物理メモリ情報の初期化
  */
 void init_mem_info();
+
+int init_pg_table();
+
+int map_page(unsigned long paddr, unsigned long vaddr);
+void set_mem(unsigned long *mem, unsigned long value, unsigned int size);
 
 /**
  * メモリ情報出力

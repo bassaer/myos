@@ -2,6 +2,7 @@
 
 #include <console.h>
 #include <io.h>
+#include <pgtable.h>
 #include <util.h>
 
 #define EFLAGS_AC_BIT       0x00040000
@@ -10,7 +11,6 @@
 #define ATTEMPT_VALUE       0xaa55aa55
 #define REVERSE_VALUE       0x55aa55aa
 
-#define NULL                0x00000000
 
 /**
  * 物理メモリの管理情報
@@ -28,11 +28,96 @@ void init_mem_info() {
   stats(&mem);
 
   mem.total_blocks = mem.total_bytes / BLOCK_SIZE;
-  mem.bitmap = (unsigned int *) KERN_MEM_START;
+  mem.bitmap = (unsigned int *) PMEM_USER_START;
   // 全ブロックの状態をbitで表現するため、intの(32bit)で割る
   mem.bitmap_size = mem.total_blocks / 32;
+
+  init_pg_table();
 }
 
+int init_pg_table() {
+  page_table_entry *user_table = (page_table_entry *)alloc_single_block();
+  page_table_entry *kernel_table = (page_table_entry *)alloc_single_block();
+  if (user_table == NULL || kernel_table == NULL) {
+    return MEM_ERROR;
+  }
+  set_mem(user_table, 0x00, BLOCK_SIZE);
+  set_mem(kernel_table, 0x00, BLOCK_SIZE);
+
+  unsigned int i;
+  unsigned long paddr;
+  unsigned long vaddr;
+  // ユーザ空間割当
+  for (i = 0, paddr = PMEM_USER_START, vaddr = VMEM_USER_START; i < PTE_NUM; paddr += BLOCK_SIZE, vaddr += BLOCK_SIZE) {
+    page_table_entry *pte = get_pte(user_table, vaddr);
+    set_pte_flags(pte, PDE_FLAG_PRESENT | PDE_FLAG_RW);
+    set_pte_paddr(pte, paddr);
+  }
+  // カーネル空間割当
+  // TODO : 仮想アドレス開始をVMEM_KERN_START(0xc0000000)に変更する
+  //        動作確認のためストレートマップさせている
+  for (i = 0, paddr = PMEM_KERN_START, vaddr = 0x28000000; i < PTE_NUM; paddr += BLOCK_SIZE, vaddr += BLOCK_SIZE) {
+    page_table_entry *pte = get_pte(kernel_table, vaddr);
+    set_pte_flags(pte, PDE_FLAG_PRESENT | PDE_FLAG_RW);
+    set_pte_paddr(pte, paddr);
+  }
+
+  page_directory_entry *pd_table = (page_directory_entry *)alloc_single_block();
+  if (pd_table == NULL) {
+    return MEM_ERROR;
+  }
+
+  // ユーザ空間ページディレクトリ設定
+  page_directory_entry *pde = get_pde(pd_table, VMEM_USER_START);
+  set_pde_flags(pde, PDE_FLAG_PRESENT | PDE_FLAG_RW);
+  set_pde_paddr(pde, (unsigned long)user_table);
+
+  // カーネル空間ぺージディレクトリ設定
+  // TODO : 仮想アドレス開始をVMEM_KERN_START(0xc0000000)に変更する
+  pde = get_pde(pd_table, 0x28000000);
+  set_pde_flags(pde, PDE_FLAG_PRESENT | PDE_FLAG_RW);
+  set_pde_paddr(pde, (unsigned long)user_table);
+
+  // ページディレクトリを設定
+  set_pd(pde);
+  // ページングを有効化
+  enable_paging();
+
+  return MEM_SUCCESS;
+}
+
+int map_page(unsigned long paddr, unsigned long vaddr) {
+  page_directory_entry *curr_pd = get_curr_pd();
+  if (curr_pd == NULL) {
+    return MEM_ERROR;
+  }
+  page_directory_entry *pde = get_pde(curr_pd, vaddr);
+  page_table_entry *pg_table;
+  if (is_pde_present(pde)) {
+    pg_table = (page_table_entry *)get_pde_ptaddr(pde);
+  } else {
+    pg_table = (page_table_entry *)alloc_single_block();
+    if (pg_table == NULL) {
+      return MEM_ERROR;
+    }
+    //.ブロック初期化
+    set_mem(pg_table, 0x00, BLOCK_SIZE);
+    set_pde_flags(pde, PDE_FLAG_PRESENT | PDE_FLAG_RW);
+    set_pde_paddr(pde, *pg_table);
+  }
+
+  page_table_entry *pte = get_pte(pg_table, vaddr);
+  set_pte_flags(pte, PDE_FLAG_PRESENT | PDE_FLAG_RW);
+  set_pte_paddr(pte, paddr);
+  return MEM_SUCCESS;
+}
+
+void set_mem(unsigned long *mem, unsigned long value, unsigned int size) {
+  unsigned int i;
+  for(i = 0; i < size; ++i) {
+    mem[i] = value;
+  }
+}
 
 /**
  * nビット目に1をセットする
