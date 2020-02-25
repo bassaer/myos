@@ -3,8 +3,8 @@
 
 #define BLOCK_SIZE        4096
 
-#define PMEM_KERN_START   0x00200000
-#define PMEM_USER_START   0x00400000
+#define PMEM_KERN_START   0x00280000
+#define PMEM_FREE_START   0x00400000
 
 #define VMEM_USER_START   0x00000000
 #define VMEM_USER_END     0xbfffffff

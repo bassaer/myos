@@ -35,6 +35,11 @@ int is_pte_writeable(page_table_entry *pte) {
   return (unsigned int)pte & (unsigned int)PTE_FLAG_RW;
 }
 
+/**
+ * 仮想アドレスを右に12bitシフトとマスクで
+ * 12から21bitの10bitを取得
+ * これがページテーブルのインデックスになる
+ */
 unsigned long get_pte_index(unsigned long vaddr) {
   return (vaddr >> PTE_SHIFT) & PTE_MASK;
 }
@@ -95,7 +100,7 @@ void set_pd(page_directory_entry *pde) {
 }
 
 void enable_paging() {
-  __asm(
+  __asm__(
       "pushl %eax;"
       "movl %cr0, %eax;"
       "OR 0x80000000, %eax;"
