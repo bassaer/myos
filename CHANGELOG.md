@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## ver 1.11.0
+- support paging
+
 ## ver 1.10.0
 - rename dir
 - fix free output format
