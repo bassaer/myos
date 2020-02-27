@@ -17,7 +17,7 @@ enum Key {
   BACKSPACE = 0x0E
 };
 
-#include <queue.h>
+#include <lib/queue.h>
 
 struct KEYBUF {
   char data;

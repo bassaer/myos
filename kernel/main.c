@@ -13,8 +13,9 @@
 #include <intr.h>
 #include <io.h>
 #include <keyboard.h>
-#include <queue.h>
+#include <mm/memory.h>
 #include <sh.h>
+#include <lib/queue.h>
 
 #define KEYBUF_LIMIT    32
 
@@ -30,8 +31,9 @@ int main(void) {
 
   init_queue(&queue, KEYBUF_LIMIT, keybuf);
   init_keyboard(&queue);
-
-  init_shell();
+  if (init_mem_info() == MEM_SUCCESS) {
+    init_shell();
+  }
 
   while(1) {
     io_cli(); // 割り込み無効化

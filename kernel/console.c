@@ -1,7 +1,6 @@
 #include <console.h>
 
 #include <io.h>
-#include <util.h>
 
 #include <stdarg.h>
 
@@ -174,6 +173,11 @@ void put_str(char *str, unsigned short color) {
 int itoa(int src, char *dst, int base) {
   int len = 0;
   int buf[10];
+  int negative = 0;
+  if (src < 0) {
+    src *= -1;
+    negative = 1;
+  }
 
   while(1) {
     buf[len++] = src % base;
@@ -184,7 +188,7 @@ int itoa(int src, char *dst, int base) {
   }
 
   // 桁
-  int digit = len;
+  int digit = len + negative;
 
   while(len) {
     --len;
@@ -197,13 +201,19 @@ int itoa(int src, char *dst, int base) {
 char* _sprintf(char *str, char *format, va_list *arg) {
   va_list list;
   va_copy(list, *arg);
+  int d_arg;
   char *s_arg;
   while(*format) {
     if (*format == '%') {
       ++format;
       switch(*format) {
         case 'd':
-          str += itoa(va_arg(list, int), str, 10);
+          d_arg = va_arg(list, int);
+          if (d_arg < 0) {
+            d_arg *= -1;
+            *(str++) = '-';
+          }
+          str += itoa(d_arg, str, 10);
           break;
         case 'x':
           *(str++) = '0';
@@ -249,7 +259,7 @@ void printf(char *format, ...) {
 }
 
 /**
- * 画面右上に40時以内のデバッグ情報を出力する
+ * 画面右上に40字以内のデバッグ情報を出力する
  */
 void debug(char *format, ...) {
   va_list list;

@@ -1,16 +1,18 @@
 VER      = $(shell ./scripts/changelog.sh -v)
 IMG      = myos-$(VER).img
-CFLAGS   = -c -m32 -Wall -Iinclude -fno-pie -fno-builtin -nostdlib
+CFLAGS   = -c -m32 -Wall -Iinclude -Ibin/include -fno-pie -fno-builtin -nostdlib
 KERN_OBJ = kernel/main.o \
            kernel/func.o \
            kernel/dsctbl.o \
            kernel/console.o \
            kernel/intr.o \
-           kernel/queue.o \
-           kernel/keyboard.o \
-           kernel/util.o
+           kernel/keyboard.o
 
-MM_OBJ   = mm/memory.o
+LIB_OBJ  = lib/queue.o \
+           lib/string.o
+
+MM_OBJ   = mm/memory.o \
+           mm/pgtable.o
 
 BIN_OBJ  = bin/echo.o \
            bin/free.o \
@@ -47,7 +49,7 @@ $(ARCH)/head.bin: $(ARCH)/head.o
 	ld $^ -T $(ARCH)/head.ld -Map head.map -o $@
 
 # TODO : ひとまずkernelにすべてリンクするが、あとでユーザ空間を分ける
-kernel/kernel.bin: $(KERN_OBJ) $(BIN_OBJ) $(MM_OBJ)
+kernel/kernel.bin: $(KERN_OBJ) $(LIB_OBJ) $(BIN_OBJ) $(MM_OBJ)
 	ld $^ -T kernel/kernel.ld -Map kernel.map -o $@
 
 run: img

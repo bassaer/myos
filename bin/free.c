@@ -2,8 +2,8 @@
 
 #include <console.h>
 #include <exit.h>
-#include <memory.h>
-#include <util.h>
+#include <mm/memory.h>
+#include <lib/string.h>
 
 int free() {
   char *fmt =
@@ -11,11 +11,12 @@ int free() {
     "free  : %dMB\n"
     "used  : %dMB";
 
-  struct MEM_INFO mem = {
-    0, 0, 0
+  struct mem_info mem = {
+    0, 0, 0, 0, 0, 0
   };
   stats(&mem);
 
-  printf(fmt, mem.total, mem.used, mem.free);
+  int mb = 1024*1024;
+  printf(fmt, mem.total_bytes/mb, mem.used_bytes/mb, mem.free_bytes/mb);
   return EXIT_SUCCESS;
 }
