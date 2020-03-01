@@ -30,7 +30,7 @@ void init_keyboard(struct Queue *q) {
  * 割り込みハンドラ
  * 入力をバッファに, 空き状態をフラグで保持
  */
-void handle_keyboard(int *esp) {
+void handle_intr21(int *esp) {
   outb_p(PIC0_OCW2, 0x61); // IRQ-01受付完了をPICに通知
   unsigned char code = io_in(PORT_KEYDAT);
   enqueue(queue, code);

@@ -47,7 +47,8 @@ int io_in(int port);
 /**
  * 割り込みハンドラ
  */
-void asm_handle_intr(void);
+void asm_handle_intr20(void);
+void asm_handle_intr21(void);
 void asm_handle_intr27(void);
 
 /**
@@ -69,7 +70,5 @@ int load_cr0(void);
  * CR0書き込み
  */
 void store_cr0(int cr0);
-
-void foobar(void);
 
 #endif
