@@ -21,4 +21,6 @@ int split(char *src, char *dst[], char delim);
  */
 void strcpy(char *src, char *dist);
 
+int atoi(char *src);
+
 #endif

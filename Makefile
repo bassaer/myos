@@ -19,7 +19,8 @@ BIN_OBJ  = bin/echo.o \
            bin/free.o \
            bin/ls.o \
            bin/sh.o \
-           bin/shutdown.o
+           bin/shutdown.o \
+           bin/sleep.o
 
 ARCH     = arch/x86/boot
 .PHONY: install img run package clean

@@ -8,6 +8,7 @@
 #include <keyboard.h>
 #include <ls.h>
 #include <shutdown.h>
+#include <sleep.h>
 #include <lib/queue.h>
 #include <lib/string.h>
 
@@ -169,6 +170,8 @@ void exec_cmd() {
     exit_status = free();
   } else if (strcmp(cmd, "shutdown") == 0 || strcmp(cmd, "exit") == 0) {
     exit_status = shutdown(args, split_count);
+  } else if(strcmp(cmd, "sleep") == 0) {
+    exit_status = sleep(args, split_count);
   } else if (strcmp(cmd, "ls") == 0) {
     exit_status = ls();
   } else {
