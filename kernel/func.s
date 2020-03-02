@@ -1,9 +1,9 @@
 .code32
 .global io_cli, io_sti, io_stihlt, io_hlt
 .global load_gdtr, load_idtr, outb_p, io_in
-.global asm_handle_intr, asm_handle_intr27
+.global asm_handle_intr20, asm_handle_intr21, asm_handle_intr27
 .global io_load_eflags, io_store_eflags, load_cr0, store_cr0
-.extern handle_keyboard, handle_intr27
+.extern handle_intr20, handle_intr21, handle_intr27
 .text
 
 io_hlt:
@@ -66,7 +66,7 @@ io_in:
     inb     %dx,        %al
     ret
 
-asm_handle_intr:
+asm_handle_intr20:
     push    %es
     push    %ds
     pusha
@@ -75,7 +75,23 @@ asm_handle_intr:
     mov     %ss,        %ax
     mov     %ax,        %ds
     mov     %ax,        %es
-    call    handle_keyboard
+    call    handle_intr20
+    pop     %eax
+    popa
+    pop     %ds
+    pop     %es
+    iret
+
+asm_handle_intr21:
+    push    %es
+    push    %ds
+    pusha
+    mov     %esp,       %eax
+    push    %eax
+    mov     %ss,        %ax
+    mov     %ax,        %ds
+    mov     %ax,        %es
+    call    handle_intr21
     pop     %eax
     popa
     pop     %ds

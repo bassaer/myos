@@ -6,7 +6,8 @@ KERN_OBJ = kernel/main.o \
            kernel/dsctbl.o \
            kernel/console.o \
            kernel/intr.o \
-           kernel/keyboard.o
+           kernel/keyboard.o \
+           kernel/timer.o
 
 LIB_OBJ  = lib/queue.o \
            lib/string.o
@@ -18,7 +19,8 @@ BIN_OBJ  = bin/echo.o \
            bin/free.o \
            bin/ls.o \
            bin/sh.o \
-           bin/shutdown.o
+           bin/shutdown.o \
+           bin/sleep.o
 
 ARCH     = arch/x86/boot
 .PHONY: install img run package clean

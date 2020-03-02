@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## ver 1.12.0
+- add sleep command
+
 ## ver 1.11.0
 - support paging
 

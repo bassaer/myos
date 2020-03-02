@@ -52,3 +52,13 @@ void strcpy(char *src, char *dst) {
   while ((*dst++ = *src++) != '\0');
   *(dst++) = '\0';
 }
+
+int atoi(char *src) {
+  int num = 0;
+  while(*src != '\0') {
+    num += *src - 48;
+    num *= 10;
+    src++;
+  }
+  return num / 10;
+}
