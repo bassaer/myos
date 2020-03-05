@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## ver 1.13.0
+- support multiple timer
+
 ## ver 1.12.0
 - add sleep command
 
