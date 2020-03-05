@@ -30,7 +30,34 @@ void init_pit() {
    */
   outb_p(PIT_CNT0, 0x9c);
   outb_p(PIT_CNT0, 0x2e);
-  timer.count++;
+  timerctrl.uptime = 0;
+
+  // タイマーの状態を初期化
+  int i;
+  for (i = 0; i < TIMER_MAX_NUM; i++) {
+    timerctrl.timers[i].status = STOPPED;
+  }
+}
+
+struct Timer* new_timer() {
+  int i;
+  for (i = 0; i < TIMER_MAX_NUM; i++) {
+    if (timerctrl.timers[i].status == STOPPED) {
+      timerctrl.timers[i].status = READY;
+      return &timerctrl.timers[i];
+    }
+  }
+  return 0;
+}
+
+
+void free_timer(struct Timer *timer) {
+  timer->status = STOPPED;
+}
+
+void init_timer(struct Timer *timer, struct Queue *queue, unsigned char data) {
+  timer->queue = queue;
+  timer->data = data;
 }
 
 /**
@@ -38,27 +65,24 @@ void init_pit() {
  */
 void handle_intr20(int *esp) {
   outb_p(PIC0_OCW2, 0x60); // IRQ-00受付完了をPICに通知
-  timer.count++;
-  // タイムアウトが設定されている場合
-  if (timer.timeout > 0) {
-    timer.timeout--;
-    if (timer.timeout == 0 ){//&& queue_status(timer.queue) != 0) {
-      unsigned char buf[8];
-      dequeue(timer.queue, buf);
+  timerctrl.uptime++;
+  int i;
+  for(i = 0; i < TIMER_MAX_NUM; i++) {
+    if (timerctrl.timers[i].status == RUNNING) {
+      // タイムアウトが設定されている場合
+      timerctrl.timers[i].timeout--;
+      if (timerctrl.timers[i].timeout == 0 ){
+        timerctrl.timers[i].status = READY;
+        unsigned char buf[8];
+        dequeue(timerctrl.timers[i].queue, buf);
+      }
     }
   }
 }
 
-void set_timer(unsigned int timeout, struct Queue *queue, unsigned char data) {
-  // EFLAGSは32bit拡張のレジスタ
-  // キャリーフラグや割り込みフラグなどを保持する
-  int eflags = io_load_eflags();
-  // 設定中の割り込みを禁止する
-  io_cli();
-  timer.timeout = timeout;
-  timer.queue = queue;
-  timer.data = data;
-  enqueue(timer.queue, timer.data);
-  // 割り込み状態を元の状態に戻す
-  io_store_eflags(eflags);
+void set_timer(struct Timer *timer, unsigned int timeout) {
+  // 現在時刻から
+  timer->timeout = timeout;
+  timer->status = RUNNING;
+  enqueue(timer->queue, timer->data);
 }
