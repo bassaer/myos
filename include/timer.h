@@ -23,8 +23,12 @@ struct TimerCtrl {
   unsigned int uptime;
   // 次回のタイマー
   unsigned int next;
+  // 現在稼働中のタイマー
+  unsigned int running_num;
+  // ソート済みタイマーのリスト
+  struct Timer *sorted_timers[TIMER_MAX_NUM];
   // すべてのタイマーリスト
-  struct Timer timers[TIMER_MAX_NUM];
+  struct Timer all_timers[TIMER_MAX_NUM];
 } timerctrl;
 
 void init_pit();
