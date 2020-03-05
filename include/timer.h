@@ -19,7 +19,11 @@ struct Timer {
 };
 
 struct TimerCtrl {
+  // システム起動時間
   unsigned int uptime;
+  // 次回のタイマー
+  unsigned int next;
+  // すべてのタイマーリスト
   struct Timer timers[TIMER_MAX_NUM];
 } timerctrl;
 
