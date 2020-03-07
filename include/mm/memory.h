@@ -17,7 +17,7 @@
 
 extern unsigned int _KERN_END;
 
-struct mem_info {
+typedef struct {
   /** 総メモリサイズ*/
   unsigned int total_bytes;
   /** 総ブロック数*/
@@ -34,7 +34,7 @@ struct mem_info {
   unsigned int *bitmap;
   /** ビットマップ長 */
   unsigned int bitmap_size;
-};
+} mem_t;
 
 unsigned int get_kernel_size();
 

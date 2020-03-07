@@ -18,13 +18,13 @@ int sleep(char *args[], int size) {
     return EXIT_FAILURE;
   }
 
-  struct Timer *timer = new_timer();
+  timer_t *timer = new_timer();
   if(timer == 0) {
     printf("failed to make timer\n");
     return EXIT_FAILURE;
   }
 
-  struct Queue queue;
+  queue_t queue;
   unsigned char buf[8];
   init_queue(&queue, 8, buf);
 

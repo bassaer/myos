@@ -23,7 +23,7 @@ int max_width = 0;
 /**
  * 入力情報
  */
-struct entry {
+typedef struct {
   /**
    * 入力文字列
    */
@@ -32,14 +32,14 @@ struct entry {
    * 現在の入力位置
    */
   int index;
-};
+} entry_t;
 
-struct entry entries[SCREEN_HEIGHT];
+entry_t entries[SCREEN_HEIGHT];
 
 /**
  * 入力履歴一時保存用
  */
-struct entry cache_entry;
+entry_t cache_entry;
 
 void init_shell() {
   init_console();
@@ -78,7 +78,7 @@ void init_entry() {
   selected_line = cur_line;
 }
 
-void copy_entry(struct entry *src, struct entry *dst) {
+void copy_entry(entry_t *src, entry_t *dst) {
     dst->index = src->index;
     strcpy(src->buf, dst->buf);
 }
@@ -180,7 +180,7 @@ void exec_cmd() {
   }
 }
 
-void start_shell(struct Queue *queue) {
+void start_shell(queue_t *queue) {
   unsigned char code;
   dequeue(queue, &code);
   input_code(code);

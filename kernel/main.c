@@ -6,8 +6,6 @@
 | |_|  |_|\__, |\___/|____/  |
 |         |___/              |
 *---------------------------*/
-#include <main.h>
-
 #include <console.h>
 #include <dsctbl.h>
 #include <intr.h>
@@ -29,7 +27,7 @@ int main(void) {
 
   init_pit();
 
-  struct Queue queue;
+  queue_t queue;
   unsigned char keybuf[KEYBUF_LIMIT];
 
   init_queue(&queue, KEYBUF_LIMIT, keybuf);

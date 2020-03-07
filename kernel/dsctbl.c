@@ -3,8 +3,8 @@
 #include <console.h>
 
 void init_gdtidt() {
-  struct SEGMENT_DESCRIPTOR *gdt = (struct SEGMENT_DESCRIPTOR *) GDT_ADDR;
-  struct GATE_DESCRIPTOR    *idt = (struct GATE_DESCRIPTOR    *) IDT_ADDR;
+  segment_descriptor_t *gdt = (segment_descriptor_t *) GDT_ADDR;
+  gate_descriptor_t    *idt = (gate_descriptor_t    *) IDT_ADDR;
 
   int i;
   for (i = 0; i <= GDT_LIMIT / 8; i++) {
@@ -32,7 +32,7 @@ void init_gdtidt() {
   set_gatedesc(idt + 0x27, (int) asm_handle_intr27, 2 * 8, AR_INTGATE32);
 }
 
-void set_segmdesc(struct SEGMENT_DESCRIPTOR *sd, unsigned int limit, int base, int ar) {
+void set_segmdesc(segment_descriptor_t *sd, unsigned int limit, int base, int ar) {
   if (limit > 0xfffff) {
     ar |= 0x8000;    // Gビットフラグを1すると
     limit /= 0x1000; // バイト単位 -> ページ単位に変更(4GBになる)
@@ -45,7 +45,7 @@ void set_segmdesc(struct SEGMENT_DESCRIPTOR *sd, unsigned int limit, int base, i
   sd->base_high = (base >> 24) & 0x0ff;
 }
 
-void set_gatedesc(struct GATE_DESCRIPTOR *gd, int offset, int selector, int ar) {
+void set_gatedesc(gate_descriptor_t *gd, int offset, int selector, int ar) {
   gd->offset_low = offset & 0xffff;
   gd->selector = selector;
   gd->dw_count = (ar >> 8) & 0xff;

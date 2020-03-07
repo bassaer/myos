@@ -18,25 +18,25 @@
 #define IDT_ADDR      0x0026f800
 #define IDT_LIMIT     0x000007ff
 
-struct SEGMENT_DESCRIPTOR {
+typedef struct {
   short limit_low;
   short base_low;
   char base_mid;
   char access_right;
   char limit_high;
   char base_high;
-};
+} segment_descriptor_t;
 
-struct GATE_DESCRIPTOR {
+typedef struct {
   short offset_low;
   short selector;
   char dw_count;
   char access_right;
   short offset_high;
-};
+} gate_descriptor_t;
 
 void init_gdtidt();
-void set_segmdesc(struct SEGMENT_DESCRIPTOR *sd, unsigned int limit, int base, int ar);
-void set_gatedesc(struct GATE_DESCRIPTOR *gd, int offset, int selector, int ar);
+void set_segmdesc(segment_descriptor_t *sd, unsigned int limit, int base, int ar);
+void set_gatedesc(gate_descriptor_t *gd, int offset, int selector, int ar);
 
 #endif

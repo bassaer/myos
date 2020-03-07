@@ -11,7 +11,7 @@
 /**
  * 特殊キー
  */
-enum Key {
+enum key {
   UP        = 0x48,
   DOWN      = 0x50,
   BACKSPACE = 0x0E
@@ -19,13 +19,13 @@ enum Key {
 
 #include <lib/queue.h>
 
-struct KEYBUF {
+struct keybuffer {
   char data;
   unsigned char flag;
 } keybuf;
 
 void wait_keyboard();
-void init_keyboard(struct Queue *q);
+void init_keyboard(queue_t *q);
 
 void handle_intr(int *esp);
 void handle_intr27(int *esp);
