@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## ver 1.14.0
+- improve timer intr handler
+- rename queue
+
 ## ver 1.13.0
 - support multiple timer
 
