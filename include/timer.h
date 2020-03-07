@@ -5,20 +5,20 @@
 
 #define TIMER_MAX_NUM       500
 
-enum TimerStatus {
+enum timer_status {
   STOPPED,
   READY,
   RUNNING
 };
 
-struct Timer {
+typedef struct {
   unsigned int timeout;
-  enum TimerStatus status;
+  enum timer_status status;
   queue_t *queue;
   unsigned char data;
-};
+} timer_t;
 
-struct TimerCtrl {
+typedef struct {
   // システム起動時間
   unsigned int uptime;
   // 次回のタイマー
@@ -26,21 +26,24 @@ struct TimerCtrl {
   // 現在稼働中のタイマー
   unsigned int running_num;
   // ソート済みタイマーのリスト
-  struct Timer *sorted_timers[TIMER_MAX_NUM];
+  timer_t *sorted_timers[TIMER_MAX_NUM];
   // すべてのタイマーリスト
-  struct Timer all_timers[TIMER_MAX_NUM];
-} timerctrl;
+  timer_t all_timers[TIMER_MAX_NUM];
+} timerctrl_t;
+
+// カーネル内部の時間管理
+timerctrl_t timerctrl;
 
 void init_pit();
 
-struct Timer* new_timer();
+timer_t* new_timer();
 
-void free_timer(struct Timer *timer);
+void free_timer(timer_t *timer);
 
-void init_timer(struct Timer *timer, queue_t *queue, unsigned char data);
+void init_timer(timer_t *timer, queue_t *queue, unsigned char data);
 
 void handle_intr20(int *esp);
 
-void set_timer(struct Timer *timer, unsigned int timeout);
+void set_timer(timer_t *timer, unsigned int timeout);
 
 #endif

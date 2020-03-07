@@ -11,7 +11,7 @@ int free() {
     "free  : %dMB\n"
     "used  : %dMB";
 
-  struct mem_info mem = {
+  mem_t mem = {
     0, 0, 0, 0, 0, 0
   };
   stats(&mem);

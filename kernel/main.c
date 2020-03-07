@@ -6,8 +6,6 @@
 | |_|  |_|\__, |\___/|____/  |
 |         |___/              |
 *---------------------------*/
-#include <main.h>
-
 #include <console.h>
 #include <dsctbl.h>
 #include <intr.h>

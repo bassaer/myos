@@ -13,7 +13,7 @@
 /**
  * 物理メモリの管理情報
  */
-struct mem_info mem;
+mem_t mem;
 
 int init_mem_info() {
   mem.total_bytes = 0;
@@ -206,7 +206,7 @@ void free_single_block(void *addr) {
 /**
  * メモリの利用状況を取得する
  */
-void stats(struct mem_info *mm) {
+void stats(mem_t *mm) {
   // CPUが 386 or 486 以降かを判定
   char is486 = 0;
   unsigned int eflg = io_load_eflags();

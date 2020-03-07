@@ -41,7 +41,7 @@ void init_pit() {
   }
 }
 
-struct Timer* new_timer() {
+timer_t* new_timer() {
   int i;
   for (i = 0; i < TIMER_MAX_NUM; i++) {
     if (timerctrl.all_timers[i].status == STOPPED) {
@@ -53,11 +53,11 @@ struct Timer* new_timer() {
   return 0;
 }
 
-void free_timer(struct Timer *timer) {
+void free_timer(timer_t *timer) {
   timer->status = STOPPED;
 }
 
-void init_timer(struct Timer *timer, queue_t *queue, unsigned char data) {
+void init_timer(timer_t *timer, queue_t *queue, unsigned char data) {
   timer->queue = queue;
   timer->data = data;
 }
@@ -98,7 +98,7 @@ void handle_intr20(int *esp) {
   }
 }
 
-void set_timer(struct Timer *timer, unsigned int timeout) {
+void set_timer(timer_t *timer, unsigned int timeout) {
   // 現在時刻から指定時間経過後を終了点とする
   timer->timeout = timerctrl.uptime + timeout;
   timer->status = RUNNING;

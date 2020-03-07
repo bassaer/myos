@@ -18,7 +18,7 @@ int sleep(char *args[], int size) {
     return EXIT_FAILURE;
   }
 
-  struct Timer *timer = new_timer();
+  timer_t *timer = new_timer();
   if(timer == 0) {
     printf("failed to make timer\n");
     return EXIT_FAILURE;
