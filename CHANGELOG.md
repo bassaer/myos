@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## ver 1.15.0
+- use linear list for timer
+
 ## ver 1.14.0
 - improve timer intr handler
 - rename struct
