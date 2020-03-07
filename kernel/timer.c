@@ -32,13 +32,20 @@ void init_pit() {
   outb_p(PIT_CNT0, 0x2e);
   timerctrl.uptime = 0;
   // 最短のタイマーを設定するため最大値を初期値に設定
-  timerctrl.next = 0xffffffff;
-  timerctrl.running_num = 0;
+  timerctrl.next_timeout = 0xffffffff;
   // タイマーの状態を初期化
   int i;
   for (i = 0; i < TIMER_MAX_NUM; i++) {
     timerctrl.all_timers[i].status = STOPPED;
   }
+  timer_t *last_timer = new_timer();
+  // 最大のタイムアウト時間を設定(約497日)
+  last_timer->timeout = 0xffffffff;
+  last_timer->status = RUNNING;
+  // 次のタイマーはなし
+  last_timer->next = 0;
+  timerctrl.next_timer = last_timer;
+  timerctrl.next_timeout = last_timer->timeout;
 }
 
 timer_t* new_timer() {
@@ -70,32 +77,26 @@ void handle_intr20(int *esp) {
   // uptimeを更新
   timerctrl.uptime++;
   // 次のタイマーの時刻を確認
-  if (timerctrl.next > timerctrl.uptime) {
+  if (timerctrl.next_timeout > timerctrl.uptime) {
     return;
   }
-  int i;
-  for(i = 0; i < timerctrl.running_num; i++) {
-    if (timerctrl.sorted_timers[i]->timeout > timerctrl.uptime ){
+  // 次のタイマーを取得
+  timer_t *timer = timerctrl.next_timer;
+  while(1) {
+    if (timer->timeout > timerctrl.uptime ){
       break;
     }
     // タイムアウト
-    timerctrl.sorted_timers[i]->status = READY;
+    timer->status = READY;
     unsigned char buf[8];
-    dequeue(timerctrl.sorted_timers[i]->queue, buf);
+    dequeue(timer->queue, buf);
+    // 次のタイマーの番地をセット
+    timer = timer->next;
   }
-  // i個タイムアウト
-  timerctrl.running_num -= i;
-  int j;
-  for(j = 0; j < timerctrl.running_num; i++) {
-    // 残りのタイマーをずらす
-    timerctrl.sorted_timers[j] = timerctrl.sorted_timers[i + j];
-  }
-  if (timerctrl.running_num > 0) {
-    // 最短のタイマーをセット
-    timerctrl.next = timerctrl.sorted_timers[0]->timeout;
-  } else {
-    timerctrl.next = 0xffffffff;
-  }
+  timerctrl.next_timer = timer;
+
+  // 最短のタイマーをセット
+  timerctrl.next_timeout = timerctrl.next_timer->timeout;
 }
 
 void set_timer(timer_t *timer, unsigned int timeout) {
@@ -106,25 +107,27 @@ void set_timer(timer_t *timer, unsigned int timeout) {
   // 割り込み禁止
   io_cli();
 
-  // 格納する場所を探索
-  int i;
-  for (i = 0; i < timerctrl.running_num; i++) {
-    if (timerctrl.sorted_timers[i]->timeout >= timer->timeout) {
-      break;
+  enqueue(timer->queue, timer->data);
+
+  timer_t *next_timer = timerctrl.next_timer;
+  if (timer->timeout <= next_timer->timeout) {
+    timerctrl.next_timer = timer;
+    timer->next = next_timer;
+    timerctrl.next_timeout = timer->timeout;
+    io_store_eflags(eflags);
+    return;
+  }
+
+  timer_t *prev_timer;
+  while(1) {
+    prev_timer = next_timer;
+    next_timer = next_timer->next;
+    if (timer->timeout <= next_timer->timeout) {
+      // prev_timerとnext_timerの間に入れる場合
+      prev_timer->next = timer;
+      timer->next = next_timer;
+      io_store_eflags(eflags);
+      return;
     }
   }
-
-  // 後ろにずらす
-  int j;
-  for (j = 0; j < timerctrl.running_num; j++) {
-    timerctrl.sorted_timers[j] = timerctrl.sorted_timers[j - 1];
-  }
-
-  timerctrl.running_num++;
-  // 時間順に格納する
-  timerctrl.sorted_timers[i] = timer;
-  enqueue(timer->queue, timer->data);
-  // 最短のタイマーの場合は更新
-  timerctrl.next = timerctrl.sorted_timers[0]->timeout;
-  io_store_eflags(eflags);
 }

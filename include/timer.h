@@ -11,7 +11,8 @@ enum timer_status {
   RUNNING
 };
 
-typedef struct {
+typedef struct timer {
+  struct timer *next;
   unsigned int timeout;
   enum timer_status status;
   queue_t *queue;
@@ -21,12 +22,10 @@ typedef struct {
 typedef struct {
   // システム起動時間
   unsigned int uptime;
+  // 次回のタイムアウト時刻
+  unsigned int next_timeout;
   // 次回のタイマー
-  unsigned int next;
-  // 現在稼働中のタイマー
-  unsigned int running_num;
-  // ソート済みタイマーのリスト
-  timer_t *sorted_timers[TIMER_MAX_NUM];
+  timer_t *next_timer;
   // すべてのタイマーリスト
   timer_t all_timers[TIMER_MAX_NUM];
 } timerctrl_t;
