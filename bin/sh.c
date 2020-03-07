@@ -180,7 +180,7 @@ void exec_cmd() {
   }
 }
 
-void start_shell(struct Queue *queue) {
+void start_shell(queue_t *queue) {
   unsigned char code;
   dequeue(queue, &code);
   input_code(code);

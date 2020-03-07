@@ -57,7 +57,7 @@ void free_timer(struct Timer *timer) {
   timer->status = STOPPED;
 }
 
-void init_timer(struct Timer *timer, struct Queue *queue, unsigned char data) {
+void init_timer(struct Timer *timer, queue_t *queue, unsigned char data) {
   timer->queue = queue;
   timer->data = data;
 }

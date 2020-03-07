@@ -14,7 +14,7 @@ enum TimerStatus {
 struct Timer {
   unsigned int timeout;
   enum TimerStatus status;
-  struct Queue *queue;
+  queue_t *queue;
   unsigned char data;
 };
 
@@ -37,7 +37,7 @@ struct Timer* new_timer();
 
 void free_timer(struct Timer *timer);
 
-void init_timer(struct Timer *timer, struct Queue *queue, unsigned char data);
+void init_timer(struct Timer *timer, queue_t *queue, unsigned char data);
 
 void handle_intr20(int *esp);
 

@@ -5,7 +5,7 @@
 #include <console.h>
 #include <color.h>
 
-struct Queue *queue;
+queue_t *queue;
 
 /**
  * キーボードコントローラがデータ送信可能になるまで待つ
@@ -18,7 +18,7 @@ void wait_keyboard() {
   }
 }
 
-void init_keyboard(struct Queue *q) {
+void init_keyboard(queue_t *q) {
   queue = q;
   wait_keyboard();
   outb_p(PORT_KEYCMD, KEYCMD_WRITE);

@@ -25,7 +25,7 @@ struct KEYBUF {
 } keybuf;
 
 void wait_keyboard();
-void init_keyboard(struct Queue *q);
+void init_keyboard(queue_t *q);
 
 void handle_intr(int *esp);
 void handle_intr27(int *esp);

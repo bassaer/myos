@@ -29,7 +29,7 @@ int main(void) {
 
   init_pit();
 
-  struct Queue queue;
+  queue_t queue;
   unsigned char keybuf[KEYBUF_LIMIT];
 
   init_queue(&queue, KEYBUF_LIMIT, keybuf);
