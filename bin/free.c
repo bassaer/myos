@@ -5,6 +5,8 @@
 #include <mm/memory.h>
 #include <lib/string.h>
 
+#define MB      (1024*1024)
+
 int free() {
   char *fmt =
     "total : %dMB\n"
@@ -16,7 +18,6 @@ int free() {
   };
   stats(&mem);
 
-  int mb = 1024*1024;
-  printf(fmt, mem.total_bytes/mb, mem.used_bytes/mb, mem.free_bytes/mb);
+  printf(fmt, mem.total_bytes/MB, mem.used_bytes/MB, mem.free_bytes/MB);
   return EXIT_SUCCESS;
 }

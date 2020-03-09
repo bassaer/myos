@@ -96,11 +96,11 @@ page_table_entry get_pde_ptaddr(page_directory_entry *pd) {
 }
 
 void set_pd(page_directory_entry *pde) {
-  __asm__("movl %%cr3, %0"::"r"(pde));
+  __asm__ volatile("movl %%cr3, %0"::"r"(pde));
 }
 
 void enable_paging() {
-  __asm__(
+  __asm__ volatile(
       "pushl %eax;"
       "movl %cr0, %eax;"
       "OR 0x80000000, %eax;"

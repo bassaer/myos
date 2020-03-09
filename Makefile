@@ -7,6 +7,7 @@ KERN_OBJ = kernel/main.o \
            kernel/console.o \
            kernel/intr.o \
            kernel/keyboard.o \
+           kernel/sched.o \
            kernel/timer.o
 
 LIB_OBJ  = lib/queue.o \

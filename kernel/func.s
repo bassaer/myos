@@ -1,8 +1,9 @@
 .code32
 .global io_cli, io_sti, io_stihlt, io_hlt
-.global load_gdtr, load_idtr, outb_p, io_in
+.global set_gdtr, set_idtr, outb_p, io_in
 .global asm_handle_intr20, asm_handle_intr21, asm_handle_intr27
 .global io_load_eflags, io_store_eflags, load_cr0, store_cr0
+.global set_tr_tmp, context_switch_tmp
 .extern handle_intr20, handle_intr21, handle_intr27
 .text
 
@@ -23,13 +24,13 @@ io_cli:
     cli
     ret
 
-load_gdtr:
+set_gdtr:
     movw    4(%esp),    %ax
     movw    %ax,        6(%esp)
     lgdt    6(%esp)
     ret
 
-load_idtr:
+set_idtr:
     movw    4(%esp),    %ax
     movw    %ax,        6(%esp)
     lidt    6(%esp)
@@ -113,3 +114,11 @@ asm_handle_intr27:
     pop     %ds
     pop     %es
     iret
+
+set_tr_tmp:
+    ltr     4(%esp)
+    ret
+
+context_switch_tmp:
+    ljmp    *4(%esp)
+    ret
