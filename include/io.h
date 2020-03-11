@@ -71,8 +71,15 @@ int load_cr0(void);
  */
 void store_cr0(int cr0);
 
-void set_tr_tmp(int tr);
+/**
+ * TRは現在実行中のタスクを記憶するためのレジスタ
+ * ltrはTRを変更するための命令
+ */
+void set_tr(int tr);
 
-void context_switch_tmp();
+/**
+ * 指定のアドレスにロングjumpする
+ */
+void context_switch();
 
 #endif

@@ -28,7 +28,7 @@ void init_sched() {
 }
 
 void task2_main() {
-  debug("start task2!!");
+  debug("task2_main!!");
   /*
   while(1) {
     io_hlt();
@@ -36,24 +36,3 @@ void task2_main() {
   */
 }
 
-/**
- * TRは現在実行中のタスクを記憶するためのレジスタ
- * ltrはTRを変更するための命令
- */
-void set_tr(int tr) {
-  __asm__ volatile(
-      "ltr %%ax;"
-      ::"a"(tr)
-  );
-  return; // returnが必要
-}
-
-/**
- * 指定のアドレスにロングjumpする
- */
-void context_switch(int *addr) {
-  __asm__ volatile(
-      "ljmp *(%0);"
-      ::"r"(&addr)
-  );
-}

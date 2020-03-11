@@ -3,7 +3,7 @@
 .global set_gdtr, set_idtr, outb_p, io_in
 .global asm_handle_intr20, asm_handle_intr21, asm_handle_intr27
 .global io_load_eflags, io_store_eflags, load_cr0, store_cr0
-.global set_tr_tmp, context_switch_tmp
+.global set_tr, context_switch
 .extern handle_intr20, handle_intr21, handle_intr27
 .text
 
@@ -115,10 +115,10 @@ asm_handle_intr27:
     pop     %es
     iret
 
-set_tr_tmp:
+set_tr:
     ltr     4(%esp)
     ret
 
-context_switch_tmp:
+context_switch:
     ljmp    *4(%esp)
     ret

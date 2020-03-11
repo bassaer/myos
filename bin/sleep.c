@@ -55,7 +55,7 @@ int sleep(char *args[], int size) {
   tss2.fs =  1 * 8;
   tss2.gs =  1 * 8;
 
-  debug("tss2 = %x", tss2.eip);
+  debug("tss2 = %x", (int *)tss2.eip);
 
   while(1) {
     // 割り込み無効化
@@ -64,8 +64,7 @@ int sleep(char *args[], int size) {
       // 割り込み有効化 + HLT
       io_stihlt();
     } else {
-      //context_switch(tss2.eip);
-      context_switch((int *)0x0000000000280ccd);
+      context_switch(tss2.eip);
       // 割り込み有効化
       io_sti();
       break;
