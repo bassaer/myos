@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## ver 1.15.1
+- fix context switch
+
 ## ver 1.15.0
 - use linear list for timer
 

@@ -26,13 +26,13 @@ void io_cli(void);
  * GDTR(global descriptor table register) : GDT設定用レジスタ
  * GDT : 大域セグメント記述子, セグメンテーションを割り当てたテーブル
  */
-void load_gdtr(int limit, int addr);
+void set_gdtr(int limit, int addr);
 
 /**
  * IDTR(interrupt descriptor table register) : IDT設定用レジスタ
  * IDT : 割り込みと割り込みハンドラの対応テーブル
  */
-void load_idtr(int limit, int addr);
+void set_idtr(int limit, int addr);
 
 /**
  * ポート指定でのレジスタ書き込み
@@ -70,5 +70,16 @@ int load_cr0(void);
  * CR0書き込み
  */
 void store_cr0(int cr0);
+
+/**
+ * TRは現在実行中のタスクを記憶するためのレジスタ
+ * ltrはTRを変更するための命令
+ */
+void set_tr(int tr);
+
+/**
+ * 指定のアドレスにロングjumpする
+ */
+void context_switch();
 
 #endif

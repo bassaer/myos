@@ -13,13 +13,14 @@ void init_gdtidt() {
   // メモリ全体
   set_segmdesc(gdt + 1, 0xffffffff, 0x00000000, AR_DATA32_RW);
   // カーネル
-  set_segmdesc(gdt + 2, KERN_LIMIT, KERN_ADDR, AR_CODE32_ER);
-  load_gdtr(GDT_LIMIT, GDT_ADDR);
+  set_segmdesc(gdt + 2, 0xffffffff, 0x00000000, AR_CODE32_ER);
+  // GDTのリミットと番地をGDTR(48bitレジスタ)に設定
+  set_gdtr(GDT_LIMIT, GDT_ADDR);
 
   for (i = 0; i <= IDT_LIMIT / 8; i++) {
     set_gatedesc(idt + i, 0, 0, 0);
   }
-  load_idtr(IDT_LIMIT, IDT_ADDR);
+  set_idtr(IDT_LIMIT, IDT_ADDR);
 
   // IDTの設定
   // 2*8 -> 2番目のセグメント

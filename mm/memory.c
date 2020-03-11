@@ -97,7 +97,6 @@ int init_pg_table() {
 int map_page(unsigned long paddr, unsigned long vaddr) {
   page_directory_entry *curr_pd = get_curr_pd();
   if (curr_pd == NULL) {
-    debug("error at 94");
     return MEM_ERROR;
   }
   page_directory_entry *pde = get_pde(curr_pd, vaddr);
@@ -107,7 +106,6 @@ int map_page(unsigned long paddr, unsigned long vaddr) {
   } else {
     pg_table = (page_table_entry *)alloc_single_block();
     if (pg_table == NULL) {
-      debug("error at 102");
       return MEM_ERROR;
     }
     //.ブロック初期化

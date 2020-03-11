@@ -11,6 +11,7 @@
 #include <intr.h>
 #include <io.h>
 #include <keyboard.h>
+#include <sched.h>
 #include <timer.h>
 #include <mm/memory.h>
 #include <sh.h>
@@ -34,6 +35,7 @@ int main(void) {
   init_keyboard(&queue);
   init_mem_info();
   init_shell();
+  init_sched();
 
   while(1) {
     io_cli(); // 割り込み無効化
