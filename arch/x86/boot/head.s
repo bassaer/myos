@@ -3,9 +3,24 @@
 .equ DSKCAC0,  0x00008000
 .equ CYLS,     0x0ff0
 .equ LEDS,     0x0ff1
+.equ VMODE,    0x0ff2
+.equ SCRNX,    0x0ff4
+.equ SCRNY,    0x0ff6
+.equ VRAM,     0x0ff8
 
 .text
 .code16
+
+
+#.org 0xc200
+
+    movb    $0x13,          %al     # VGAグラフィックス 320x200x8bit color
+    movb    $0x00,          %ah
+    int     $0x10
+    movb    $0x08,          (VMODE)
+    movw    $320,           (SCRNX)
+    movw    $200,           (SCRNY)
+    movl    $0x000a0000,    (VRAM)
 
 keystatus:
     movb    $0x02,          %ah

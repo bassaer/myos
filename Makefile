@@ -16,6 +16,8 @@ LIB_OBJ  = lib/queue.o \
 MM_OBJ   = mm/memory.o \
            mm/pgtable.o
 
+DRV_OBJ  = drivers/vram.o
+
 BIN_OBJ  = bin/echo.o \
            bin/free.o \
            bin/ls.o \
@@ -52,7 +54,7 @@ $(ARCH)/head.bin: $(ARCH)/head.o
 	ld $^ -T $(ARCH)/head.ld -Map head.map -o $@
 
 # TODO : ひとまずkernelにすべてリンクするが、あとでユーザ空間を分ける
-kernel/kernel.bin: $(KERN_OBJ) $(LIB_OBJ) $(BIN_OBJ) $(MM_OBJ)
+kernel/kernel.bin: $(KERN_OBJ) $(LIB_OBJ) $(BIN_OBJ) $(MM_OBJ) $(DRV_OBJ)
 	ld $^ -T kernel/kernel.ld -Map kernel.map -o $@
 
 run: img

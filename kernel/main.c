@@ -13,39 +13,20 @@
 #include <keyboard.h>
 #include <sched.h>
 #include <timer.h>
-#include <mm/memory.h>
 #include <sh.h>
+#include <mm/memory.h>
 #include <lib/queue.h>
+#include <drivers/vram.h>
 
 #define KEYBUF_LIMIT    32
 
 int main(void) {
-  init_gdtidt();
-  init_pic();
-
-  io_sti();
-  outb_p(PIC0_IMR, 0xf8); // PIT, PIC1, キーボードを許可(11111000)
-
-  init_pit();
-
-  queue_t queue;
-  unsigned char keybuf[KEYBUF_LIMIT];
-
-  init_queue(&queue, KEYBUF_LIMIT, keybuf);
-  init_keyboard(&queue);
-  init_mem_info();
-  init_shell();
-  init_sched();
-
-  while(1) {
-    io_cli(); // 割り込み無効化
-    if (queue_status(&queue) == 0) {
-      io_stihlt(); // 割り込み有効化 + HLT
-    } else {
-      start_shell(&queue);
-      io_sti(); // 割り込み有効化
-    }
+  int i;
+  for (i = 0xa0000; i < 0xaffff; i++) {
+    write_mem8(i, 15);
   }
-
+  while(1) {
+    io_hlt();
+  }
   return 0;
 }
