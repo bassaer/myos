@@ -17,14 +17,12 @@
 #include <mm/memory.h>
 #include <lib/queue.h>
 #include <drivers/vram.h>
+#include <drivers/screen.h>
 
 #define KEYBUF_LIMIT    32
 
 int main(void) {
-  int i;
-  for (i = 0xa0000; i < 0xaffff; i++) {
-    write_mem8(i, 15);
-  }
+  init_screen();
   while(1) {
     io_hlt();
   }

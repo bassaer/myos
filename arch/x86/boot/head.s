@@ -11,9 +11,6 @@
 .text
 .code16
 
-
-#.org 0xc200
-
     movb    $0x13,          %al     # VGAグラフィックス 320x200x8bit color
     movb    $0x00,          %ah
     int     $0x10
