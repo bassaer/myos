@@ -1,5 +1,6 @@
 #include <drivers/screen.h>
 
+#include <drivers/font.h>
 #include <drivers/palette.h>
 
 struct {
@@ -34,8 +35,9 @@ void init_screen(char *vram, unsigned int width, unsigned int height) {
   fill_box(screen.width, PALETTE_WHITE,      screen.width - 3,  screen.height - 24, screen.width -  3,  screen.height -  3);
 }
 
-void put_c(int x, int y, char color, char *font) {
+void put_c(int x, int y, char color, char c) {
   int i;
+  char *font = FONT[(int)c];
   for (i = 0; i < 16; i++) {
     char *ptr = screen.vram + (y + i) * screen.width + x;
     char data = font[i];
@@ -51,3 +53,10 @@ void put_c(int x, int y, char color, char *font) {
   }
 }
 
+void put_s(int x, int y, char color, char *str) {
+  while (*str != '\0') {
+    put_c(x, y, color, *str);
+    str++;
+    x += 8;
+  }
+}

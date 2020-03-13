@@ -3,6 +3,8 @@
 
 void init_screen(char *vram, unsigned int width, unsigned height);
 
-void put_c(int x, int y, char color, char *font);
+void put_c(int x, int y, char color, char c);
+
+void put_s(int x, int y, char color, char *str);
 
 #endif

@@ -16,7 +16,6 @@
 #include <sh.h>
 #include <mm/memory.h>
 #include <lib/queue.h>
-#include <drivers/font.h>
 #include <drivers/palette.h>
 #include <drivers/screen.h>
 #include <drivers/vram.h>
@@ -40,7 +39,7 @@ int main(void) {
 
   init_screen(boot_info->vram, boot_info->width, boot_info->height);
 
-  put_c(8, 8, PALETTE_WHITE, FONT['A']);
+  put_s(8, 8, PALETTE_WHITE, "hello world");
 
   while(1) {
     io_hlt();
