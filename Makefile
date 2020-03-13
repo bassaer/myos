@@ -49,6 +49,9 @@ img: $(ARCH)/ipl.bin $(ARCH)/head.bin kernel/kernel.bin
 .s.o:
 	as --32 -o $@ $<
 
+font:
+	python scripts/font.py -f scripts/font.txt
+
 $(ARCH)/ipl.bin: $(ARCH)/ipl.o
 	ld $^ -T $(ARCH)/ipl.ld -Map ipl.map -o $@
 

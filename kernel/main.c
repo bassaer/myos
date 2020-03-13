@@ -16,9 +16,10 @@
 #include <sh.h>
 #include <mm/memory.h>
 #include <lib/queue.h>
-#include <drivers/vram.h>
-#include <drivers/screen.h>
+#include <drivers/font.h>
 #include <drivers/palette.h>
+#include <drivers/screen.h>
+#include <drivers/vram.h>
 
 #define KEYBUF_LIMIT    32
 #define BOOT_INFO_ADDR  0x0ff0
@@ -39,11 +40,7 @@ int main(void) {
 
   init_screen(boot_info->vram, boot_info->width, boot_info->height);
 
-  static char font[16] = {
-    0x00, 0x18, 0x18, 0x18, 0x18, 0x24, 0x24, 0x24,
-    0x24, 0x7e, 0x42, 0x42, 0x42, 0xe7, 0x00, 0x00
-  };
-  put_c(8, 8, PALETTE_WHITE, font);
+  put_c(8, 8, PALETTE_WHITE, FONT['A']);
 
   while(1) {
     io_hlt();
