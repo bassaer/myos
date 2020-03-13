@@ -17,6 +17,7 @@
 #include <mm/memory.h>
 #include <lib/queue.h>
 #include <lib/string.h>
+#include <drivers/cursor.h>
 #include <drivers/palette.h>
 #include <drivers/screen.h>
 #include <drivers/vram.h>
@@ -40,9 +41,11 @@ int main(void) {
 
   init_screen(boot_info->vram, boot_info->width, boot_info->height);
 
-  char msg[256];
-  sprintf(msg, "hello, world!! -> %d", 100);
-  put_s(8, 8, PALETTE_WHITE, msg);
+
+  char cursor[16*16];
+  init_cursor(cursor, PALETTE_BLUE_GRAY);
+  //put_block(16, 16, boot_info->width / 2, (boot_info->height - 50) / 2, cursor, 16);
+  put_block(16, 16, 130, 130, cursor, 16);
 
   while(1) {
     io_hlt();

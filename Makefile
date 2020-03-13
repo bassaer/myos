@@ -16,7 +16,8 @@ LIB_OBJ  = lib/queue.o \
 MM_OBJ   = mm/memory.o \
            mm/pgtable.o
 
-DRV_OBJ  = drivers/palette.o \
+DRV_OBJ  = drivers/cursor.o \
+           drivers/palette.o \
            drivers/screen.o \
            drivers/vram.o
 

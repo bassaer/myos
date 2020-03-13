@@ -61,3 +61,12 @@ void put_s(int x, int y, char color, char *str) {
     x += 8;
   }
 }
+
+void put_block(int width, int height, int start_x, int start_y, char *buf, int px) {
+  int x, y;
+  for (y = 0; y < height; y++) {
+    for (x = 0; x < width; x++) {
+      screen.vram[(start_y + y) * screen.width + (start_x + x)] = buf[y * px + x];
+    }
+  }
+}

@@ -7,4 +7,6 @@ void put_c(int x, int y, char color, char c);
 
 void put_s(int x, int y, char color, char *str);
 
+void put_block(int width, int height, int start_x, int start_y, char *buf, int px);
+
 #endif
