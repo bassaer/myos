@@ -6,7 +6,11 @@
 #define PALETTE_COLOR_PORT  0x03c9
 #define PALETTE_ADDR        0xa0000
 
-void init_palette() {
+char *vram = (char *)PALETTE_ADDR;
+
+void init_palette(char *_vram) {
+  vram = _vram;
+
   static unsigned char rgb_table[16 * 3] = {
     0x00, 0x00, 0x00, //  0: black
     0xff, 0x00, 0x00, //  1: red
@@ -34,7 +38,6 @@ void set_palette(int start, int end, unsigned char *rgb) {
   // 割り込み禁止
   io_cli();
 
-
   // パレットの色を設定
   outb_p(PALETTE_NUM_PORT, start);
   int i;
@@ -50,7 +53,6 @@ void set_palette(int start, int end, unsigned char *rgb) {
 }
 
 void fill_box(int size, unsigned int color, int start_x, int start_y, int end_x, int end_y) {
-  char *vram = (char *)PALETTE_ADDR;
   int x, y;
   for (y = start_y; y <= end_y; y++) {
     for (x = start_x; x <= end_x; x++) {

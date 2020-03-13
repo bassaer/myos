@@ -18,7 +18,7 @@
 #define PALETTE_BLUE_GRAY     14
 #define PALETTE_DARK_GRAY     15
 
-void init_palette();
+void init_palette(char *vrm);
 
 void set_palette(int start, int end, unsigned char *rgb);
 

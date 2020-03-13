@@ -2,26 +2,52 @@
 
 #include <drivers/palette.h>
 
-#define WIDTH    320
-#define HEIGHT   200
+struct {
+  unsigned int width;
+  unsigned int height;
+  char *vram;
+} screen;
 
-void init_screen() {
-  init_palette();
-  fill_box(WIDTH, PALETTE_BLUE_GRAY,  0,          0,            WIDTH - 1,  HEIGHT - 29);
-  fill_box(WIDTH, PALETTE_LIGHT_GRAY, 0,          HEIGHT - 28,  WIDTH - 1,  HEIGHT - 28);
-  fill_box(WIDTH, PALETTE_WHITE,      0,          HEIGHT - 27,  WIDTH - 1,  HEIGHT - 27);
-  fill_box(WIDTH, PALETTE_LIGHT_GRAY, 0,          HEIGHT - 26,  WIDTH - 1,  HEIGHT -  1);
 
-  fill_box(WIDTH, PALETTE_WHITE,      3,          HEIGHT - 24,         59,  HEIGHT - 24);
-  fill_box(WIDTH, PALETTE_WHITE,      2,          HEIGHT - 24,          2,  HEIGHT -  4);
-  fill_box(WIDTH, PALETTE_DARK_GRAY,  3,          HEIGHT -  4,         59,  HEIGHT -  4);
-  fill_box(WIDTH, PALETTE_DARK_GRAY,  59,         HEIGHT - 23,         59,  HEIGHT -  5);
-  fill_box(WIDTH, PALETTE_BLACK,      2,          HEIGHT -  3,         59,  HEIGHT -  3);
-  fill_box(WIDTH, PALETTE_BLACK,      60,         HEIGHT - 24,         60,  HEIGHT -  3);
+void init_screen(char *vram, unsigned int width, unsigned int height) {
+  screen.width = width;
+  screen.height = height;
+  screen.vram = vram;
 
-  fill_box(WIDTH, PALETTE_DARK_GRAY,  WIDTH - 47, HEIGHT - 24,  WIDTH -  4, HEIGHT - 24);
-  fill_box(WIDTH, PALETTE_DARK_GRAY,  WIDTH - 47, HEIGHT - 23,  WIDTH - 47, HEIGHT -  4);
-  fill_box(WIDTH, PALETTE_WHITE,      WIDTH - 47, HEIGHT -  3,  WIDTH -  3, HEIGHT -  3);
-  fill_box(WIDTH, PALETTE_WHITE,      WIDTH - 3,  HEIGHT - 24,  WIDTH -  3, HEIGHT -  3);
+  init_palette(vram);
+
+  fill_box(screen.width, PALETTE_BLUE_GRAY,  0,                 0,                  screen.width - 1,   screen.height - 29);
+  fill_box(screen.width, PALETTE_LIGHT_GRAY, 0,                 screen.height - 28, screen.width - 1,   screen.height - 28);
+  fill_box(screen.width, PALETTE_WHITE,      0,                 screen.height - 27, screen.width - 1,   screen.height - 27);
+  fill_box(screen.width, PALETTE_LIGHT_GRAY, 0,                 screen.height - 26, screen.width - 1,   screen.height -  1);
+
+  fill_box(screen.width, PALETTE_WHITE,      3,                 screen.height - 24, 59,                 screen.height - 24);
+  fill_box(screen.width, PALETTE_WHITE,      2,                 screen.height - 24, 2,                  screen.height -  4);
+  fill_box(screen.width, PALETTE_DARK_GRAY,  3,                 screen.height -  4, 59,                 screen.height -  4);
+  fill_box(screen.width, PALETTE_DARK_GRAY,  59,                screen.height - 23, 59,                 screen.height -  5);
+  fill_box(screen.width, PALETTE_BLACK,      2,                 screen.height -  3, 59,                 screen.height -  3);
+  fill_box(screen.width, PALETTE_BLACK,      60,                screen.height - 24, 60,                 screen.height -  3);
+
+  fill_box(screen.width, PALETTE_DARK_GRAY,  screen.width - 47, screen.height - 24, screen.width -  4,  screen.height - 24);
+  fill_box(screen.width, PALETTE_DARK_GRAY,  screen.width - 47, screen.height - 23, screen.width - 47,  screen.height -  4);
+  fill_box(screen.width, PALETTE_WHITE,      screen.width - 47, screen.height -  3, screen.width -  3,  screen.height -  3);
+  fill_box(screen.width, PALETTE_WHITE,      screen.width - 3,  screen.height - 24, screen.width -  3,  screen.height -  3);
+}
+
+void put_c(int x, int y, char color, char *font) {
+  int i;
+  for (i = 0; i < 16; i++) {
+    char *ptr = screen.vram + (y + i) * screen.width + x;
+    char data = font[i];
+
+    if ((data & 0x80) != 0) { ptr[0] = color; }
+    if ((data & 0x40) != 0) { ptr[1] = color; }
+    if ((data & 0x20) != 0) { ptr[2] = color; }
+    if ((data & 0x10) != 0) { ptr[3] = color; }
+    if ((data & 0x08) != 0) { ptr[4] = color; }
+    if ((data & 0x04) != 0) { ptr[5] = color; }
+    if ((data & 0x02) != 0) { ptr[6] = color; }
+    if ((data & 0x01) != 0) { ptr[7] = color; }
+  }
 }
 

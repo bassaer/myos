@@ -1,6 +1,8 @@
 #ifndef MYOS_SCREEN_H
 #define MYOS_SCREEN_H
 
-void init_screen();
+void init_screen(char *vram, unsigned int width, unsigned height);
+
+void put_c(int x, int y, char color, char *font);
 
 #endif
