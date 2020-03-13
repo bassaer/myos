@@ -1,6 +1,8 @@
 #ifndef MYOS_UTIL_H
 #define MYOS_UTIL_H
 
+#include <stdarg.h>
+
 /**
  * ひとまず同じ場合は0を返す
  */
@@ -22,5 +24,9 @@ int split(char *src, char *dst[], char delim);
 void strcpy(char *src, char *dist);
 
 int atoi(char *src);
+
+char* format_str(char *str, char *format, va_list *arg);
+
+char* sprintf(char *str, char *format, ...);
 
 #endif

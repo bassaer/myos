@@ -2,6 +2,7 @@
 
 #include <drivers/font.h>
 #include <drivers/palette.h>
+#include <lib/string.h>
 
 struct {
   unsigned int width;

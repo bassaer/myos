@@ -22,7 +22,6 @@ void newline();
 void clear_line();
 void scroll();
 void put_prompt();
-char* sprintf(char *str, char *format, ...);
 void printf(char *format, ...);
 void debug(char *format, ...);
 
