@@ -55,11 +55,9 @@ int main(void) {
   unsigned char cursor_buf[QUEUE_LIMIT];
   queue_t cursor_q;
   init_queue(&cursor_q, QUEUE_LIMIT, cursor_buf);
-  char cursor[16*16];
-  init_cursor(cursor, &cursor_q ,PALETTE_BLUE_GRAY);
+  init_cursor(&cursor_q ,PALETTE_BLUE_GRAY, boot_info->width, boot_info->height);
   enable_cursor();
 
-  put_block(16, 16, boot_info->width / 2, (boot_info->height - 50) / 2, cursor, 16);
 
   while(1) {
     io_cli(); // 割り込み無効化
@@ -74,7 +72,8 @@ int main(void) {
       io_sti(); // 割り込み有効化
     } else if (queue_status(&cursor_q) != 0) {
       int data = dequeue(&cursor_q);
-      update_cursor(data);
+      decode_cursor(data);
+      update_cursor();
       io_sti();
     } else {
       io_stihlt(); // 割り込み有効化 + HLT

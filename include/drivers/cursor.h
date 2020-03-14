@@ -3,12 +3,14 @@
 
 #include<lib/queue.h>
 
-void init_cursor(char *cursor, queue_t *q, char bg_color);
+void init_cursor(queue_t *q, char bg_color, int width, int height);
 
 void handle_intr2c(int *esp);
 
 void enable_cursor();
 
-void update_cursor(unsigned char data);
+void decode_cursor(unsigned char data);
+
+void update_cursor();
 
 #endif
