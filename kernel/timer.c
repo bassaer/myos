@@ -88,8 +88,7 @@ void handle_intr20(int *esp) {
     }
     // タイムアウト
     timer->status = READY;
-    unsigned char buf[8];
-    dequeue(timer->queue, buf);
+    dequeue(timer->queue);
     // 次のタイマーの番地をセット
     timer = timer->next;
   }

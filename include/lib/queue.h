@@ -16,7 +16,7 @@ void init_queue(queue_t *queue, int size, unsigned char *buf);
 
 int enqueue(queue_t *queue, unsigned char data);
 
-int dequeue(queue_t *queue, unsigned char *data);
+int dequeue(queue_t *queue);
 
 int queue_status(queue_t *queue);
 

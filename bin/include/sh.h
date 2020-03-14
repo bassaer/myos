@@ -6,7 +6,7 @@
 
 void init_shell();
 void init_entry();
-void input_code(unsigned char code);
+void input_code(int code);
 void exec_cmd();
 void start_shell();
 

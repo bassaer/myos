@@ -9,4 +9,6 @@ void handle_intr2c(int *esp);
 
 void enable_cursor();
 
+void update_cursor(unsigned char data);
+
 #endif

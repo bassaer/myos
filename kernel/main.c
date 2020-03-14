@@ -63,19 +63,18 @@ int main(void) {
 
   while(1) {
     io_cli(); // 割り込み無効化
-    if (queue_status(&cursor_q) != 0) {
+    if (queue_status(&keyboard_q) != 0) {
       fill_box(boot_info->width, PALETTE_BLUE_GRAY, 0, 16, 320, 32);
-      unsigned char data[256];
-      dequeue(&cursor_q, data);
+
+      int data = dequeue(&keyboard_q);
       char buf[256];
-      sprintf(buf, "%x", data);
+      sprintf(buf, "kb -> %x", data);
       put_s(0, 16, PALETTE_WHITE, buf);
+
       io_sti(); // 割り込み有効化
-    } else if (queue_status(&keyboard_q) != 0) {
-      fill_box(boot_info->width, PALETTE_BLUE_GRAY, 0, 48, 320, 64);
-      unsigned char data[256];
-      dequeue(&keyboard_q, data);
-      put_s(0, 48, PALETTE_WHITE, "keyboard");
+    } else if (queue_status(&cursor_q) != 0) {
+      int data = dequeue(&cursor_q);
+      update_cursor(data);
       io_sti();
     } else {
       io_stihlt(); // 割り込み有効化 + HLT
