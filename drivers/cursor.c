@@ -12,6 +12,11 @@
 #define KEYCMD_SENDTO_CURSOR  0xd4
 #define CURSORCMD_ENABLE      0xf4
 #define CURSOR_ACK            0xfa
+#define FIRST_BYTE_MASK       0xc8
+#define FIRST_BYTE_OK         0x08
+#define CURSOR_BUTTON_MASK    0x07
+#define CURSOR_X_MASK         0x10
+#define CURSOR_Y_MASK         0x20
 
 char CURSOR[16][16] = {
   "...**...........",
@@ -45,6 +50,9 @@ struct {
   queue_t *queue;
   unsigned char buf[3];
   enum cursor_status status;
+  int x;
+  int y;
+  int button;
 } cursor_info;
 
 void init_cursor(char *cursor, queue_t *queue, char bg_color) {
@@ -97,8 +105,11 @@ void update_cursor(unsigned char data) {
       }
       return;
     case FIRST_BIT:
-      cursor_info.buf[0] = data;
-      cursor_info.status = SECOND_BIT;
+      // 1バイト目のチェック
+      if((data & FIRST_BYTE_MASK) == FIRST_BYTE_OK) {
+        cursor_info.buf[0] = data;
+        cursor_info.status = SECOND_BIT;
+      }
       return;
     case SECOND_BIT:
       cursor_info.buf[1] = data;
@@ -111,8 +122,35 @@ void update_cursor(unsigned char data) {
     default:
       return;
   }
+  // ボタンの状態を下位3bitから取得
+  cursor_info.button = cursor_info.buf[0] & CURSOR_BUTTON_MASK;
+  // 基本的にx, yにはそのまま2, 3バイト目をいれる
+  cursor_info.x = cursor_info.buf[1];
+  cursor_info.y = cursor_info.buf[2];
+  // １バイト目の移動に反応する桁の情報を使って
+  // 8bit目以上を全部1 or 0にするか決める
+  if ((cursor_info.buf[0] & CURSOR_X_MASK) != 0) {
+    cursor_info.x |= 0xffffff00;
+  }
+  if ((cursor_info.buf[0] & CURSOR_Y_MASK) != 0) {
+    cursor_info.y |= 0xffffff00;
+  }
+  // yの符号は画面の方向と逆
+  cursor_info.y *= -1;
+
+  // debug
+  char *btn = "-";
+  if ((cursor_info.button & 0x01) != 0) {
+    btn = "L";
+  }
+  if ((cursor_info.button & 0x02) != 0) {
+    btn = "R";
+  }
+  if ((cursor_info.button & 0x04) != 0) {
+    btn = "C";
+  }
   fill_box(320, PALETTE_BLUE_GRAY, 0, 48, 320, 64);
   char str[256];
-  sprintf(str, "status: %d, data: %x, %x, %x, %x", cursor_info.status, data, cursor_info.buf[0], cursor_info.buf[1], cursor_info.buf[2]);
+  sprintf(str, "btn: %s, (%d, %d)", btn, cursor_info.x, cursor_info.y);
   put_s(0, 48, PALETTE_WHITE, str);
 }
