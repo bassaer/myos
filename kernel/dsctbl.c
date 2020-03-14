@@ -31,6 +31,7 @@ void init_gdtidt() {
   set_gatedesc(idt + 0x20, (int) asm_handle_intr20, 2 * 8, AR_INTGATE32);
   set_gatedesc(idt + 0x21, (int) asm_handle_intr21, 2 * 8, AR_INTGATE32);
   set_gatedesc(idt + 0x27, (int) asm_handle_intr27, 2 * 8, AR_INTGATE32);
+  set_gatedesc(idt + 0x2c, (int) asm_handle_intr2c, 2 * 8, AR_INTGATE32);
 }
 
 void set_segmdesc(segment_descriptor_t *sd, unsigned int limit, int base, int ar) {

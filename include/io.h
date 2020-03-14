@@ -50,6 +50,7 @@ int io_in(int port);
 void asm_handle_intr20(void);
 void asm_handle_intr21(void);
 void asm_handle_intr27(void);
+void asm_handle_intr2c(void);
 
 /**
  * EFLAGS読み込み

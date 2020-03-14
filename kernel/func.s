@@ -1,10 +1,10 @@
 .code32
 .global io_cli, io_sti, io_stihlt, io_hlt
 .global set_gdtr, set_idtr, outb_p, io_in
-.global asm_handle_intr20, asm_handle_intr21, asm_handle_intr27
+.global asm_handle_intr20, asm_handle_intr21, asm_handle_intr27, asm_handle_intr2c
 .global io_load_eflags, io_store_eflags, load_cr0, store_cr0
 .global set_tr, context_switch
-.extern handle_intr20, handle_intr21, handle_intr27
+.extern handle_intr20, handle_intr21, handle_intr27, handle_intr2c
 .text
 
 io_hlt:
@@ -114,6 +114,23 @@ asm_handle_intr27:
     pop     %ds
     pop     %es
     iret
+
+asm_handle_intr2c:
+    push    %es
+    push    %ds
+    pusha
+    mov     %esp,       %eax
+    push    %eax
+    mov     %ss,        %ax
+    mov     %ax,        %ds
+    mov     %ax,        %es
+    call    handle_intr2c
+    pop     %eax
+    popa
+    pop     %ds
+    pop     %es
+    iret
+
 
 set_tr:
     ltr     4(%esp)

@@ -52,11 +52,15 @@ void set_palette(int start, int end, unsigned char *rgb) {
   io_store_eflags(eflags);
 }
 
-void fill_box(int size, unsigned int color, int start_x, int start_y, int end_x, int end_y) {
+/**
+ * 四角形描画
+ * width: 画面幅
+ */
+void fill_box(int width, unsigned int color, int start_x, int start_y, int end_x, int end_y) {
   int x, y;
   for (y = start_y; y <= end_y; y++) {
     for (x = start_x; x <= end_x; x++) {
-      vram[y * size + x] = color;
+      vram[y * width + x] = color;
     }
   }
 }

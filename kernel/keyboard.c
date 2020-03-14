@@ -5,7 +5,7 @@
 #include <console.h>
 #include <color.h>
 
-queue_t *queue;
+queue_t *keyboard_queue;
 
 /**
  * キーボードコントローラがデータ送信可能になるまで待つ
@@ -18,8 +18,8 @@ void wait_keyboard() {
   }
 }
 
-void init_keyboard(queue_t *q) {
-  queue = q;
+void init_keyboard(queue_t *queue) {
+  keyboard_queue = queue;
   wait_keyboard();
   outb_p(PORT_KEYCMD, KEYCMD_WRITE);
   wait_keyboard();
@@ -33,7 +33,7 @@ void init_keyboard(queue_t *q) {
 void handle_intr21(int *esp) {
   outb_p(PIC0_OCW2, 0x61); // IRQ-01受付完了をPICに通知
   unsigned char code = io_in(PORT_KEYDAT);
-  enqueue(queue, code);
+  enqueue(keyboard_queue, code);
 }
 
 void handle_intr27(int *esp) {
