@@ -83,7 +83,7 @@ void copy_entry(entry_t *src, entry_t *dst) {
     strcpy(src->buf, dst->buf);
 }
 
-void input_code(unsigned char code) {
+void input_code(int code) {
   if (code == BACKSPACE && entries[cur_line].index > 0) {
     entries[cur_line].buf[--(entries[cur_line].index)] = '\0';
     backspace();
@@ -181,7 +181,6 @@ void exec_cmd() {
 }
 
 void start_shell(queue_t *queue) {
-  unsigned char code;
-  dequeue(queue, &code);
+  int code = dequeue(queue);
   input_code(code);
 }

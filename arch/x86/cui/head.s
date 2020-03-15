@@ -3,6 +3,11 @@
 .equ DSKCAC0,  0x00008000
 .equ CYLS,     0x0ff0
 .equ LEDS,     0x0ff1
+.equ VMODE,    0x0ff2
+.equ SCRNX,    0x0ff4
+.equ SCRNY,    0x0ff6
+.equ VRAM,     0x0ff8
+.equ GUI,      0x0ffc
 
 .text
 .code16
@@ -11,6 +16,7 @@ keystatus:
     movb    $0x02,          %ah
     int     $0x16
     movb    %al,            (LEDS)
+    movb    $0x03,          (GUI)    # 起動をCUIかGUIか選択
 
 # PICが一切割り込みをしないようにする
     movb    $0xff,          %al

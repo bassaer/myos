@@ -23,18 +23,18 @@ int enqueue(queue_t *queue, unsigned char data) {
   return 0;
 }
 
-int dequeue(queue_t *queue, unsigned char *data) {
+int dequeue(queue_t *queue) {
   if (queue->free == queue->size) {
     // バッファが空
     return -1;
   }
-  *data = queue->buf[queue->next_r];
+  int data = queue->buf[queue->next_r];
   queue->next_r++;
   if (queue->next_r == queue->size) {
     queue->next_r = 0;
   }
   queue->free++;
-  return 0;
+  return data;
 }
 
 int queue_status(queue_t *queue) {
