@@ -7,22 +7,16 @@
 .equ SCRNX,    0x0ff4
 .equ SCRNY,    0x0ff6
 .equ VRAM,     0x0ff8
+.equ GUI,      0x0ffc
 
 .text
 .code16
-
-    movb    $0x13,          %al     # VGAグラフィックス 320x200x8bit color
-    movb    $0x00,          %ah
-    int     $0x10
-    movb    $0x08,          (VMODE)
-    movw    $320,           (SCRNX)
-    movw    $200,           (SCRNY)
-    movl    $0x000a0000,    (VRAM)
 
 keystatus:
     movb    $0x02,          %ah
     int     $0x16
     movb    %al,            (LEDS)
+    movb    $0x03,          (GUI)    # 起動をCUIかGUIか選択
 
 # PICが一切割り込みをしないようにする
     movb    $0xff,          %al

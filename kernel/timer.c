@@ -76,6 +76,7 @@ void handle_intr20(int *esp) {
   outb_p(PIC0_OCW2, 0x60); // IRQ-00受付完了をPICに通知
   // uptimeを更新
   timerctrl.uptime++;
+  debug("uptime: %d", timerctrl.uptime);
   // 次のタイマーの時刻を確認
   if (timerctrl.next_timeout > timerctrl.uptime) {
     return;
