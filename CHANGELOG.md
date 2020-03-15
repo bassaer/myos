@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## ver 2.0.0
+- add GUI
+
 ## ver 1.15.1
 - fix context switch
 

@@ -35,6 +35,8 @@ int main() {
   io_sti();
   outb_p(PIC0_IMR, 0xf8); // PIT, PIC1, キーボードを許可(11111000)
 
+  init_pit();
+
   unsigned char keyboard_buf[QUEUE_LIMIT];
   queue_t keyboard_q;
   init_queue(&keyboard_q, QUEUE_LIMIT, keyboard_buf);
@@ -58,14 +60,15 @@ void start_cui(queue_t *keyboard_q) {
     io_cli(); // 割り込み無効化
     if (queue_status(keyboard_q) == 0) {
       io_stihlt(); // 割り込み有効化 + HLT
-    } else { start_shell(keyboard_q);
+    } else {
+      start_shell(keyboard_q);
       io_sti(); // 割り込み有効化
     }
   }
 }
 
 void start_gui(boot_info_t *boot_info, queue_t *keyboard_q) {
-  outb_p(PIC1_IMR, 0xef); // PIT, PIC1, カーソルを許可(11101111)
+  outb_p(PIC1_IMR, 0xef); // PIC1, カーソルを許可(11101111)
 
   init_screen(boot_info->vram, boot_info->width, boot_info->height);
 
@@ -96,4 +99,3 @@ void start_gui(boot_info_t *boot_info, queue_t *keyboard_q) {
     }
   }
 }
-

@@ -2,12 +2,18 @@
 [![Build Status](https://travis-ci.com/bassaer/myos.svg?branch=master)](https://travis-ci.com/bassaer/myos)
 
 - x86 32bit OS
-- debian/ubuntu上でビルド
-- qemuで実行
+- debian/ubuntu build
+- run on qemu
 - gas + C
 
+## GUI
 ```
-❯ make run
+❯ make clean run UI=GUI
 ```
 
+## CUI
+```
+❯ make clean run UI=CUI
+```
+##
 ![screenshot](https://github.com/bassaer/myos/blob/master/screen.gif)
