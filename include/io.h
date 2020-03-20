@@ -1,6 +1,8 @@
 #ifndef MYOS_IO_H
 #define MYOS_IO_H
 
+#include <mm/pgtable.h>
+
 /**
  * HLT : CPU停止
  */
@@ -47,6 +49,7 @@ int io_in(int port);
 /**
  * 割り込みハンドラ
  */
+void asm_handle_intr14(void);
 void asm_handle_intr20(void);
 void asm_handle_intr21(void);
 void asm_handle_intr27(void);
@@ -71,6 +74,12 @@ int load_cr0(void);
  * CR0書き込み
  */
 void store_cr0(int cr0);
+
+void set_pd(page_directory_entry *pde);
+
+void enable_pagin();
+
+int load_cr3();
 
 /**
  * TRは現在実行中のタスクを記憶するためのレジスタ

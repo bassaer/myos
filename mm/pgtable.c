@@ -95,6 +95,8 @@ page_table_entry get_pde_ptaddr(page_directory_entry *pd) {
   return *pd & PDE_PT_ADDR;
 }
 
+/*
+ func.sに一旦移動
 void set_pd(page_directory_entry *pde) {
   __asm__ volatile("movl %%cr3, %0"::"r"(pde));
 }
@@ -108,3 +110,4 @@ void enable_paging() {
       "pop %eax;"
   );
 }
+*/
