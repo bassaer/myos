@@ -42,7 +42,10 @@ int main() {
   init_queue(&keyboard_q, QUEUE_LIMIT, keyboard_buf);
   init_keyboard(&keyboard_q);
 
-  init_mem_info();
+  if (init_mem_info() != MEM_SUCCESS) {
+    printf("memory init error.\n");
+    while(1) { io_hlt(); }
+  }
 
   if (boot_info->gui == 1) {
     start_gui(boot_info, &keyboard_q);

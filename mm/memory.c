@@ -40,77 +40,31 @@ unsigned int get_kernel_size() {
   return (unsigned int)((unsigned int)&_KERN_END - PMEM_KERN_START);
 }
 
-/**
- * 確認のためカーネル空間だけにしてみる
- */
-int init_pg_table() {
-  // 0x00401000 - 0x00402000 を割り当て
-  page_table_entry *kernel_table = (page_table_entry *)alloc_single_block();
-  if (kernel_table == NULL) {
-    return MEM_ERROR;
-  }
-
-  page_directory_entry *pd_table = (page_directory_entry *)alloc_single_block();
-  if (pd_table == NULL) {
-    return MEM_ERROR;
-  }
-
-  // 使用するブロックを初期化
-  set_mem(kernel_table, 0x00, BLOCK_SIZE);
-
-  unsigned int i;
-  unsigned long paddr;
-  unsigned long vaddr;
-
-  // カーネル空間割当
-  // TODO : 仮想アドレス開始をVMEM_KERN_START(0xc0000000)に変更する
-  //        動作確認のためストレートマップさせている
-  for (i = 0, paddr = 0x00/*PMEM_KERN_START, vaddr = 0x00280000*/; i < PTE_NUM; ++i, paddr += BLOCK_SIZE, vaddr += BLOCK_SIZE) {
-    pd_table[i] = PDE_FLAG_RW;
-    kernel_table[i] = paddr | (PDE_FLAG_PRESENT | PDE_FLAG_RW);
-  }
-
-  pd_table[0] = (page_directory_entry)kernel_table | (PDE_FLAG_PRESENT | PDE_FLAG_RW);
-
-  // ページディレクトリを設定
-  set_pd(pd_table);
-  // ページングを有効化
-  enable_paging();
-
-  return MEM_SUCCESS;
-}
-
-/*
- * 確認用でコメントアウト
 int init_pg_table() {
   // 0x00400000 - 0x00401000 を割り当て
-  page_table_entry *user_table = (page_table_entry *)alloc_single_block();
-  // 0x00401000 - 0x00402000 を割り当て
-  page_table_entry *kernel_table = (page_table_entry *)alloc_single_block();
-  if (user_table == NULL || kernel_table == NULL) {
+  // TODO : user_tableとkernel_tableを分ける
+  page_table_entry *page_table = (page_table_entry *)alloc_single_block();
+  if (page_table == NULL) {
     return MEM_ERROR;
   }
-  // 使用するブロックを初期化
-  set_mem(user_table, 0x00, BLOCK_SIZE);
-  set_mem(kernel_table, 0x00, BLOCK_SIZE);
 
+  // 使用するブロックを初期化
+  set_mem(page_table, 0x00, BLOCK_SIZE);
+
+  /**
+   * 各ページテーブル初期化
+   * 確認のため1番目のページテーブルに共存する
+   * ユーザ空間   0x00000000 - 0x0027ffff
+   * カーネル空間 0x00280000 - 0x003fffff
+   *
+   */
   unsigned int i;
   unsigned long paddr;
   unsigned long vaddr;
-  // ユーザ空間割当
+  // ページ割当
   for (i = 0, paddr = PMEM_FREE_START, vaddr = VMEM_USER_START; i < PTE_NUM; i++, paddr += BLOCK_SIZE, vaddr += BLOCK_SIZE) {
-    page_table_entry *pte = get_pte(user_table, vaddr);
-    set_pte_flags(pte, PDE_FLAG_PRESENT | PDE_FLAG_RW);
-    set_pte_paddr(pte, paddr);
-  }
-
-  // カーネル空間割当
-  // TODO : 仮想アドレス開始をVMEM_KERN_START(0xc0000000)に変更する
-  //        動作確認のためストレートマップさせている
-  for (i = 0, paddr = PMEM_KERN_START, vaddr = 0x00280000; paddr < (unsigned int)&_KERN_END; ++i, paddr += BLOCK_SIZE, vaddr += BLOCK_SIZE) {
-    page_table_entry *pte = get_pte(kernel_table, vaddr);
-    set_pte_flags(pte, PDE_FLAG_PRESENT | PDE_FLAG_RW);
-    set_pte_paddr(pte, paddr);
+    page_table_entry *pte = get_pte(page_table, vaddr);
+    set_pte_flags(pte, vaddr | PDE_FLAG_PRESENT | PDE_FLAG_RW);
   }
 
   page_directory_entry *pd_table = (page_directory_entry *)alloc_single_block();
@@ -118,16 +72,15 @@ int init_pg_table() {
     return MEM_ERROR;
   }
 
-  // ユーザ空間ページディレクトリ設定
+  // ページディレクトリ設定
+  for (i = 0, vaddr = VMEM_USER_START; i < PTE_NUM; ++i, vaddr += BLOCK_SIZE) {
+    pd_table[i] = PDE_FLAG_RW;
+  }
+
+  // １番目のPTEだけひとまず設定
   page_directory_entry *pde = get_pde(pd_table, VMEM_USER_START);
   set_pde_flags(pde, PDE_FLAG_PRESENT | PDE_FLAG_RW);
-  set_pde_paddr(pde, (unsigned long)user_table);
-
-  // カーネル空間ぺージディレクトリ設定
-  // TODO : 仮想アドレス開始をVMEM_KERN_START(0xc0000000)に変更する
-  pde = get_pde(pd_table, 0x00280000);
-  set_pde_flags(pde, PDE_FLAG_PRESENT | PDE_FLAG_RW);
-  set_pde_paddr(pde, (unsigned long)user_table);
+  set_pde_paddr(pde, (unsigned long)page_table);
 
   // ページディレクトリを設定
   set_pd(pd_table);
@@ -136,7 +89,6 @@ int init_pg_table() {
 
   return MEM_SUCCESS;
 }
-*/
 
 int map_page(unsigned long paddr, unsigned long vaddr) {
   page_directory_entry *curr_pd = get_curr_pd();

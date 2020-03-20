@@ -40,7 +40,7 @@ int is_pte_writeable(page_table_entry *pte) {
  * 12から21bitの10bitを取得
  * これがページテーブルのインデックスになる
  */
-unsigned long get_pte_index(unsigned long vaddr) {
+int get_pte_index(unsigned long vaddr) {
   return (vaddr >> PTE_SHIFT) & PTE_MASK;
 }
 
@@ -48,7 +48,7 @@ page_table_entry* get_pte(page_table_entry *table, unsigned int vaddr) {
   if (table == NULL) {
     return (page_table_entry *)NULL;
   }
-  return (page_table_entry *)(table[get_pte_index(vaddr)]);
+  return &table[get_pte_index(vaddr)];
 }
 
 
