@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## ver 2.0.1
+- fix paging
+- fix itoa
+
 ## ver 2.0.0
 - add GUI
 
