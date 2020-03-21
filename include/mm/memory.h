@@ -87,4 +87,9 @@ void stats();
  */
 unsigned int scan_mem(unsigned int start, unsigned int end);
 
+/**
+ * ページフォールハンドラ
+ */
+void handle_intr14(int *esp);
+
 #endif

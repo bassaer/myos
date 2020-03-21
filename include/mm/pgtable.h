@@ -33,7 +33,7 @@ int is_pte_present(page_table_entry *pte);
 
 int is_pte_writeable(page_table_entry *pte);
 
-unsigned long get_pte_index(unsigned long vaddr);
+int get_pte_index(unsigned long vaddr);
 
 page_table_entry* get_pte(page_table_entry *table, unsigned int vaddr);
 
