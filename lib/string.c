@@ -63,7 +63,7 @@ int atoi(char *src) {
   return num / 10;
 }
 
-int itoa(int src, char *dst, int base) {
+unsigned long itoa(unsigned long src, char *dst, int base) {
   int len = 0;
   int buf[100];
   int negative = 0;
@@ -111,7 +111,7 @@ char* format_str(char *str, char *format, va_list *arg) {
         case 'x':
           *(str++) = '0';
           *(str++) = 'x';
-          str += itoa(va_arg(list, int), str, 16);
+          str += itoa(va_arg(list, unsigned long), str, 16);
           break;
         case 'c':
           *(str++) = va_arg(list, int);
