@@ -1,6 +1,7 @@
 VER       = $(shell ./scripts/changelog.sh -v)
 IMG       = myos-$(VER).img
-CFLAGS    = -c -m32 -Wall -Iinclude -Ibin/include -fno-pie -fno-builtin -nostdlib
+CC        = x86_64-w64-mingw32-gcc
+CFLAGS    = -Wall -Wextra -nostdinc -nostdlib -fno-builtin -Wl,--subsystem,10
 KERN_OBJ  = kernel/main.o \
             kernel/func.o \
             kernel/dsctbl.o \
@@ -41,12 +42,17 @@ endif
 all: package
 
 install:
-	sudo apt install -y gcc mtools qemu-system-i386
+	sudo apt install -y mtools qemu-system-x86_64 gcc-mingw-w64-x86-64 ovmf
 
-img: $(ARCH_BOOT)/ipl.bin $(ARCH_HEAD)/head.bin kernel/kernel.bin
-	cat $(ARCH_HEAD)/head.bin kernel/kernel.bin > sys.bin
-	mformat -f 1440 -C -B $(ARCH_BOOT)/ipl.bin -i $(IMG)
-	mcopy sys.bin -i $(IMG) ::
+BOOTX64.EFI: kernel/main.c
+	${CC} ${CFLAGS} -e efi_main -o $@ $<
+
+img: BOOTX64.EFI
+	dd if=/dev/zero of=$(IMG) bs=1k count=1440
+	mformat -i $(IMG) -f 1440 ::
+	mmd -i $(IMG) ::/EFI
+	mmd -i $(IMG) ::/EFI/BOOT
+	mcopy -i $(IMG) $< ::/EFI/BOOT
 
 %.o: %.c
 	gcc $(CFLAGS) -o $@ $*.c
@@ -71,7 +77,13 @@ kernel/kernel.bin: $(KERN_OBJ) $(LIB_OBJ) $(BIN_OBJ) $(MM_OBJ) $(DRV_OBJ)
 	ld $^ -T kernel/kernel.ld -Map kernel.map -o $@
 
 run: img
-	qemu-system-i386 -name myos -localtime -monitor stdio -device isa-debug-exit -fda ./$(IMG) || true
+	qemu-system-x86_64 -name myos \
+                     -localtime \
+                     -monitor stdio \
+                     -bios /usr/share/ovmf/OVMF.fd \
+                     -net none \
+                     -usbdevice disk::$(IMG) \
+                     || true
 
 package: img
 	rm -rf ./release
@@ -80,7 +92,7 @@ package: img
 
 clean:
 	find . \( -name '*.img' -or -name '*.bin' -or -name '*.o' -or -name '*.map' \) | xargs rm -f
-	rm -rf ./release
+	rm -rf ./release BOOTX64.EFI
 
 # Makefile memo
 # B=$(A:%.bin=%.o) -> A=aaa.binのとき B=aaa.o となる
