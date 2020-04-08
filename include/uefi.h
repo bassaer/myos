@@ -1,5 +1,5 @@
-#ifndef MYOS_MAIN_H
-#define MYOS_MAIN_H
+#ifndef MYOS_UEFI_H
+#define MYOS_UEFI_H
 
 struct EFI_INPUT_KEY {
   unsigned short ScanCode;
@@ -11,6 +11,7 @@ struct EFI_SYSTEM_TABLE {
   struct EFI_SIMPLE_TEXT_INPUT_PROTOCOL {
     unsigned long long _buf;
     unsigned long long (*ReadKeyStroke)(struct EFI_SIMPLE_TEXT_INPUT_PROTOCOL *This, struct EFI_INPUT_KEY *Key);
+    void *WaitForKey;
   } *ConIn;
   unsigned long long _buf2;
   struct EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL {
