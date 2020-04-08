@@ -1,20 +1,24 @@
 #ifndef MYOS_MAIN_H
 #define MYOS_MAIN_H
 
-#include <lib/queue.h>
+struct EFI_INPUT_KEY {
+  unsigned short ScanCode;
+  unsigned short UnicodeChar;
+};
 
-typedef struct {
-  char cyls;
-  char leds;
-  char vmode;
-  char reserve;
-  short width;
-  short height;
-  char  *vram;
-  short gui;
-} boot_info_t;
-
-void start_cui(queue_t *keyboard_q);
-void start_gui(boot_info_t *boot_info, queue_t *keyboard_q);
+struct EFI_SYSTEM_TABLE {
+  char _buf1[44];
+  struct EFI_SIMPLE_TEXT_INPUT_PROTOCOL {
+    unsigned long long _buf;
+    unsigned long long (*ReadKeyStroke)(struct EFI_SIMPLE_TEXT_INPUT_PROTOCOL *This, struct EFI_INPUT_KEY *Key);
+  } *ConIn;
+  unsigned long long _buf2;
+  struct EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL {
+    unsigned long long _buf;
+    unsigned long long (*OutputString)(struct EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, unsigned short *String);
+    unsigned long long _buf2[4];
+    unsigned long long (*ClearScreen)(struct EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This);
+  } *ConOut;
+};
 
 #endif

@@ -1,7 +1,7 @@
 VER       = $(shell ./scripts/changelog.sh -v)
 IMG       = myos-$(VER).img
 CC        = x86_64-w64-mingw32-gcc
-CFLAGS    = -Wall -Wextra -nostdinc -nostdlib -fno-builtin -Wl,--subsystem,10
+CFLAGS    = -Wall -Wextra -Iinclude -nostdinc -nostdlib -fno-builtin -Wl,--subsystem,10
 KERN_OBJ  = kernel/main.o \
             kernel/func.o \
             kernel/dsctbl.o \
