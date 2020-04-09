@@ -11,7 +11,8 @@
 
 #define PROMPT  L"myos> "
 
-void efi_main(void *ImageHandle __attribute__ ((unused)), struct EFI_SYSTEM_TABLE *SystemTable) {
+void efi_main(void *ImageHandle __attribute__ ((unused)), EFI_SYSTEM_TABLE *SystemTable) {
+  SystemTable->BootServices->SetWatchdogTimer(0, 0, 0, NULL);
   SystemTable->ConOut->ClearScreen(SystemTable->ConOut);
   unsigned short *os =
     L"  __  __        ___  ____     \r\n"
@@ -23,7 +24,7 @@ void efi_main(void *ImageHandle __attribute__ ((unused)), struct EFI_SYSTEM_TABL
   SystemTable->ConOut->OutputString(SystemTable->ConOut, os);
   SystemTable->ConOut->OutputString(SystemTable->ConOut, PROMPT);
 
-  struct EFI_INPUT_KEY key;
+  EFI_INPUT_KEY key;
   unsigned short buf[3];
   while (1) {
     if (!SystemTable->ConIn->ReadKeyStroke(SystemTable->ConIn, &key)) {
