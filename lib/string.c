@@ -1,6 +1,6 @@
 #include <lib/string.h>
 
-int strcmp(char *first, char *second) {
+int strcmp(CHAR16 *first, CHAR16 *second) {
   for (; *first != '\0' && *second != '\0'; ++first, ++second) {
     if (*first != *second) {
       return 1;
@@ -12,7 +12,7 @@ int strcmp(char *first, char *second) {
   return 1;
 }
 
-int strlen(char *str) {
+int strlen(CHAR16 *str) {
   int len = 0;
   while(*str++ != '\0') {
     len++;
@@ -21,7 +21,7 @@ int strlen(char *str) {
 }
 
 
-int split(char *src, char *dst[], char delim) {
+int split(CHAR16 *src, CHAR16 *dst[], CHAR16 delim) {
   int count = 0;
 
   while(1) {
@@ -48,12 +48,12 @@ int split(char *src, char *dst[], char delim) {
   return count;
 }
 
-void strcpy(char *src, char *dst) {
+void strcpy(CHAR16 *src, CHAR16 *dst) {
   while ((*dst++ = *src++) != '\0');
   *(dst++) = '\0';
 }
 
-int atoi(char *src) {
+int atoi(CHAR16 *src) {
   int num = 0;
   while(*src != '\0') {
     num += *src - 48;
@@ -63,7 +63,7 @@ int atoi(char *src) {
   return num / 10;
 }
 
-unsigned long itoa(unsigned long src, char *dst, int base) {
+unsigned long itoa(long src, CHAR16 *dst, int base) {
   int len = 0;
   int buf[100];
   int negative = 0;
@@ -91,11 +91,11 @@ unsigned long itoa(unsigned long src, char *dst, int base) {
   return digit;
 }
 
-char* format_str(char *str, char *format, va_list *arg) {
+CHAR16* format_str(CHAR16 *str, CHAR16 *format, va_list *arg) {
   va_list list;
   va_copy(list, *arg);
   long d_arg;
-  char *s_arg;
+  CHAR16 *s_arg;
   while(*format) {
     if (*format == '%') {
       ++format;
@@ -117,7 +117,7 @@ char* format_str(char *str, char *format, va_list *arg) {
           *(str++) = va_arg(list, int);
           break;
         case 's':
-          s_arg = va_arg(list, char*);
+          s_arg = va_arg(list, CHAR16*);
           while(*s_arg) {
             *(str++) = *(s_arg++);
           }
@@ -134,7 +134,7 @@ char* format_str(char *str, char *format, va_list *arg) {
   return str;
 }
 
-char* sprintf(char *str, char *format, ...) {
+CHAR16* sprintf(CHAR16 *str, CHAR16 *format, ...) {
   va_list list;
   va_start(list, format);
   format_str(str, format, &list);

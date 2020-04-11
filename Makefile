@@ -1,15 +1,10 @@
 VER       = $(shell ./scripts/changelog.sh -v)
 IMG       = myos-$(VER).img
 CC        = x86_64-w64-mingw32-gcc
-CFLAGS    = -Wall -Wextra -Iinclude -nostdinc -nostdlib -fno-builtin -Wl,--subsystem,10
+INCLUDE   = -Iinclude -Ibin/include
+CFLAGS    = -Wall -Wextra $(INCLUDE) -nostdlib -fno-builtin -Wl,--subsystem,10
 KERN_OBJ  = kernel/main.o \
-            kernel/func.o \
-            kernel/dsctbl.o \
             kernel/console.o \
-            kernel/intr.o \
-            kernel/keyboard.o \
-            kernel/sched.o \
-            kernel/timer.o
 
 LIB_OBJ   = lib/queue.o \
             lib/string.o
@@ -22,12 +17,15 @@ DRV_OBJ   = drivers/cursor.o \
             drivers/screen.o \
             drivers/vram.o
 
-BIN_OBJ   = bin/echo.o \
-            bin/free.o \
-            bin/ls.o \
-            bin/sh.o \
-            bin/shutdown.o \
-            bin/sleep.o
+BIN_OBJ   = bin/sh.o \
+
+KERN_C    = kernel/main.c \
+            kernel/console.c \
+            kernel/event.c
+
+LIB_C     = lib/string.c
+
+BIN_C     = bin/sh.c
 
 ARCH_BOOT = arch/x86/boot
 
@@ -44,8 +42,8 @@ all: package
 install:
 	sudo apt install -y mtools qemu-system-x86_64 gcc-mingw-w64-x86-64 ovmf
 
-BOOTX64.EFI: kernel/main.c
-	${CC} ${CFLAGS} -e efi_main -o $@ $<
+BOOTX64.EFI: $(KERN_C) $(LIB_C) $(BIN_C)
+	$(CC) $(CFLAGS) -e efi_main -o $@ $^
 
 img: BOOTX64.EFI
 	dd if=/dev/zero of=$(IMG) bs=1k count=1440
@@ -55,7 +53,7 @@ img: BOOTX64.EFI
 	mcopy -i $(IMG) $< ::/EFI/BOOT
 
 %.o: %.c
-	gcc $(CFLAGS) -o $@ $*.c
+	${CC} $(CFLAGS) -o $@ $*.c
 
 %.bin: %.o
 	ld $(LDFLAGS) $^ -T $*.ld -o $@

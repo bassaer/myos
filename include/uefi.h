@@ -11,6 +11,7 @@
 typedef UINTN EFI_STATUS;
 typedef UINTN EFI_TPL;
 typedef void * EFI_HANDLE;
+typedef void * EFI_EVENT;
 
 typedef struct {
   UINT16 ScanCode;
@@ -58,7 +59,7 @@ typedef struct {
   EFI_STATUS FreePool;
   EFI_STATUS CreateEvent;
   EFI_STATUS SetTimer;
-  EFI_STATUS WaitForEvent;
+  EFI_STATUS (*WaitForEvent)(UINTN NumberOfEvents, EFI_EVENT *Event, UINTN *index);
   EFI_STATUS SignalEvent;
   EFI_STATUS CloseEvent;
   EFI_STATUS CheckEvent;

@@ -12,13 +12,9 @@
 #include <lib/queue.h>
 #include <lib/string.h>
 
-#define PROMPT        "myos> "
+#include<uefi.h>
 
-int exit_status = EXIT_SUCCESS;
-int char_color = GRAY;
-int cur_line = 0;
-int selected_line = 0;
-int max_width = 0;
+#define PROMPT        L"myos> "
 
 /**
  * 入力情報
@@ -27,42 +23,44 @@ typedef struct {
   /**
    * 入力文字列
    */
-  char buf[CMD_LIMIT];
+  CHAR16 buf[CMD_LIMIT];
   /**
    * 現在の入力位置
    */
   int index;
 } entry_t;
 
-entry_t entries[SCREEN_HEIGHT];
+static entry_t entries[SCREEN_HEIGHT];
 
 /**
  * 入力履歴一時保存用
  */
-entry_t cache_entry;
+//static entry_t cache_entry;
+
+static int exit_status = EXIT_SUCCESS;
+static int cur_line = 0;
+static int selected_line = 0;
+static int max_width = 0;
 
 void init_shell() {
-  init_console();
   cur_line = 0;
   selected_line = 0;
   int i;
   for (i = 0; i < SCREEN_HEIGHT; ++i) {
     entries[i].index = 0;
-    entries[i].buf[0] = '\0';
+    entries[i].buf[0] = L'\0';
   }
 
   max_width = 256;
 
-  char *os =
-    "  __  __        ___  ____     \n"
-    " |  \\/  |_   _ / _ \\/ ___|  \n"
-    " | |\\/| | | | | | | \\___ \\ \n"
-    " | |  | | |_| | |_| |___) |   \n"
-    " |_|  |_|\\__, |\\___/|____/  \n"
-    "         |___/              \n\n";
-
-  put_str(os, GRAY);
-  put_prompt();
+  CHAR16 *os =
+    L"  __  __        ___  ____     \r\n"
+     " |  \\/  |_   _ / _ \\/ ___|  \r\n"
+     " | |\\/| | | | | | | \\___ \\ \r\n"
+     " | |  | | |_| | |_| |___) |   \r\n"
+     " |_|  |_|\\__, |\\___/|____/  \r\n"
+     "         |___/              \r\n\n";
+  put_str(os, WHITE);
 }
 
 void put_prompt() {
@@ -71,8 +69,10 @@ void put_prompt() {
   } else {
     put_str(PROMPT, RED);
   }
+  set_color(GRAY);
 }
 
+/*
 void init_entry() {
   cur_line++;
   selected_line = cur_line;
@@ -179,8 +179,12 @@ void exec_cmd() {
     exit_status = EXIT_FAILURE;
   }
 }
+*/
 
-void start_shell(queue_t *queue) {
-  int code = dequeue(queue);
-  input_code(code);
+void start_shell() {
+  while (1) {
+    put_prompt();
+    read_str(entries[cur_line].buf, CMD_LIMIT);
+    put_str(entries[cur_line].buf, GRAY);
+  }
 }
