@@ -3,6 +3,11 @@
 
 #define NULL 0
 
+typedef enum {
+  false,
+  true
+} BOOLEAN;
+
 typedef unsigned long long INTN;
 typedef unsigned long long UINTN;
 

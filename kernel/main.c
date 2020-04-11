@@ -8,12 +8,14 @@
 *---------------------------*/
 
 #include<uefi.h>
+#include<color.h>
 
 #define PROMPT  L"myos> "
 
 void efi_main(void *ImageHandle __attribute__ ((unused)), EFI_SYSTEM_TABLE *SystemTable) {
   SystemTable->BootServices->SetWatchdogTimer(0, 0, 0, NULL);
   SystemTable->ConOut->ClearScreen(SystemTable->ConOut);
+  SystemTable->ConOut->EnableCursor(SystemTable->ConOut, true);
   unsigned short *os =
     L"  __  __        ___  ____     \r\n"
      " |  \\/  |_   _ / _ \\/ ___|  \r\n"
@@ -22,7 +24,9 @@ void efi_main(void *ImageHandle __attribute__ ((unused)), EFI_SYSTEM_TABLE *Syst
      " |_|  |_|\\__, |\\___/|____/  \r\n"
      "         |___/              \r\n\n";
   SystemTable->ConOut->OutputString(SystemTable->ConOut, os);
+  SystemTable->ConOut->SetAttribute(SystemTable->ConOut, EFI_GREEN);
   SystemTable->ConOut->OutputString(SystemTable->ConOut, PROMPT);
+  SystemTable->ConOut->SetAttribute(SystemTable->ConOut, EFI_LIGHTGRAY);
 
   EFI_INPUT_KEY key;
   unsigned short buf[3];
@@ -37,8 +41,10 @@ void efi_main(void *ImageHandle __attribute__ ((unused)), EFI_SYSTEM_TABLE *Syst
         buf[1] = L'\n';
         buf[2] = L'\0';
         SystemTable->ConOut->OutputString(SystemTable->ConOut, buf);
+        SystemTable->ConOut->SetAttribute(SystemTable->ConOut, EFI_GREEN);
         SystemTable->ConOut->OutputString(SystemTable->ConOut, PROMPT);
       }
+      SystemTable->ConOut->SetAttribute(SystemTable->ConOut, EFI_LIGHTGRAY);
     }
   }
 }
