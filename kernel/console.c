@@ -34,20 +34,22 @@ void put_char(CHAR16 c, UINTN color) {
   put_str(str, color);
 }
 
-CHAR16 read_key() {
-  EFI_INPUT_KEY key;
+void read_key(EFI_INPUT_KEY *key) {
   UINTN index;
   wait_event(1, ConIn->WaitForKey, &index);
-  while(ConIn->ReadKeyStroke(ConIn, &key));
-  return key.UnicodeChar;
+  while(ConIn->ReadKeyStroke(ConIn, key));
 }
 
 unsigned int read_str(CHAR16 *buf, unsigned int size) {
+  EFI_INPUT_KEY key;
   unsigned int index = 0;
+  UINTN color = GRAY;
   while(index < size - 1) {
-    buf[index] = read_key();
-    put_char(buf[index], GRAY);
-    if (buf[index] == L'\r') {
+    read_key(&key);
+    color = key.ScanCode == 0x01 ? RED : GRAY;
+    put_char(key.UnicodeChar, color);
+    buf[index] = key.UnicodeChar;
+    if (key.UnicodeChar == L'\r') {
       buf[++index] = L'\n';
       break;
     }

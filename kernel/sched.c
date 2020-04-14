@@ -3,7 +3,6 @@
 #include <console.h>
 #include <io.h>
 #include <tss.h>
-#include <dsctbl.h>
 #include <mm/memory.h>
 
 void init_sched() {
@@ -28,7 +27,6 @@ void init_sched() {
 }
 
 void task2_main() {
-  debug("task2_main!!");
   /*
   while(1) {
     io_hlt();

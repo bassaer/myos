@@ -4,6 +4,6 @@
 #include <exit.h>
 
 int ls() {
-  printf("hello, %c%s", 'w', "orld!");
+  printf(L"hello, %c%s", L'w', L"orld!");
   return EXIT_SUCCESS;
 }

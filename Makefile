@@ -17,15 +17,11 @@ DRV_OBJ   = drivers/cursor.o \
             drivers/screen.o \
             drivers/vram.o
 
-BIN_OBJ   = bin/sh.o \
+KERN_C    = $(wildcard kernel/*.c)
 
-KERN_C    = kernel/main.c \
-            kernel/console.c \
-            kernel/event.c
+LIB_C     = $(wildcard lib/*.c)
 
-LIB_C     = lib/string.c
-
-BIN_C     = bin/sh.c
+BIN_C     = $(wildcard bin/*.c)
 
 ARCH_BOOT = arch/x86/boot
 
@@ -35,7 +31,7 @@ else
 	ARCH_HEAD = arch/x86/gui
 endif
 
-.PHONY: install img run package clean
+.PHONY: install img lib run package test clean
 
 all: package
 
@@ -64,6 +60,9 @@ img: BOOTX64.EFI
 font:
 	python scripts/font.py -f scripts/font.txt
 
+lib:
+	make -C lib
+
 $(ARCH_BOOT)/ipl.bin: $(ARCH_BOOT)/ipl.o
 	ld $^ -T $(ARCH_BOOT)/ipl.ld -Map ipl.map -o $@
 
@@ -88,9 +87,13 @@ package: img
 	mkdir release
 	tar zcvf release/myos-$(VER).tag.gz ${IMG}
 
+test:
+	@make --no-print-directory test -C tests
+
 clean:
 	find . \( -name '*.img' -or -name '*.bin' -or -name '*.o' -or -name '*.map' \) | xargs rm -f
 	rm -rf ./release BOOTX64.EFI
+	@make clean -C tests
 
 # Makefile memo
 # B=$(A:%.bin=%.o) -> A=aaa.binのとき B=aaa.o となる

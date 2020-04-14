@@ -16,7 +16,7 @@ void clear_screen();
 void set_color(UINTN color);
 void put_char(CHAR16 c, UINTN color);
 void put_str(CHAR16 *str, UINTN color);
-CHAR16 read_key();
+void read_key(EFI_INPUT_KEY *key);
 unsigned int read_str(CHAR16 *buf, unsigned int size);
 void printf(CHAR16 *format, ...);
 void debug(CHAR16 *format, ...);

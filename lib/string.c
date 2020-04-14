@@ -1,12 +1,12 @@
 #include <lib/string.h>
 
 int strcmp(CHAR16 *first, CHAR16 *second) {
-  for (; *first != '\0' && *second != '\0'; ++first, ++second) {
+  for (; *first != L'\0' && *second != L'\0'; ++first, ++second) {
     if (*first != *second) {
       return 1;
     }
   }
-  if ( *first == '\0' && *second == '\0') {
+  if ( *first == L'\0' && *second == L'\0') {
     return 0;
   }
   return 1;
@@ -14,7 +14,7 @@ int strcmp(CHAR16 *first, CHAR16 *second) {
 
 int strlen(CHAR16 *str) {
   int len = 0;
-  while(*str++ != '\0') {
+  while(*str++ != L'\0') {
     len++;
   }
   return len;
@@ -29,7 +29,7 @@ int split(CHAR16 *src, CHAR16 *dst[], CHAR16 delim) {
       src++;
     }
 
-    if (*src == '\0') {
+    if (*src == L'\0') {
       break;
     }
 
@@ -39,18 +39,18 @@ int split(CHAR16 *src, CHAR16 *dst[], CHAR16 delim) {
       src++;
     }
 
-    if (*src == '\0') {
+    if (*src == L'\0') {
       break;
     }
-    *src++ = '\0';
+    *src++ = L'\0';
   }
 
   return count;
 }
 
 void strcpy(CHAR16 *src, CHAR16 *dst) {
-  while ((*dst++ = *src++) != '\0');
-  *(dst++) = '\0';
+  while ((*dst++ = *src++) != L'\0');
+  *(dst++) = L'\0';
 }
 
 int atoi(CHAR16 *src) {

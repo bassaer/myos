@@ -4,17 +4,19 @@
 #include <exit.h>
 #include <io.h>
 
-void usage_shutdown(char *cmd) {
-  put_str("usage : ", CHAR_COLOR);
+void usage_shutdown(CHAR16 *cmd) {
+  put_str(L"usage : ", CHAR_COLOR);
   put_str(cmd, CHAR_COLOR);
-  put_str(" command does not need options.", CHAR_COLOR);
+  put_str(L" command does not need options.", CHAR_COLOR);
 }
 
-int shutdown(char *args[], int size) {
+int shutdown(CHAR16 *args[], int size) {
   if (size != 1) {
     usage_shutdown(args[0]);
     return EXIT_FAILURE;
   }
+
+  /*
   outb_p(0x8900, 'S');
   outb_p(0x8900, 'h');
   outb_p(0x8900, 'u');
@@ -24,6 +26,7 @@ int shutdown(char *args[], int size) {
   outb_p(0x8900, 'w');
   outb_p(0x8900, 'n');
   outb_p(0x501, 0x31);
+  */
 
   return EXIT_SUCCESS;
 }

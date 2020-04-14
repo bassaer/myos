@@ -13,6 +13,20 @@ typedef UINTN EFI_TPL;
 typedef void * EFI_HANDLE;
 typedef void * EFI_EVENT;
 
+typedef enum {
+  NULL_SCAN = 0x00,
+  CURSOR_UP,
+  CURSOR_DOWN,
+  CURSOR_RIGHT,
+  CURSOR_LEFT,
+  HOME,
+  END,
+  INSERT,
+  DELETE,
+  PAGE_UP,
+  PAGE_DOWN
+} SPECIAL_KEY;
+
 typedef struct {
   UINT16 ScanCode;
   CHAR16 UnicodeChar;
