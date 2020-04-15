@@ -87,13 +87,9 @@ package: img
 	mkdir release
 	tar zcvf release/myos-$(VER).tag.gz ${IMG}
 
-test:
-	@make --no-print-directory test -C tests
-
 clean:
 	find . \( -name '*.img' -or -name '*.bin' -or -name '*.o' -or -name '*.map' \) | xargs rm -f
 	rm -rf ./release BOOTX64.EFI
-	@make clean -C tests
 
 # Makefile memo
 # B=$(A:%.bin=%.o) -> A=aaa.binのとき B=aaa.o となる

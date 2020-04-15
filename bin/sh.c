@@ -127,7 +127,7 @@ void eval_key(EFI_INPUT_KEY *key) {
   if (key->UnicodeChar == L'\0') {
     return;
   }
-  if (key->UnicodeChar == L'\n') {
+  if (key->UnicodeChar == L'\r') {
     if (entries[cur_line].index > 0) {
       newline();
       exec_cmd();
@@ -148,12 +148,14 @@ void eval_key(EFI_INPUT_KEY *key) {
 }
 
 void exec_cmd() {
+  put_text(L"OK");
+  /*
   entries[cur_line].buf[entries[cur_line].index] = '\0';
   CHAR16 *args[max_width];
 
   // 元の文字列を操作するため、一時配列を用意
   CHAR16 tmp[strlen(entries[cur_line].buf)];
-  strcpy(entries[cur_line].buf, tmp);
+  //strcpy(entries[cur_line].buf, tmp);
   // スペースで分割し、コマンドを取得
   int split_count = split(tmp, args, L' ');
   CHAR16 *cmd = args[0];
@@ -171,15 +173,14 @@ void exec_cmd() {
     put_text(L"command not found");
     exit_status = EXIT_FAILURE;
   }
+  */
 }
 
 void start_shell() {
   EFI_INPUT_KEY key;
+  put_prompt();
   while (1) {
-    put_prompt();
     read_key(&key);
-    //eval_key(&key);
-    //read_str(entries[cur_line].buf, CMD_LIMIT);
-    //put_str(entries[cur_line].buf, GRAY);
+    eval_key(&key);
   }
 }
