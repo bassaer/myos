@@ -43,9 +43,10 @@ void put_char(CHAR16 c, UINTN color) {
 }
 
 void clear_line() {
-  ConOut->SetCursorPosition(ConOut, 0, ConOut->Mode->CursorRow);
+  UINTN row = ConOut->Mode->CursorRow;
+  ConOut->SetCursorPosition(ConOut, 0, row);
   printf(clear_string);
-  ConOut->SetCursorPosition(ConOut, 0, ConOut->Mode->CursorRow - 1);
+  ConOut->SetCursorPosition(ConOut, 0, row);
 }
 
 void read_key(EFI_INPUT_KEY *key) {
