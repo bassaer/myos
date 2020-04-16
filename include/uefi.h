@@ -46,16 +46,26 @@ typedef struct EFI_SIMPLE_TEXT_INPUT_PROTOCOL {
   void *WaitForKey;
 } EFI_SIMPLE_TEXT_INPUT_PROTOCOL;
 
+typedef struct {
+ INT32 MaxMode;
+ INT32 Mode;
+ INT32 Attribute;
+ INT32 CursorColumn;
+ INT32 CursorRow;
+ BOOLEAN CursorVisible;
+} SIMPLE_TEXT_OUTPUT_MODE;
+
 typedef struct EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL {
   EFI_STATUS Reset;
   EFI_STATUS (*OutputString)(struct EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, unsigned short *String);
   EFI_STATUS TestString;
-  EFI_STATUS QueryMode;
+  EFI_STATUS (*QueryMode)(struct EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, UINTN ModeNumber, UINTN *Columns, UINTN *Rows);
   EFI_STATUS SetMode;
   EFI_STATUS (*SetAttribute)(struct EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, UINTN Attribute);
   EFI_STATUS (*ClearScreen)(struct EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This);
   EFI_STATUS (*SetCursorPosition)(struct EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, UINTN Column, UINTN Row);
   EFI_STATUS (*EnableCursor)(struct EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, BOOLEAN Visible);
+  SIMPLE_TEXT_OUTPUT_MODE *Mode;
 } EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL;
 
 typedef struct {

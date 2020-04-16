@@ -84,10 +84,6 @@ void put_text(CHAR16 *text) {
   put_str(text, GRAY);
 }
 
-void clear_line() {
-  put_text(L"");
-}
-
 void newline() {
   put_text(L"\r\n");
 }
@@ -148,7 +144,7 @@ void eval_key(EFI_INPUT_KEY *key) {
 }
 
 void exec_cmd() {
-  put_text(L"OK");
+  printf(L"OK");
   /*
   entries[cur_line].buf[entries[cur_line].index] = '\0';
   CHAR16 *args[max_width];

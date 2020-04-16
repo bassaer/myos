@@ -8,12 +8,20 @@
 
 static EFI_SIMPLE_TEXT_INPUT_PROTOCOL *ConIn;
 static EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *ConOut;
+static CHAR16 *clear_string;
 
 void init_console(EFI_SIMPLE_TEXT_INPUT_PROTOCOL *In, EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *Out) {
   ConIn = In;
   ConOut = Out;
   clear_screen();
   ConOut->EnableCursor(ConOut, true);
+  UINTN Columns;
+  UINTN Rows;
+  ConOut->QueryMode(ConOut, ConOut->Mode->Mode, &Columns, &Rows);
+  UINTN i;
+  for(i = 0; i < Columns; i++) {
+    clear_string[i] = L' ';
+  }
 }
 
 void clear_screen() {
@@ -32,6 +40,12 @@ void put_str(CHAR16 *str, UINTN color) {
 void put_char(CHAR16 c, UINTN color) {
   CHAR16 str[2] = {c, L'\0'};
   put_str(str, color);
+}
+
+void clear_line() {
+  ConOut->SetCursorPosition(ConOut, 0, ConOut->Mode->CursorRow);
+  printf(clear_string);
+  ConOut->SetCursorPosition(ConOut, 0, ConOut->Mode->CursorRow - 1);
 }
 
 void read_key(EFI_INPUT_KEY *key) {
