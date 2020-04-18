@@ -39,6 +39,11 @@ static int exit_status = EXIT_SUCCESS;
 static int cur_line = 0;
 static int selected_line = 0;
 
+/**
+ * 起動フラグ
+ */
+static BOOLEAN running = false;
+
 void init_shell() {
   cur_line = 0;
   selected_line = 0;
@@ -56,6 +61,8 @@ void init_shell() {
      " |_|  |_|\\__, |\\___/|____/  \r\n"
      "         |___/              \r\n\n";
   put_str(os, WHITE);
+
+  running = true;
 }
 
 void put_prompt() {
@@ -154,7 +161,7 @@ void exec_cmd() {
   } else if (strcmp(cmd, L"free") == 0) {
     exit_status = free();
   } else if (strcmp(cmd, L"shutdown") == 0 || strcmp(cmd, L"exit") == 0) {
-    exit_status = shutdown(args, split_count);
+    running = false;
   } else if(strcmp(cmd, L"sleep") == 0) {
     exit_status = sleep(args, split_count);
   } else if (strcmp(cmd, L"ls") == 0) {
@@ -168,7 +175,7 @@ void exec_cmd() {
 void start_shell() {
   EFI_INPUT_KEY key;
   put_prompt();
-  while (1) {
+  while (running) {
     read_key(&key);
     eval_key(&key);
   }
