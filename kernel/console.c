@@ -55,26 +55,6 @@ void read_key(EFI_INPUT_KEY *key) {
   while(ConIn->ReadKeyStroke(ConIn, key));
 }
 
-unsigned int read_str(CHAR16 *buf, unsigned int size) {
-  EFI_INPUT_KEY key;
-  unsigned int index = 0;
-  UINTN color = GRAY;
-  while(index < size - 1) {
-    read_key(&key);
-    color = key.ScanCode == 0x01 ? RED : GRAY;
-    put_char(key.UnicodeChar, color);
-    buf[index] = key.UnicodeChar;
-    if (key.UnicodeChar == L'\r') {
-      buf[++index] = L'\n';
-      break;
-    }
-    index++;
-  }
-  put_char(L'\n', GRAY);
-  buf[index + 1] = L'\0';
-  return index;
-}
-
 void printf(CHAR16 *format, ...) {
   CHAR16 buf[256];
   va_list list;
