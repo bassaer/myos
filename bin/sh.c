@@ -38,7 +38,6 @@ static entry_t cache_entry;
 static int exit_status = EXIT_SUCCESS;
 static int cur_line = 0;
 static int selected_line = 0;
-static int max_width = 0;
 
 void init_shell() {
   cur_line = 0;
@@ -48,8 +47,6 @@ void init_shell() {
     entries[i].index = 0;
     entries[i].buf[0] = L'\0';
   }
-
-  max_width = 256;
 
   CHAR16 *os =
     L"  __  __        ___  ____     \r\n"
@@ -133,7 +130,7 @@ void eval_key(EFI_INPUT_KEY *key) {
     put_prompt();
     return;
   }
-  if (max_width <= entries[cur_line].index + 1) {
+  if (CMD_LIMIT <= entries[cur_line].index + 1) {
     // 入力サイズオーバー
     // 終端文字も含めるため+1
     return;
@@ -144,14 +141,11 @@ void eval_key(EFI_INPUT_KEY *key) {
 }
 
 void exec_cmd() {
-  printf(L"OK");
-  /*
-  entries[cur_line].buf[entries[cur_line].index] = '\0';
-  CHAR16 *args[max_width];
-
+  entries[cur_line].buf[entries[cur_line].index] = L'\0';
+  CHAR16 *args[CMD_LIMIT];
   // 元の文字列を操作するため、一時配列を用意
   CHAR16 tmp[strlen(entries[cur_line].buf)];
-  //strcpy(entries[cur_line].buf, tmp);
+  strcpy(entries[cur_line].buf, tmp);
   // スペースで分割し、コマンドを取得
   int split_count = split(tmp, args, L' ');
   CHAR16 *cmd = args[0];
@@ -169,7 +163,6 @@ void exec_cmd() {
     put_text(L"command not found");
     exit_status = EXIT_FAILURE;
   }
-  */
 }
 
 void start_shell() {

@@ -39,7 +39,7 @@ install:
 	sudo apt install -y mtools qemu-system-x86_64 gcc-mingw-w64-x86-64 ovmf
 
 BOOTX64.EFI: $(KERN_C) $(LIB_C) $(BIN_C)
-	$(CC) $(CFLAGS) -e efi_main -o $@ $^
+	$(CC) $(CFLAGS) -e efi_main -o $@ $^ -lgcc
 
 img: BOOTX64.EFI
 	dd if=/dev/zero of=$(IMG) bs=1k count=1440
