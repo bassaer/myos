@@ -23,6 +23,8 @@ LIB_C     = $(wildcard lib/*.c)
 
 BIN_C     = $(wildcard bin/*.c)
 
+MAKE      = make --no-print-directory
+
 ARCH_BOOT = arch/x86/boot
 
 ifeq ($(UI), CUI)
@@ -38,15 +40,19 @@ all: package
 install:
 	sudo apt install -y mtools qemu-system-x86_64 gcc-mingw-w64-x86-64 ovmf
 
-BOOTX64.EFI: $(KERN_C) $(LIB_C) $(BIN_C)
-	$(CC) $(CFLAGS) -e efi_main -o $@ $^ -lgcc
+kernel/kernel.bin:
+	@$(MAKE) build -C kernel
 
-img: BOOTX64.EFI
+arch/x86/BOOTX64.EFI:
+	@$(MAKE) build -C arch/x86
+
+img: arch/x86/BOOTX64.EFI kernel/kernel.bin
 	dd if=/dev/zero of=$(IMG) bs=1k count=1440
 	mformat -i $(IMG) -f 1440 ::
 	mmd -i $(IMG) ::/EFI
 	mmd -i $(IMG) ::/EFI/BOOT
 	mcopy -i $(IMG) $< ::/EFI/BOOT
+	mcopy -i $(IMG) kernel/kernel.bin ::/
 
 %.o: %.c
 	${CC} $(CFLAGS) -o $@ $*.c
@@ -69,10 +75,6 @@ $(ARCH_BOOT)/ipl.bin: $(ARCH_BOOT)/ipl.o
 $(ARCH_HEAD)/head.bin: $(ARCH_HEAD)/head.o
 	ld $^ -T $(ARCH_HEAD)/head.ld -Map head.map -o $@
 
-# TODO : ひとまずkernelにすべてリンクするが、あとでユーザ空間を分ける
-kernel/kernel.bin: $(KERN_OBJ) $(LIB_OBJ) $(BIN_OBJ) $(MM_OBJ) $(DRV_OBJ)
-	ld $^ -T kernel/kernel.ld -Map kernel.map -o $@
-
 run: img
 	qemu-system-x86_64 -name myos \
                      -localtime \
@@ -80,7 +82,9 @@ run: img
                      -bios /usr/share/ovmf/OVMF.fd \
                      -net none \
                      -usbdevice disk::$(IMG) \
+                     -d guest_errors \
                      || true
+
 
 package: img
 	rm -rf ./release
@@ -88,8 +92,8 @@ package: img
 	tar zcvf release/myos-$(VER).tag.gz ${IMG}
 
 clean:
-	find . \( -name '*.img' -or -name '*.bin' -or -name '*.o' -or -name '*.map' \) | xargs rm -f
-	rm -rf ./release BOOTX64.EFI
+	@$(MAKE) clean -C arch/x86
+	@$(MAKE) clean -C kernel
 
 # Makefile memo
 # B=$(A:%.bin=%.o) -> A=aaa.binのとき B=aaa.o となる

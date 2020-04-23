@@ -1,7 +1,7 @@
 #ifndef MYOS_TYPE_H
 #define MYOS_TYPE_H
 
-#define NULL 0
+#define NULL ((void *)0)
 
 typedef enum {
   false,

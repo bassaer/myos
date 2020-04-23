@@ -2,16 +2,20 @@
 #define MYOS_UEFI_H
 
 #include <type.h>
+#include <err.h>
 
 /**
  * UEFI SPECIFICATIONS 2.8 Errata A, February 2020
  * https://uefi.org/specifications
  */
 
+
 typedef UINTN EFI_STATUS;
 typedef UINTN EFI_TPL;
-typedef void * EFI_HANDLE;
-typedef void * EFI_EVENT;
+typedef void *EFI_HANDLE;
+typedef void *EFI_EVENT;
+typedef UINT64 EFI_PHYSICAL_ADDRESS;
+typedef UINT64 EFI_VIRTUAL_ADDRESS;
 
 typedef enum {
   NULL_SCAN = 0x00,
@@ -31,6 +35,13 @@ typedef struct {
   UINT16 ScanCode;
   CHAR16 UnicodeChar;
 } EFI_INPUT_KEY;
+
+typedef struct {
+  UINT32 Data1;
+  UINT16 Data2;
+  UINT16 Data3;
+  UINT8 Data4[8];
+} EFI_GUID;
 
 typedef struct {
   UINT64 Signature;
@@ -68,9 +79,90 @@ typedef struct EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL {
   SIMPLE_TEXT_OUTPUT_MODE *Mode;
 } EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL;
 
-typedef struct {
+typedef enum {
+  PixelRedGreenBlueReserved8BitPerColor,
+  PixelBlueGreenRedReserved8BitPerColor,
+  PixelBitMask,
+  PixelBltOnly,
+  PixelFormatMax
+} EFI_GRAPHICS_PIXEL_FORMAT;
 
+typedef struct {
+  UINT32 Version;
+  UINT32 HorizontalResolution;
+  UINT32 VerticalResolution;
+  EFI_GRAPHICS_PIXEL_FORMAT PixelFormat;
+  INTN PixelInformation;
+  UINT32 PixelsPerScanLine;
+} EFI_GRAPHICS_OUTPUT_MODE_INFORMATION;
+
+typedef struct {
+  UINT32 MaxMode;
+  UINT32 Mode;
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *Info;
+  UINTN SizeOfInfo;
+  EFI_PHYSICAL_ADDRESS FrameBufferBase;
+  UINTN FrameBufferSize;
+} EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE;
+
+typedef struct EFI_GRAPHICS_OUTPUT_PROTCOL {
+  EFI_STATUS QueryMode;
+  EFI_STATUS SetMode;
+  EFI_STATUS Blt;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE *Mode;
+} EFI_GRAPHICS_OUTPUT_PROTOCOL;
+
+typedef enum {
+  EfiResetCold,
+  EfiResetWarm,
+  EfiResetShutdown,
+  EfiResetPlatformSpecific
+} EFI_RESET_TYPE;
+
+typedef struct {
+  EFI_TABLE_HEADER Hdr;
+  EFI_STATUS GetTime;
+  EFI_STATUS SetTime;
+  EFI_STATUS GetWakeupTime;
+  EFI_STATUS SetWakeupTime;
+  EFI_STATUS SetVirtualAddressMap;
+  EFI_STATUS ConvertPointer;
+  EFI_STATUS GetVariable;
+  EFI_STATUS GetNextVariableName;
+  EFI_STATUS SetVariable;
+  EFI_STATUS GetNextHighMonotonicCount;
+  void (*ResetSystem)(EFI_RESET_TYPE ResetType, EFI_STATUS ResetStatus, UINTN DataSize, void *ResetData);
+  EFI_STATUS UpdateCapsule;
+  EFI_STATUS QueryCapsuleCapabilities;
+  EFI_STATUS QueryVariableInfo;
 } EFI_RUNTIME_SERVICES;
+
+typedef enum {
+  EfiReservedMemoryType,
+  EfiLoaderCode,
+  EfiLoaderData,
+  EfiBootServicesCode,
+  EfiBootServicesData,
+  EfiRuntimeServicesCode,
+  EfiRuntimeServicesData,
+  EfiConventionalMemory,
+  EfiUnusableMemory,
+  EfiACPIReclaimMemory,
+  EfiACPIMemoryNVS,
+  EfiMemoryMappedIO,
+  EfiMemoryMappedIOPortSpace,
+  EfiPalCode,
+  EfiPersistentMemory,
+  EfiMaxMemoryType
+} EFI_MEMORY_TYPE;
+
+typedef struct {
+  UINT32 Type;
+  EFI_PHYSICAL_ADDRESS PhysicalStart;
+  EFI_VIRTUAL_ADDRESS VirtualStart;
+  UINT64 NumberOfPages;
+  UINT64 Attribute;
+} EFI_MEMORY_DESCRIPTOR;
 
 typedef struct {
   EFI_TABLE_HEADER Hdr;
@@ -78,8 +170,8 @@ typedef struct {
   void *RestoreTPL;
   EFI_STATUS AllocatePages;
   EFI_STATUS FreePages;
-  EFI_STATUS GetMemoryMap;
-  EFI_STATUS AllocatePool;
+  EFI_STATUS (*GetMemoryMap)(UINTN *MemoryMapSize, EFI_MEMORY_DESCRIPTOR *MemoryMap, UINTN *MapKey, UINTN *DescriptorSize, UINT32 *DescriptorVersion);
+  EFI_STATUS (*AllocatePool)(EFI_MEMORY_TYPE PoolType, UINTN size, void **Buffer);
   EFI_STATUS FreePool;
   EFI_STATUS CreateEvent;
   EFI_STATUS SetTimer;
@@ -100,7 +192,7 @@ typedef struct {
   EFI_STATUS StartImage;
   EFI_STATUS Exit;
   EFI_STATUS UnloadImage;
-  EFI_STATUS ExitBootServices;
+  EFI_STATUS (*ExitBootServices)(EFI_HANDLE ImageHandle, UINTN MapKey);
   EFI_STATUS GetNextMonotonicCount;
   EFI_STATUS Stall;
   EFI_STATUS (* SetWatchdogTimer)(UINTN Timeout, UINT64 WatchdogCode, UINTN DataSize, CHAR16 *WatchdogData);
