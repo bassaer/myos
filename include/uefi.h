@@ -3,6 +3,7 @@
 
 #include <type.h>
 #include <err.h>
+#include <guid.h>
 
 /**
  * UEFI SPECIFICATIONS 2.8 Errata A, February 2020
@@ -16,6 +17,20 @@ typedef void *EFI_HANDLE;
 typedef void *EFI_EVENT;
 typedef UINT64 EFI_PHYSICAL_ADDRESS;
 typedef UINT64 EFI_VIRTUAL_ADDRESS;
+
+typedef struct {
+  UINT16 Year; // 1900 – 9999
+  UINT8 Month; // 1 – 12
+  UINT8 Day; // 1 – 31
+  UINT8 Hour; // 0 – 23
+  UINT8 Minute; // 0 – 59
+  UINT8 Second; // 0 – 59
+  UINT8 Pad1;
+  UINT32 Nanosecond; // 0 – 999,999,999
+  INT16 TimeZone; // -1440 to 1440 or 2047
+  UINT8 Daylight;
+  UINT8 Pad2;
+} EFI_TIME;
 
 typedef enum {
   NULL_SCAN = 0x00,
@@ -203,7 +218,7 @@ typedef struct {
   EFI_STATUS OpenProtocolInformation;
   EFI_STATUS ProtocolsPerHandle;
   EFI_STATUS LocateHandleBuffer;
-  EFI_STATUS LocateProtocol;
+  EFI_STATUS (* LocateProtocol)(EFI_GUID *Protocol, void *Registration, void **Interface);
   EFI_STATUS InstallMultipleProtocolInterfaces;
   EFI_STATUS UninstallMultipleProtocolInterfaces;
   EFI_STATUS CalculateCrc32;
@@ -225,5 +240,39 @@ typedef struct {
   EFI_RUNTIME_SERVICES *RuntimeServices;
   EFI_BOOT_SERVICES *BootServices;
 } EFI_SYSTEM_TABLE;
+
+typedef struct EFI_FILE_PROTOCOL {
+  UINT64 Revision;
+  EFI_STATUS (* Open)(struct EFI_FILE_PROTOCOL *This, struct EFI_FILE_PROTOCOL **NewHandle, CHAR16 *FileName, UINT64 OpenMode, UINT64 Attributes);
+  EFI_STATUS (* Close)(struct  EFI_FILE_PROTOCOL *This);
+  EFI_STATUS Delete;
+  EFI_STATUS (* Read)(struct EFI_FILE_PROTOCOL *This, UINTN *BufferSize, void *Buffer);
+  EFI_STATUS Write;
+  EFI_STATUS GetPosition;
+  EFI_STATUS SetPosition;
+  EFI_STATUS GetInfo;
+  EFI_STATUS SetInfo;
+  EFI_STATUS Flush;
+  EFI_STATUS OpenEx; // Added for revision 2
+  EFI_STATUS ReadEx; // Added for revision 2
+  EFI_STATUS WriteEx; // Added for revision 2
+  EFI_STATUS FlushEx; // Added for revision 2
+} EFI_FILE_PROTOCOL;
+
+typedef struct EFI_SIMPLE_FILE_SYSTEM_PROTOCOL {
+  UINT64 Revision;
+  EFI_STATUS (* OpenVolume)(struct EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *This, EFI_FILE_PROTOCOL **Root);
+} EFI_SIMPLE_FILE_SYSTEM_PROTOCOL;
+
+typedef struct {
+  UINT64 Size;
+  UINT64 FileSize;
+  UINT64 PhysicalSize;
+  EFI_TIME CreateTime;
+  EFI_TIME LastAccessTime;
+  EFI_TIME ModificationTime;
+  UINT64 Attribute;
+  CHAR16 FileName[];
+} EFI_FILE_INFO;
 
 #endif

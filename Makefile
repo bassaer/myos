@@ -43,7 +43,7 @@ install:
 kernel/kernel.bin:
 	@$(MAKE) build -C kernel
 
-arch/x86/BOOTX64.EFI:
+arch/x86/BOOTX64.EFI: lib
 	@$(MAKE) build -C arch/x86
 
 img: arch/x86/BOOTX64.EFI kernel/kernel.bin
@@ -67,7 +67,7 @@ font:
 	python scripts/font.py -f scripts/font.txt
 
 lib:
-	make -C lib
+	@$(MAKE) -C lib
 
 $(ARCH_BOOT)/ipl.bin: $(ARCH_BOOT)/ipl.o
 	ld $^ -T $(ARCH_BOOT)/ipl.ld -Map ipl.map -o $@

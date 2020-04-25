@@ -8,7 +8,7 @@ MAKE      = make --no-print-directory
 
 build: BOOTX64.EFI
 
-BOOTX64.EFI: boot.c #$(KERN_C) $(LIB_C) $(BIN_C)
+BOOTX64.EFI: boot.c ../../lib/string.c ../../kernel/console.c ../../kernel/event.c
 	$(CC) $(CFLAGS) -e efi_main -o $@ $^ -lgcc
 
 clean:

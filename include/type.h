@@ -20,8 +20,8 @@ typedef unsigned short UINT16;
 typedef int INT32;
 typedef unsigned int UINT32;
 
-typedef long INT64;
-typedef unsigned long UINT64;
+typedef long long INT64;
+typedef unsigned long long UINT64;
 
 typedef long long INT128;
 typedef unsigned long long UINT128;
