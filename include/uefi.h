@@ -5,6 +5,10 @@
 #include <err.h>
 #include <guid.h>
 
+#define EFI_FILE_MODE_READ 0x0000000000000001
+#define EFI_FILE_MODE_WRITE 0x0000000000000002
+#define EFI_FILE_MODE_CREATE 0x8000000000000000
+
 /**
  * UEFI SPECIFICATIONS 2.8 Errata A, February 2020
  * https://uefi.org/specifications
@@ -187,7 +191,7 @@ typedef struct {
   EFI_STATUS FreePages;
   EFI_STATUS (*GetMemoryMap)(UINTN *MemoryMapSize, EFI_MEMORY_DESCRIPTOR *MemoryMap, UINTN *MapKey, UINTN *DescriptorSize, UINT32 *DescriptorVersion);
   EFI_STATUS (*AllocatePool)(EFI_MEMORY_TYPE PoolType, UINTN size, void **Buffer);
-  EFI_STATUS FreePool;
+  EFI_STATUS (*FreePool)(void *Buffer);
   EFI_STATUS CreateEvent;
   EFI_STATUS SetTimer;
   EFI_STATUS (*WaitForEvent)(UINTN NumberOfEvents, EFI_EVENT *Event, UINTN *index);
@@ -223,7 +227,7 @@ typedef struct {
   EFI_STATUS UninstallMultipleProtocolInterfaces;
   EFI_STATUS CalculateCrc32;
   void *CopyMem;
-  void *SetMem;
+  void* (*SetMem)(void *Buffer, UINTN Size, UINT8 Value);
   EFI_STATUS CreateEventEx;
 } EFI_BOOT_SERVICES;
 
@@ -274,5 +278,88 @@ typedef struct {
   UINT64 Attribute;
   CHAR16 FileName[];
 } EFI_FILE_INFO;
+
+
+// TODO : fix
+
+typedef struct {
+  unsigned char Type;
+  unsigned char SubType;
+  unsigned char Length[2];
+} EFI_DEVICE_PATH_PROTOCOL;
+
+typedef struct {
+  unsigned int KeyShiftState;
+  unsigned char KeyToggleState;
+} EFI_KEY_STATE;
+
+typedef struct {
+  EFI_INPUT_KEY Key;
+  EFI_KEY_STATE KeyState;
+} EFI_KEY_DATA;
+
+typedef struct {
+  int RelativeMovementX;
+  int RelativeMovementY;
+  int RelativeMovementZ;
+  unsigned char LeftButton;
+  unsigned char RightButton;
+} EFI_SIMPLE_POINTER_STATE;
+
+
+typedef struct EFI_SIMPLE_POINTER_PROTOCOL {
+  unsigned long long (*Reset)(
+    struct EFI_SIMPLE_POINTER_PROTOCOL *This,
+    unsigned char ExtendedVerification);
+  unsigned long long (*GetState)(
+    struct EFI_SIMPLE_POINTER_PROTOCOL *This,
+    EFI_SIMPLE_POINTER_STATE *State);
+  void *WaitForInput;
+} EFI_SIMPLE_POINTER_PROTOCOL;
+
+typedef struct EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL {
+  unsigned long long (*Reset)(
+    struct EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
+    unsigned char ExtendedVerification);
+  unsigned long long (*ReadKeyStrokeEx)(
+    struct EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
+    EFI_KEY_DATA *KeyData);
+  void *WaitForKeyEx;
+  unsigned long long (*SetState)(
+    struct EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
+    unsigned char *KeyToggleState);
+  unsigned long long (*RegisterKeyNotify)(
+    struct EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
+    EFI_KEY_DATA *KeyData,
+    unsigned long long (*KeyNotificationFunction)(
+      EFI_KEY_DATA *KeyData),
+    void **NotifyHandle);
+  unsigned long long (*UnregisterKeyNotify)(
+    struct EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
+    void *NotificationHandle);
+} EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL;
+
+typedef struct {
+  unsigned long long _buf;
+  unsigned short *(*ConvertDevicePathToText)(
+    const EFI_DEVICE_PATH_PROTOCOL* DeviceNode,
+    unsigned char DisplayOnly,
+    unsigned char AllowShortcuts);
+} EFI_DEVICE_PATH_TO_TEXT_PROTOCOL;
+
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL *(*ConvertTextToDeviceNode) (
+    const unsigned short *TextDeviceNode);
+  EFI_DEVICE_PATH_PROTOCOL *(*ConvertTextToDevicePath) (
+    const unsigned short *TextDevicePath);
+} EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL;
+
+typedef struct {
+  unsigned long long _buf[3];
+  EFI_DEVICE_PATH_PROTOCOL *(*AppendDeviceNode)(
+    const EFI_DEVICE_PATH_PROTOCOL *DevicePath,
+    const EFI_DEVICE_PATH_PROTOCOL *DeviceNode);
+} EFI_DEVICE_PATH_UTILITIES_PROTOCOL;
+
 
 #endif

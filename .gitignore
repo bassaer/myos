@@ -55,4 +55,4 @@ dkms.conf
 # release updates
 /*.ogv
 /release/
-/BOOTX64.EFI
+BOOTX64.EFI
