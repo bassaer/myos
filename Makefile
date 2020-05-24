@@ -37,7 +37,7 @@ endif
 
 all: package
 
-install:
+prepare:
 	sudo apt install -y mtools qemu-system-x86_64 gcc-mingw-w64-x86-64 ovmf
 
 kernel/kernel.bin:
@@ -85,6 +85,15 @@ run: img
                      -d guest_errors \
                      || true
 
+
+usb: arch/x86/BOOTX64.EFI kernel/kernel.bin
+	sudo mount /dev/sda /mnt
+	sudo rm -rf /mnt/EFI
+	sudo rm -rf /mnt/kernel.bin
+	mkdir -p /mnt/EFI/BOOT
+	sudo cp arch/x86/BOOTX64.EFI /mnt/EFI/BOOT
+	sudo cp kernel/kernel.bin /mnt/
+	sudo umount /mnt
 
 package: img
 	rm -rf ./release
