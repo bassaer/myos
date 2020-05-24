@@ -3,10 +3,18 @@
 
 #define NULL ((void *)0)
 
+#define	EFIAPI
+#define OUT
+#define IN
+#define OPTIONAL
+#define CONST const
+
 typedef enum {
   false,
   true
 } BOOLEAN;
+
+typedef void VOID;
 
 typedef unsigned long long INTN;
 typedef unsigned long long UINTN;
