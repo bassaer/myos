@@ -10,7 +10,9 @@
 #define STACK_BASE (UINTN)0x0000000000010000
 #define KERN_PATH L"kernel.bin"
 
-EFI_SYSTEM_TABLE *ST;
+EFI_SYSTEM_TABLE *gST;
+EFI_BOOT_SERVICES *gBS;
+EFI_RUNTIME_SERVICES *gRT;
 
 void halt() {
   while (1) __asm__ volatile("hlt");
@@ -56,32 +58,26 @@ EFI_STATUS load_kernel(EFI_FILE_PROTOCOL *root, void *addr, INTN file_size) {
 }
 
 EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
-  ST = SystemTable;
+  gST = SystemTable;
+  gBS = SystemTable->BootServices;
+  gRT = SystemTable->RuntimeServices;
+
+  gST->ConOut->ClearScreen(gST->ConOut);
   // init_event(SystemTable->BootServices);
-  init_console(ST->ConIn, ST->ConOut);
+  init_console(gST->ConIn, gST->ConOut);
   printf( L"loading kernel...\r\n");
 
   EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *fs;
   EFI_GRAPHICS_OUTPUT_PROTOCOL *gop;
-  EFI_SIMPLE_POINTER_PROTOCOL *pointer;
-  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *input;
-  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL *dptt;
-  EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL *dpft;
-  EFI_DEVICE_PATH_UTILITIES_PROTOCOL *dpu;
 
   EFI_GUID fs_guid = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID;
   EFI_GUID gop_guid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
-  EFI_GUID pointer_guid = EFI_SIMPLE_POINTER_PROTOCOL_GUID;
-  EFI_GUID input_guid = EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL_GUID;
-  EFI_GUID dptt_guid = EFI_DEVICE_PATH_TO_TEXT_PROTOCOL_GUID;
-  EFI_GUID dpft_guid = EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL_GUID;
-  EFI_GUID dpu_guid = EFI_DEVICE_PATH_UTILITIES_PROTOCOL_GUID;
 
-  EFI_STATUS status = ST->BootServices->LocateProtocol(&fs_guid, NULL, (void **)&fs);
+  EFI_STATUS status = gST->BootServices->LocateProtocol(&fs_guid, NULL, (void **)&fs);
   if (status != EFI_SUCCESS) {
     return status;
   }
-  status = ST->BootServices->LocateProtocol(&gop_guid, NULL, (void **)&gop);
+  status = gST->BootServices->LocateProtocol(&gop_guid, NULL, (void **)&gop);
   if (status != EFI_SUCCESS) {
     return status;
   }
@@ -90,17 +86,8 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   } else {
     printf(L"with: %d, height: %d\r\n", gop->Mode->Info->HorizontalResolution, gop->Mode->Info->VerticalResolution);
   }
-  status += ST->BootServices->LocateProtocol(&pointer_guid, NULL, (void **)&pointer);
-  status += ST->BootServices->LocateProtocol(&input_guid, NULL, (void **)&input);
-  status += ST->BootServices->LocateProtocol(&dptt_guid, NULL, (void **)&dptt);
-  status += ST->BootServices->LocateProtocol(&dpft_guid, NULL, (void **)&dpft);
-  status += ST->BootServices->LocateProtocol(&dpu_guid, NULL, (void **)&dpu);
 
-  if (status != EFI_SUCCESS) {
-    printf(L"failed locate protocol\r\n");
-  }
-
-  ST->BootServices->SetWatchdogTimer(0, 0, 0, NULL);
+  gST->BootServices->SetWatchdogTimer(0, 0, 0, NULL);
 
   EFI_FILE_PROTOCOL *root;
   status = fs->OpenVolume(fs, &root);
@@ -148,9 +135,20 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   kernel->Close(kernel);
   //root->Close(root);
 
-  ST->BootServices->SetMem(header.bss_start, header.bss_size, 0);
+  gBS->SetMem(header.bss_start, header.bss_size, 0);
 
   printf(L"done load kernel\r\n");
+
+  EFI_TIME *Time;
+  status = gBS->AllocatePool(EfiBootServicesData, sizeof(EFI_TIME), (VOID **)&Time);
+  if (status != EFI_SUCCESS) {
+    return status;
+  }
+  status = gRT->GetTime(Time, NULL);
+  if (status != EFI_SUCCESS) {
+    return status;
+  }
+  printf(L"Now=> %d/%d/%d %d:%d:%d:%d.%d", Time->Year, Time->Month, Time->Day, Time->Hour, Time->Minute, Time->Second, Time->Nanosecond);
 
   /*
   UINTN MemoryMapSize = 0;
@@ -182,17 +180,17 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   UINT32 DescriptorVersion;
 
   do {
-    status =  ST->BootServices->GetMemoryMap(&MemoryMapSize, MemoryMap, &MapKey, &DescriptorSize, &DescriptorVersion);
+    status =  gBS->GetMemoryMap(&MemoryMapSize, MemoryMap, &MapKey, &DescriptorSize, &DescriptorVersion);
     while (status == EFI_BUFFER_TOO_SMALL) {
       if (MemoryMap) {
-        ST->BootServices->FreePool(MemoryMap);
+        gBS->FreePool(MemoryMap);
       }
-      ST->BootServices->AllocatePool(EfiLoaderData, MemoryMapSize, (void **)&MemoryMap);
-      status =  ST->BootServices->GetMemoryMap(&MemoryMapSize, MemoryMap, &MapKey, &DescriptorSize, &DescriptorVersion);
+      gBS->AllocatePool(EfiLoaderData, MemoryMapSize, (void **)&MemoryMap);
+      status =  gBS->GetMemoryMap(&MemoryMapSize, MemoryMap, &MapKey, &DescriptorSize, &DescriptorVersion);
     }
   } while(status != EFI_SUCCESS);
 
-  return ST->BootServices->ExitBootServices(ImageHandle, MapKey);
+  return gBS->ExitBootServices(ImageHandle, MapKey);
 
   if (status != EFI_SUCCESS) {
     printf(L"failed to exit boot services\r\n");
