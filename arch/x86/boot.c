@@ -18,7 +18,7 @@ void halt() {
   while (1) __asm__ volatile("hlt");
 }
 
-UINTN get_kernel_size(EFI_FILE_PROTOCOL *root) {
+UINT64 get_kernel_size(EFI_FILE_PROTOCOL *root) {
   EFI_FILE_INFO *file = NULL;
   while(1) {
     INTN buf_size = BUF_SIZE;
@@ -95,11 +95,14 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
     return status;
   }
 
-  INTN kernel_size = get_kernel_size(root);
+  //INT64 kernel_size = get_kernel_size(root);
+  INT64 kernel_size = 80;
   if (kernel_size == 0) {
     printf( L"Not found kernel\r\n");
     halt();
   }
+  printf(L"kernel size : %d\r\n", kernel_size);
+
 
   EFI_FILE_PROTOCOL *kernel;
   status = root->Open(root, &kernel, KERN_PATH, EFI_FILE_MODE_READ, 0);
@@ -125,15 +128,17 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 
   printf( L"done load head, addr: %x, size: %d\r\n", header.bss_start, header_size);
 
+  /*
   status = load_kernel(kernel, (void *)KERN_ADDR, kernel_size - header_size);
   if (status != EFI_SUCCESS) {
     printf(L"failed to load kernel: %d\r\n", status);
     return status;
   }
+  */
   printf( L"done load form kern addr\r\n");
 
   kernel->Close(kernel);
-  //root->Close(root);
+  root->Close(root);
 
   gBS->SetMem(header.bss_start, header.bss_size, 0);
 
@@ -148,49 +153,36 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   if (status != EFI_SUCCESS) {
     return status;
   }
-  printf(L"Now=> %d/%d/%d %d:%d:%d:%d.%d", Time->Year, Time->Month, Time->Day, Time->Hour, Time->Minute, Time->Second, Time->Nanosecond);
+  printf(L"Now=> %d-%d-%d %d:%d:%d\r\n", Time->Year, Time->Month, Time->Day, Time->Hour, Time->Minute, Time->Second);
 
-  /*
   UINTN MemoryMapSize = 0;
   EFI_MEMORY_DESCRIPTOR *MemoryMap = NULL;
   UINTN MapKey;
   UINTN DescriptorSize;
   UINT32 DescriptorVersion;
 
-  status = SystemTable->BootServices->GetMemoryMap(&MemoryMapSize, (EFI_MEMORY_DESCRIPTOR *)MemoryMap, &MapKey, &DescriptorSize, &DescriptorVersion);
+  status = gBS->GetMemoryMap(&MemoryMapSize, (EFI_MEMORY_DESCRIPTOR *)MemoryMap, &MapKey, &DescriptorSize, &DescriptorVersion);
   if (status != EFI_BUFFER_TOO_SMALL) {
     return status;
   }
   MemoryMapSize += 1024 * DescriptorSize;
-  status = SystemTable->BootServices->AllocatePool(EfiLoaderData, MemoryMapSize, (void **)&MemoryMap);
+  status = gBS->AllocatePool(EfiLoaderData, MemoryMapSize, (void **)&MemoryMap);
   if (status != EFI_SUCCESS) {
     return status;
   }
-  status = SystemTable->BootServices->GetMemoryMap(&MemoryMapSize, (EFI_MEMORY_DESCRIPTOR *)MemoryMap, &MapKey, &DescriptorSize, &DescriptorVersion);
+  status = gBS->GetMemoryMap(&MemoryMapSize, (EFI_MEMORY_DESCRIPTOR *)MemoryMap, &MapKey, &DescriptorSize, &DescriptorVersion);
   if (status != EFI_SUCCESS) {
     return status;
   }
-  status = SystemTable->BootServices->ExitBootServices(ImageHandle, MapKey);
-  */
 
-  EFI_MEMORY_DESCRIPTOR *MemoryMap = NULL;
-  UINTN MemoryMapSize = 0;
-  UINTN MapKey;
-  UINTN DescriptorSize;
-  UINT32 DescriptorVersion;
+  // printf(L"try ExitBootServices\r\n");
+  status = gBS->ExitBootServices(ImageHandle, MapKey);
+  if (status != EFI_SUCCESS) {
+    printf(L"failed to ExitBootServices\r\n");
+    while(1);
+  }
+  return status;
 
-  do {
-    status =  gBS->GetMemoryMap(&MemoryMapSize, MemoryMap, &MapKey, &DescriptorSize, &DescriptorVersion);
-    while (status == EFI_BUFFER_TOO_SMALL) {
-      if (MemoryMap) {
-        gBS->FreePool(MemoryMap);
-      }
-      gBS->AllocatePool(EfiLoaderData, MemoryMapSize, (void **)&MemoryMap);
-      status =  gBS->GetMemoryMap(&MemoryMapSize, MemoryMap, &MapKey, &DescriptorSize, &DescriptorVersion);
-    }
-  } while(status != EFI_SUCCESS);
-
-  return gBS->ExitBootServices(ImageHandle, MapKey);
 
   if (status != EFI_SUCCESS) {
     printf(L"failed to exit boot services\r\n");

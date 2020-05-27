@@ -17,11 +17,14 @@
 
 typedef UINTN EFI_STATUS;
 typedef UINTN EFI_TPL;
-typedef void *EFI_HANDLE;
-typedef void *EFI_EVENT;
+typedef VOID *EFI_HANDLE;
+typedef VOID *EFI_EVENT;
 typedef UINT64 EFI_PHYSICAL_ADDRESS;
 typedef UINT64 EFI_VIRTUAL_ADDRESS;
 typedef UINTN EFI_TPL;
+
+typedef struct _EFI_FILE_PROTOCOL EFI_FILE_PROTOCOL;
+typedef struct _EFI_SIMPLE_FILE_SYSTEM_PROTOCOL EFI_SIMPLE_FILE_SYSTEM_PROTOCOL;
 
 typedef struct {
   UINT16 Year; // 1900 – 9999
@@ -778,27 +781,149 @@ typedef struct {
   EFI_BOOT_SERVICES *BootServices;
 } EFI_SYSTEM_TABLE;
 
-typedef struct EFI_FILE_PROTOCOL {
-  UINT64 Revision;
-  EFI_STATUS (* Open)(struct EFI_FILE_PROTOCOL *This, struct EFI_FILE_PROTOCOL **NewHandle, CHAR16 *FileName, UINT64 OpenMode, UINT64 Attributes);
-  EFI_STATUS (* Close)(struct  EFI_FILE_PROTOCOL *This);
-  EFI_STATUS Delete;
-  EFI_STATUS (* Read)(struct EFI_FILE_PROTOCOL *This, UINTN *BufferSize, void *Buffer);
-  EFI_STATUS Write;
-  EFI_STATUS GetPosition;
-  EFI_STATUS SetPosition;
-  EFI_STATUS GetInfo;
-  EFI_STATUS SetInfo;
-  EFI_STATUS Flush;
-  EFI_STATUS OpenEx; // Added for revision 2
-  EFI_STATUS ReadEx; // Added for revision 2
-  EFI_STATUS WriteEx; // Added for revision 2
-  EFI_STATUS FlushEx; // Added for revision 2
-} EFI_FILE_PROTOCOL;
+typedef
+EFI_STATUS
+(EFIAPI *EFI_FILE_OPEN) (
+  IN EFI_FILE_PROTOCOL *This,
+  OUT EFI_FILE_PROTOCOL **NewHandle,
+  IN CHAR16 *FileName,
+  IN UINT64 OpenMode,
+  IN UINT64 Attributes
+);
 
-typedef struct EFI_SIMPLE_FILE_SYSTEM_PROTOCOL {
+typedef
+EFI_STATUS
+(EFIAPI *EFI_FILE_CLOSE) (
+  IN EFI_FILE_PROTOCOL *This
+);
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_FILE_DELETE) (
+  IN EFI_FILE_PROTOCOL *This
+);
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_FILE_READ) (
+  IN EFI_FILE_PROTOCOL *This,
+  IN OUT UINTN *BufferSize,
+  OUT VOID *Buffer
+);
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_FILE_WRITE) (
+  IN EFI_FILE_PROTOCOL *This,
+  IN OUT UINTN *BufferSize,
+  IN VOID *Buffer
+);
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_FILE_GET_POSITION) (
+  IN EFI_FILE_PROTOCOL *This,
+  OUT UINT64 *Position
+);
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_FILE_SET_POSITION) (
+  IN EFI_FILE_PROTOCOL *This,
+  IN UINT64 Position
+);
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_FILE_GET_INFO) (
+  IN EFI_FILE_PROTOCOL *This,
+  IN EFI_GUID *InformationType,
+  IN OUT UINTN *BufferSize,
+  OUT VOID *Buffer
+);
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_FILE_SET_INFO) (
+  IN EFI_FILE_PROTOCOL *This,
+  IN EFI_GUID *InformationType,
+  IN UINTN BufferSize,
+  IN VOID *Buffer
+);
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_FILE_FLUSH) (
+  IN EFI_FILE_PROTOCOL *This
+);
+
+typedef struct {
+  EFI_EVENT Event;
+  EFI_STATUS Status;
+  UINTN BufferSize;
+  VOID *Buffer;
+} EFI_FILE_IO_TOKEN;
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_FILE_OPEN_EX) (
+  IN EFI_FILE_PROTOCOL *This,
+  OUT EFI_FILE_PROTOCOL **NewHandle,
+  IN CHAR16 *FileName,
+  IN UINT64 OpenMode,
+  IN UINT64 Attributes,
+  IN OUT EFI_FILE_IO_TOKEN *Token
+);
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_FILE_READ_EX) (
+  IN EFI_FILE_PROTOCOL *This,
+  IN OUT EFI_FILE_IO_TOKEN *Token
+);
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_FILE_WRITE_EX) (
+  IN EFI_FILE_PROTOCOL *This,
+  IN OUT EFI_FILE_IO_TOKEN *Token
+);
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_FILE_FLUSH_EX) (
+  IN EFI_FILE_PROTOCOL *This,
+  IN OUT EFI_FILE_IO_TOKEN *Token
+);
+
+struct _EFI_FILE_PROTOCOL {
   UINT64 Revision;
-  EFI_STATUS (* OpenVolume)(struct EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *This, EFI_FILE_PROTOCOL **Root);
+  EFI_FILE_OPEN Open;
+  EFI_FILE_CLOSE Close;
+  EFI_FILE_DELETE Delete;
+  EFI_FILE_READ Read;
+  EFI_FILE_WRITE Write;
+  EFI_FILE_GET_POSITION GetPosition;
+  EFI_FILE_SET_POSITION SetPosition;
+  EFI_FILE_GET_INFO GetInfo;
+  EFI_FILE_SET_INFO SetInfo;
+  EFI_FILE_FLUSH Flush;
+  EFI_FILE_OPEN_EX OpenEx; // Added for revision 2
+  EFI_FILE_READ_EX ReadEx; // Added for revision 2
+  EFI_FILE_WRITE_EX WriteEx; // Added for revision 2
+  EFI_FILE_FLUSH_EX FlushEx; // Added for revision 2
+};
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_OPEN_VOLUME) (
+  IN EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *This,
+  OUT EFI_FILE_PROTOCOL **Root
+);
+
+typedef struct _EFI_SIMPLE_FILE_SYSTEM_PROTOCOL {
+  UINT64 Revision;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_OPEN_VOLUME OpenVolume;
 } EFI_SIMPLE_FILE_SYSTEM_PROTOCOL;
 
 typedef struct {
@@ -811,75 +936,5 @@ typedef struct {
   UINT64 Attribute;
   CHAR16 FileName[];
 } EFI_FILE_INFO;
-
-
-// TODO : fix
-
-typedef struct {
-  unsigned int KeyShiftState;
-  unsigned char KeyToggleState;
-} EFI_KEY_STATE;
-
-typedef struct {
-  EFI_INPUT_KEY Key;
-  EFI_KEY_STATE KeyState;
-} EFI_KEY_DATA;
-
-typedef struct {
-  int RelativeMovementX;
-  int RelativeMovementY;
-  int RelativeMovementZ;
-  unsigned char LeftButton;
-  unsigned char RightButton;
-} EFI_SIMPLE_POINTER_STATE;
-
-
-typedef struct EFI_SIMPLE_POINTER_PROTOCOL {
-  unsigned long long (*Reset)(
-    struct EFI_SIMPLE_POINTER_PROTOCOL *This,
-    unsigned char ExtendedVerification);
-  unsigned long long (*GetState)(
-    struct EFI_SIMPLE_POINTER_PROTOCOL *This,
-    EFI_SIMPLE_POINTER_STATE *State);
-  void *WaitForInput;
-} EFI_SIMPLE_POINTER_PROTOCOL;
-
-typedef struct EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL {
-  unsigned long long (*Reset)(
-    struct EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
-    unsigned char ExtendedVerification);
-  unsigned long long (*ReadKeyStrokeEx)(
-    struct EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
-    EFI_KEY_DATA *KeyData);
-  void *WaitForKeyEx;
-  unsigned long long (*SetState)(
-    struct EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
-    unsigned char *KeyToggleState);
-  unsigned long long (*RegisterKeyNotify)(
-    struct EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
-    EFI_KEY_DATA *KeyData,
-    unsigned long long (*KeyNotificationFunction)(
-      EFI_KEY_DATA *KeyData),
-    void **NotifyHandle);
-  unsigned long long (*UnregisterKeyNotify)(
-    struct EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
-    void *NotificationHandle);
-} EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL;
-
-typedef struct {
-  unsigned long long _buf;
-  unsigned short *(*ConvertDevicePathToText)(
-    const EFI_DEVICE_PATH_PROTOCOL* DeviceNode,
-    unsigned char DisplayOnly,
-    unsigned char AllowShortcuts);
-} EFI_DEVICE_PATH_TO_TEXT_PROTOCOL;
-
-typedef struct {
-  unsigned long long _buf[3];
-  EFI_DEVICE_PATH_PROTOCOL *(*AppendDeviceNode)(
-    const EFI_DEVICE_PATH_PROTOCOL *DevicePath,
-    const EFI_DEVICE_PATH_PROTOCOL *DeviceNode);
-} EFI_DEVICE_PATH_UTILITIES_PROTOCOL;
-
 
 #endif
