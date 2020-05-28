@@ -3,10 +3,12 @@
 #include <event.h>
 #include <lib/string.h>
 
-#define BUF_SIZE 1024
+#define BUF_SIZE 4*1024
+#define PAGE_SIZE 4*1024
 
 //#define KERN_ADDR (UINTN)0x0000000000001000
-#define KERN_ADDR (UINTN)0x0000000000002000
+//#define KERN_ADDR (UINTN)0x0000000000002000
+#define KERN_ADDR 0x1000
 #define STACK_BASE (UINTN)0x0000000000010000
 #define KERN_PATH L"kernel.bin"
 
@@ -18,45 +20,6 @@ void halt() {
   while (1) __asm__ volatile("hlt");
 }
 
-UINT64 get_kernel_size(EFI_FILE_PROTOCOL *root) {
-  EFI_FILE_INFO *file = NULL;
-  while(1) {
-    INTN buf_size = BUF_SIZE;
-    EFI_STATUS status = root->Read(root, &buf_size, file);
-    if (status != EFI_SUCCESS) {
-      break;
-    }
-    if (!buf_size) {
-      break;
-    }
-    if (strcmp(KERN_PATH, file->FileName) == 0) {
-      return file->FileSize;
-    }
-  }
-  return 0;
-}
-
-EFI_STATUS load_kernel(EFI_FILE_PROTOCOL *root, void *addr, INTN file_size) {
-  UINTN buf_size = 0;
-  UINTN remain = file_size;
-  EFI_STATUS status;
-
-  while(remain > 0) {
-    buf_size = remain > BUF_SIZE ? BUF_SIZE : remain;
-    status = root->Read(root, &buf_size, addr);
-
-    if (status != EFI_SUCCESS) {
-      return status;
-    }
-
-    if (remain > BUF_SIZE) {
-      addr += buf_size;
-    }
-    remain -= buf_size;
-  }
-  return EFI_SUCCESS;
-}
-
 EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   gST = SystemTable;
   gBS = SystemTable->BootServices;
@@ -65,11 +28,10 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   gST->ConOut->ClearScreen(gST->ConOut);
   // init_event(SystemTable->BootServices);
   init_console(gST->ConIn, gST->ConOut);
-  printf( L"loading kernel...\r\n");
+  printf( L"[OK] loading kernel...\r\n");
 
   EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *fs;
   EFI_GRAPHICS_OUTPUT_PROTOCOL *gop;
-
   EFI_GUID fs_guid = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID;
   EFI_GUID gop_guid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
 
@@ -84,7 +46,7 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   if (!gop) {
     printf(L"failed locate graphic\r\n");
   } else {
-    printf(L"with: %d, height: %d\r\n", gop->Mode->Info->HorizontalResolution, gop->Mode->Info->VerticalResolution);
+    printf(L"[OK] with: %d, height: %d\r\n", gop->Mode->Info->HorizontalResolution, gop->Mode->Info->VerticalResolution);
   }
 
   gST->BootServices->SetWatchdogTimer(0, 0, 0, NULL);
@@ -94,55 +56,33 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   if (status != EFI_SUCCESS) {
     return status;
   }
-
-  //INT64 kernel_size = get_kernel_size(root);
-  INT64 kernel_size = 80;
-  if (kernel_size == 0) {
-    printf( L"Not found kernel\r\n");
-    halt();
-  }
-  printf(L"kernel size : %d\r\n", kernel_size);
-
-
+  
   EFI_FILE_PROTOCOL *kernel;
-  status = root->Open(root, &kernel, KERN_PATH, EFI_FILE_MODE_READ, 0);
+  status = root->Open(root, &kernel, KERN_PATH, EFI_FILE_MODE_READ, EFI_FILE_READ_ONLY);
   if (status != EFI_SUCCESS) {
-    printf( L"failed to open kernel\r\n");
+    printf(L"faild to open kernel: %d\r\n", status);
     halt();
-    return status;
   }
-
-  struct _header {
-    void *bss_start;
-    UINTN bss_size;
-  } header;
-
-  printf( L"start load head: %d\r\n", sizeof(header));
-  UINTN header_size = sizeof(header);
-
-  status = load_kernel(kernel, (void *)&header, header_size);
+  UINTN buf_size = BUF_SIZE;
+  EFI_PHYSICAL_ADDRESS buf = (EFI_PHYSICAL_ADDRESS)KERN_ADDR;
+  status = gBS->AllocatePages(AllocateAddress, EfiLoaderData, buf_size / PAGE_SIZE, &buf);
   if (status != EFI_SUCCESS) {
-    printf(L"failed to load kernel head: %d\r\n", status);
-    return status;
+    printf(L"faild to allocate page: %d\r\n", status);
+    halt();
   }
-
-  printf( L"done load head, addr: %x, size: %d\r\n", header.bss_start, header_size);
-
-  /*
-  status = load_kernel(kernel, (void *)KERN_ADDR, kernel_size - header_size);
+  status = kernel->Read(kernel, &buf_size, (VOID *)buf);
   if (status != EFI_SUCCESS) {
-    printf(L"failed to load kernel: %d\r\n", status);
-    return status;
+    printf(L"faild to read kenel: %d\r\n", status);
+    halt();
   }
-  */
-  printf( L"done load form kern addr\r\n");
 
   kernel->Close(kernel);
   root->Close(root);
+  gBS->FreePages(buf, BUF_SIZE);
 
-  gBS->SetMem(header.bss_start, header.bss_size, 0);
+  printf( L"[OK] load kernel: size=>%d, addr=>%x\r\n", buf_size, &buf);
 
-  printf(L"done load kernel\r\n");
+  //gBS->SetMem(header.bss_start, header.bss_size, 0);
 
   EFI_TIME *Time;
   status = gBS->AllocatePool(EfiBootServicesData, sizeof(EFI_TIME), (VOID **)&Time);
@@ -153,7 +93,7 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   if (status != EFI_SUCCESS) {
     return status;
   }
-  printf(L"Now=> %d-%d-%d %d:%d:%d\r\n", Time->Year, Time->Month, Time->Day, Time->Hour, Time->Minute, Time->Second);
+  printf(L"[OK] Now => %d-%d-%d %d:%d:%d\r\n", Time->Year, Time->Month, Time->Day, Time->Hour, Time->Minute, Time->Second);
 
   UINTN MemoryMapSize = 0;
   EFI_MEMORY_DESCRIPTOR *MemoryMap = NULL;
