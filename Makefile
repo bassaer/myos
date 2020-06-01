@@ -40,19 +40,19 @@ all: package
 prepare:
 	sudo apt install -y mtools qemu-system-x86_64 gcc-mingw-w64-x86-64 ovmf
 
-kernel/kernel.bin:
+kernel/vmmyos:
 	@$(MAKE) build -C kernel
 
 arch/x86/BOOTX64.EFI: lib
 	@$(MAKE) build -C arch/x86
 
-img: arch/x86/BOOTX64.EFI kernel/kernel.bin
+img: arch/x86/BOOTX64.EFI kernel/vmmyos
 	dd if=/dev/zero of=$(IMG) bs=1k count=1440
 	mformat -i $(IMG) -f 1440 ::
 	mmd -i $(IMG) ::/EFI
 	mmd -i $(IMG) ::/EFI/BOOT
 	mcopy -i $(IMG) $< ::/EFI/BOOT
-	mcopy -i $(IMG) kernel/kernel.bin ::/
+	mcopy -i $(IMG) kernel/vmmyos ::/
 
 %.o: %.c
 	${CC} $(CFLAGS) -o $@ $*.c
@@ -83,16 +83,17 @@ run: img
                      -net none \
                      -usbdevice disk::$(IMG) \
                      -d guest_errors \
+                     -m 4G \
                      || true
 
 
-usb: arch/x86/BOOTX64.EFI kernel/kernel.bin
+usb: arch/x86/BOOTX64.EFI kernel/vmmyos
 	sudo mount /dev/sda /mnt
 	sudo rm -rf /mnt/EFI
-	sudo rm -rf /mnt/kernel.bin
+	sudo rm -rf /mnt/vmmyos
 	mkdir -p /mnt/EFI/BOOT
 	sudo cp arch/x86/BOOTX64.EFI /mnt/EFI/BOOT
-	sudo cp kernel/kernel.bin /mnt/
+	sudo cp kernel/vmmyos /mnt/
 	sudo umount /mnt
 
 package: img

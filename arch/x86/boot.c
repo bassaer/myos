@@ -6,11 +6,13 @@
 #define BUF_SIZE 4*1024
 #define PAGE_SIZE 4*1024
 
-//#define KERN_ADDR (UINTN)0x0000000000001000
-//#define KERN_ADDR (UINTN)0x0000000000002000
-#define KERN_ADDR 0x1000
+#define KERN_ADDR 100000000
+//#define KERN_ADDR 0x0000000000002000
+//define KERN_ADDR 0x0000000000110000
 #define STACK_BASE (UINTN)0x0000000000010000
-#define KERN_PATH L"kernel.bin"
+#define KERN_PATH L"\\vmmyos"
+
+#define UINT64_MAX  0xffffffffffffffff
 
 EFI_SYSTEM_TABLE *gST;
 EFI_BOOT_SERVICES *gBS;
@@ -19,6 +21,7 @@ EFI_RUNTIME_SERVICES *gRT;
 void halt() {
   while (1) __asm__ volatile("hlt");
 }
+
 
 EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   gST = SystemTable;
@@ -56,31 +59,45 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   if (status != EFI_SUCCESS) {
     return status;
   }
-  
+
   EFI_FILE_PROTOCOL *kernel;
-  status = root->Open(root, &kernel, KERN_PATH, EFI_FILE_MODE_READ, EFI_FILE_READ_ONLY);
+  EFI_GUID lip_guid = EFI_LOADED_IMAGE_PROTOCOL_GUID;
+  EFI_LOADED_IMAGE_PROTOCOL* lip;
+  status = gBS->HandleProtocol(ImageHandle, &lip_guid, (VOID **)&lip);
   if (status != EFI_SUCCESS) {
-    printf(L"faild to open kernel: %d\r\n", status);
+    printf(L"failed to handle protocol lip: %d\r\n", status);
+    halt();
+  };
+  status = gBS->HandleProtocol(lip->DeviceHandle, &fs_guid, (VOID **)&fs);
+  if (status != EFI_SUCCESS) {
+    printf(L"failed to handle protocol fs: %d\r\n", status);
+    halt();
+  };
+  status = fs->OpenVolume(fs, &kernel);
+  if (status != EFI_SUCCESS) {
+    printf(L"failed to open volume: %d\r\n", status);
+    halt();
+  };
+
+  EFI_FILE_PROTOCOL *handle = NULL;
+  status = kernel->Open(kernel, &handle, KERN_PATH, EFI_FILE_MODE_READ, 0);
+  if (status != EFI_SUCCESS) {
+    halt();
+  };
+  UINT64 kernel_size = UINT64_MAX;
+  status = handle->SetPosition(handle, kernel_size);
+  if (status != EFI_SUCCESS) {
+    printf(L"failed to set position: %d\r\n", status);
     halt();
   }
-  UINTN buf_size = BUF_SIZE;
-  EFI_PHYSICAL_ADDRESS buf = (EFI_PHYSICAL_ADDRESS)KERN_ADDR;
-  status = gBS->AllocatePages(AllocateAddress, EfiLoaderData, buf_size / PAGE_SIZE, &buf);
+  status = handle->GetPosition(handle, &kernel_size);
   if (status != EFI_SUCCESS) {
-    printf(L"faild to allocate page: %d\r\n", status);
-    halt();
-  }
-  status = kernel->Read(kernel, &buf_size, (VOID *)buf);
-  if (status != EFI_SUCCESS) {
-    printf(L"faild to read kenel: %d\r\n", status);
+    printf(L"failed to get position: %d\r\n", status);
     halt();
   }
 
-  kernel->Close(kernel);
-  root->Close(root);
-  gBS->FreePages(buf, BUF_SIZE);
-
-  printf( L"[OK] load kernel: size=>%d, addr=>%x\r\n", buf_size, &buf);
+  printf( L"[OK] load kernel: size=>%d\r\n", kernel_size);
+  halt();
 
   //gBS->SetMem(header.bss_start, header.bss_size, 0);
 

@@ -25,7 +25,7 @@ ARCH_BOOT = arch/x86/boot
 
 .PHONY: build clean
 
-build: kernel.bin
+build: vmmyos
 
 %.o: %.c
 	${CC} $(CFLAGS) -o $@ $*.c
@@ -33,11 +33,11 @@ build: kernel.bin
 %.bin: %.o
 	ld $(LDFLAGS) $^ -T $*.ld -o $@
 
-kernel.bin: main.o #$(KERN_OBJ) $(LIB_OBJ) $(BIN_OBJ) $(MM_OBJ) $(DRV_OBJ)
+vmmyos: main.o #$(KERN_OBJ) $(LIB_OBJ) $(BIN_OBJ) $(MM_OBJ) $(DRV_OBJ)
 	ld $^ -T kernel.ld -Map kernel.map -o $@
 
 clean:
-	rm -rf *.img *.bin *.o *.map
+	rm -rf *.img vmmyos *.o *.map
 
 # Makefile memo
 # B=$(A:%.bin=%.o) -> A=aaa.binのとき B=aaa.o となる
