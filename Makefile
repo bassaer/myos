@@ -38,7 +38,7 @@ endif
 all: package
 
 prepare:
-	sudo apt install -y mtools qemu-system-x86_64 gcc-mingw-w64-x86-64 ovmf
+	sudo apt install -y mtools qemu gcc-mingw-w64-x86-64 ovmf
 
 kernel/vmmyos:
 	@$(MAKE) build -C kernel
