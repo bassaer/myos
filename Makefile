@@ -83,7 +83,6 @@ run: img
                      -net none \
                      -usbdevice disk::$(IMG) \
                      -d guest_errors \
-                     -m 4G \
                      || true
 
 

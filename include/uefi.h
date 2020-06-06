@@ -964,4 +964,17 @@ typedef struct {
   EFI_IMAGE_UNLOAD Unload;
 } EFI_LOADED_IMAGE_PROTOCOL;
 
+typedef struct {
+  UINT8 Blue;
+  UINT8 Green;
+  UINT8 Red;
+  UINT8 Reserved;
+} EFI_GRAPHICS_OUTPUT_BLT_PIXEL;
+
+typedef struct {
+  EFI_PHYSICAL_ADDRESS FrameBufferBase;
+  UINT32 HorizontalResolution;
+  UINT32 VerticalResolution;
+} BootInfo;
+
 #endif
