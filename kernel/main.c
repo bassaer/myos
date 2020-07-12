@@ -7,6 +7,9 @@
 |         |___/              |
 *---------------------------*/
 
-int main() {
+#include<uefi.h>
+
+void kernel_main(BootInfo *boot) {
+  (void) boot;
   while (1) __asm__ volatile("hlt");
 }

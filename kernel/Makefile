@@ -1,5 +1,5 @@
 CC        = gcc
-INCLUDE   = -Iinclude -Ibin/include
+INCLUDE   = -I../include -I../bin/include
 CFLAGS    = -c -Wall -Wextra $(INCLUDE) -nostdlib -fno-builtin
 KERN_OBJ  = kernel/main.o \
             kernel/console.o \
@@ -34,7 +34,8 @@ build: vmmyos
 	ld $(LDFLAGS) $^ -T $*.ld -o $@
 
 vmmyos: main.o #$(KERN_OBJ) $(LIB_OBJ) $(BIN_OBJ) $(MM_OBJ) $(DRV_OBJ)
-	ld $^ -T kernel.ld -Map kernel.map -o $@
+	#ld $^ -T kernel.ld -Map kernel.map -o $@
+	ld $^ -Map kernel.map -o $@
 
 clean:
 	rm -rf *.img vmmyos *.o *.map

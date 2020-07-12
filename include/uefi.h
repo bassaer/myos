@@ -972,9 +972,10 @@ typedef struct {
 } EFI_GRAPHICS_OUTPUT_BLT_PIXEL;
 
 typedef struct {
-  EFI_PHYSICAL_ADDRESS FrameBufferBase;
-  UINT32 HorizontalResolution;
-  UINT32 VerticalResolution;
+  EFI_SYSTEM_TABLE *system;
+  EFI_PHYSICAL_ADDRESS framebuffer;
+  UINT32 width;
+  UINT32 height;
 } BootInfo;
 
 #endif
