@@ -44,4 +44,17 @@ typedef struct {
   Elf64_Xword p_align; /* Alignment of segment */
 } Elf64_Phdr;
 
+typedef struct {
+  UINT32   sh_name;
+  UINT32   sh_type;
+  UINT64   sh_flags;
+  Elf64_Addr sh_addr;
+  Elf64_Off  sh_offset;
+  UINT64   sh_size;
+  UINT32   sh_link;
+  UINT32   sh_info;
+  UINT64   sh_addralign;
+  UINT64   sh_entsize;
+} Elf64_Shdr;
+
 #endif

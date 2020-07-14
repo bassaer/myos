@@ -973,7 +973,8 @@ typedef struct {
 
 typedef struct {
   EFI_SYSTEM_TABLE *system;
-  EFI_PHYSICAL_ADDRESS framebuffer;
+  //EFI_PHYSICAL_ADDRESS framebuffer;
+  VOID *framebuffer;
   UINT32 width;
   UINT32 height;
 } BootInfo;
