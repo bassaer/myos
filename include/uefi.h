@@ -4,6 +4,7 @@
 #include <type.h>
 #include <err.h>
 #include <guid.h>
+#include <color.h>
 
 #define EFI_FILE_MODE_READ 0x0000000000000001
 #define EFI_FILE_MODE_WRITE 0x0000000000000002

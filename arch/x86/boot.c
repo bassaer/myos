@@ -1,16 +1,11 @@
 #include <uefi.h>
-#include <console.h>
-#include <event.h>
-#include <lib/string.h>
 #include <elf64.h>
 
 #define BUF_SIZE 4*1024
 #define PAGE_SIZE 4*1024
-
 #define KERN_ADDR  0x0000000000002000
 #define STACK_BASE 0x0000000000100000
 #define KERN_PATH L"\\vmmyos"
-
 #define UINT64_MAX  0xffffffffffffffff
 
 EFI_SYSTEM_TABLE *gST;
@@ -28,6 +23,11 @@ void halt() {
   while (1) __asm__ volatile("hlt");
 }
 
+void printf(CHAR16 *str) {
+  gST->ConOut->SetAttribute(gST->ConOut, EFI_LIGHTGRAY);
+  gST->ConOut->OutputString(gST->ConOut, str);
+}
+
 EFI_STATUS load_kernel(VOID *ElfImage, EntryPoint **entryPoint) {
   Elf64_Ehdr *ElfHdr = (Elf64_Ehdr *)ElfImage;
   UINT8  magic[4] = {0x7f, 0x45, 0x4c, 0x46};
@@ -35,7 +35,7 @@ EFI_STATUS load_kernel(VOID *ElfImage, EntryPoint **entryPoint) {
   UINTN  i;
   for(i=0; i<4; i++){
     if(ElfHdr->e_ident[i] != magic[i]){
-      printf(L"invalid paramater\r\n", magic[i], ElfHdr->e_ident[i]);
+      printf(L"invalid elf header\r\n");
       return EFI_INVALID_PARAMETER;
     }
   }
@@ -76,7 +76,6 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   gRT = SystemTable->RuntimeServices;
 
   gST->ConOut->ClearScreen(gST->ConOut);
-  init_console(gST->ConIn, gST->ConOut);
   printf( L"[OK] loading kernel...\r\n");
 
   EFI_GUID fs_guid = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID;
@@ -92,8 +91,6 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   }
   if (!gop) {
     printf(L"[ERROR] failed locate graphic\r\n");
-  } else {
-    printf(L"[OK] fb: %x, with: %d, height: %d\r\n", gop->Mode->FrameBufferBase, gop->Mode->Info->HorizontalResolution, gop->Mode->Info->VerticalResolution);
   }
 
   gST->BootServices->SetWatchdogTimer(0, 0, 0, NULL);
@@ -109,17 +106,17 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   EFI_LOADED_IMAGE_PROTOCOL* lip;
   status = gBS->HandleProtocol(ImageHandle, &lip_guid, (VOID **)&lip);
   if (status != EFI_SUCCESS) {
-    printf(L"[ERROR] failed to handle protocol lip: %d\r\n", status);
+    printf(L"[ERROR] failed to handle protocol lip\r\n");
     halt();
   };
   status = gBS->HandleProtocol(lip->DeviceHandle, &fs_guid, (VOID **)&fs);
   if (status != EFI_SUCCESS) {
-    printf(L"[ERROR] failed to handle protocol fs: %d\r\n", status);
+    printf(L"[ERROR] failed to handle protocol fs\r\n");
     halt();
   };
   status = fs->OpenVolume(fs, &kernel);
   if (status != EFI_SUCCESS) {
-    printf(L"[ERROR] failed to open volume: %d\r\n", status);
+    printf(L"[ERROR] failed to open volume\r\n");
     halt();
   };
 
@@ -132,52 +129,50 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   UINTN kernel_size = UINT64_MAX;
   status = handle->SetPosition(handle, kernel_size);
   if (status != EFI_SUCCESS) {
-    printf(L"[ERROR] failed to set position: %d\r\n", status);
+    printf(L"[ERROR] failed to set position\r\n");
     halt();
   }
   status = handle->GetPosition(handle, &kernel_size);
   if (status != EFI_SUCCESS) {
-    printf(L"[ERROR] failed to get position: %d\r\n", status);
+    printf(L"[ERROR] failed to get position\r\n");
     halt();
   }
   status = handle->SetPosition(handle, 0);
   if (status != EFI_SUCCESS) {
-    printf(L"[ERROR] failed to set position zero: %d\r\n", status);
+    printf(L"[ERROR] failed to set position zero\r\n");
     halt();
   }
-  printf(L"kernel_size = %d\r\n", kernel_size);
 
   UINT8 *buffer = (VOID *)KERN_ADDR;
   status = gST->BootServices->AllocatePool(EfiLoaderData, kernel_size, (VOID **)&buffer);
   if (status != EFI_SUCCESS) {
-    printf(L"[ERROR] failed to allocate: %d\r\n", status);
+    printf(L"[ERROR] failed to allocate\r\n");
     halt();
   }
 
   status = handle->Read(handle, &kernel_size, (VOID *)buffer);
   if (status != EFI_SUCCESS) {
-    printf(L"[ERROR] failed to load kernel to memory: %d\r\n", status);
+    printf(L"[ERROR] failed to load kernel to memory\r\n");
     halt();
   }
   status = handle->Close(handle);
   if (status != EFI_SUCCESS) {
-    printf(L"[ERROR] failed to close handle: %d\r\n", status);
+    printf(L"[ERROR] failed to close handle\r\n");
     halt();
   }
   status = root->Close(root);
   if (status != EFI_SUCCESS) {
-    printf(L"[ERROR] failed to close root: %d\r\n", status);
+    printf(L"[ERROR] failed to close root\r\n");
     halt();
   }
 
   EntryPoint *kernel_main;
   status = load_kernel(buffer, &kernel_main);
   if (status != EFI_SUCCESS) {
-    printf(L"[ERROR] failed to load kernel_main: %d\r\n", status);
+    printf(L"[ERROR] failed to load kernel_main\r\n");
     halt();
   }
 
-  printf( L"[OK] load kernel: size=>%d, addr=>%x\r\n", kernel_size, kernel_main);
 
   EFI_TIME *Time;
   status = gBS->AllocatePool(EfiBootServicesData, sizeof(EFI_TIME), (VOID **)&Time);
@@ -188,7 +183,6 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   if (status != EFI_SUCCESS) {
     return status;
   }
-  printf(L"[OK] Now => %d-%d-%d %d:%d:%d\r\n", Time->Year, Time->Month, Time->Day, Time->Hour, Time->Minute, Time->Second);
 
   UINTN MemoryMapSize = 0;
   EFI_MEMORY_DESCRIPTOR *MemoryMap = NULL;
