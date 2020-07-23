@@ -17,8 +17,6 @@ EFI_GRAPHICS_OUTPUT_PROTOCOL *gop;
 
 BootInfo *boot_info;
 
-typedef VOID (EntryPoint)(BootInfo *boot);
-
 void halt() {
   while (1) __asm__ volatile("hlt");
 }
@@ -28,7 +26,7 @@ void printf(CHAR16 *str) {
   gST->ConOut->OutputString(gST->ConOut, str);
 }
 
-EFI_STATUS load_kernel(VOID *ElfImage, EntryPoint **entryPoint) {
+EFI_STATUS load_kernel(VOID *ElfImage, VOID **entryPoint) {
   Elf64_Ehdr *ElfHdr = (Elf64_Ehdr *)ElfImage;
   UINT8  magic[4] = {0x7f, 0x45, 0x4c, 0x46};
 
@@ -166,7 +164,7 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
     halt();
   }
 
-  EntryPoint *kernel_main;
+  VOID *kernel_main;
   status = load_kernel(buffer, &kernel_main);
   if (status != EFI_SUCCESS) {
     printf(L"[ERROR] failed to load kernel_main\r\n");
@@ -183,6 +181,8 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   if (status != EFI_SUCCESS) {
     return status;
   }
+
+  printf(L"[OK] kernel has been loaded successfully.\r\n");
 
   UINTN MemoryMapSize = 0;
   EFI_MEMORY_DESCRIPTOR *MemoryMap = NULL;
@@ -217,8 +217,10 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 
   __asm__ volatile (
       "mov %0, %%rdi\n"
-      "jmp *%1\n"
-      ::"m"(boot_info), "m"(kernel_main));
+      "jmp *%1\n" ::
+      "m" (boot_info),
+      "m" (kernel_main)
+  );
 
   return EFI_SUCCESS;
 }
