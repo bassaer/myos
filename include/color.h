@@ -45,4 +45,11 @@
 #define EFI_BACKGROUND_BROWN 0x60
 #define EFI_BACKGROUND_LIGHTGRAY 0x70
 
+// material design color
+#define BLUE_GRAY_200 0xB0BEC5
+#define BLUE_GRAY_400 0x78909C
+#define BLUE_GRAY_500 0x607D8B
+#define BLUE_GRAY_800 0x37474F
+
+
 #endif

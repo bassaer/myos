@@ -40,7 +40,7 @@ all: package
 prepare:
 	sudo apt install -y mtools qemu gcc-mingw-w64-x86-64 ovmf
 
-kernel/vmmyos:
+kernel/vmmyos: window
 	@$(MAKE) build -C kernel
 
 arch/x86/BOOTX64.EFI: lib
@@ -68,6 +68,9 @@ font:
 
 lib:
 	@$(MAKE) -C lib
+
+window:
+	@$(MAKE) -c window
 
 $(ARCH_BOOT)/ipl.bin: $(ARCH_BOOT)/ipl.o
 	ld $^ -T $(ARCH_BOOT)/ipl.ld -Map ipl.map -o $@
@@ -103,6 +106,8 @@ package: img
 clean:
 	@$(MAKE) clean -C arch/x86
 	@$(MAKE) clean -C kernel
+	@$(MAKE) clean -C lib
+	@$(MAKE) clean -C window
 
 # Makefile memo
 # B=$(A:%.bin=%.o) -> A=aaa.binのとき B=aaa.o となる
