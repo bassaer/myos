@@ -1,26 +1,69 @@
 #include <window/desktop.h>
+#include <window/font.h>
+
+struct {
+  unsigned int width;
+  unsigned int height;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL *framebuffer;
+} screen;
 
 void init_desktop(BootInfo *boot) {
-  UINTN bar_y = boot->height * 0.92;
-  UINTN bar_height = boot->height - bar_y;
-  UINTN box_width =  bar_height * 0.7;
-  UINTN margin = (bar_height - box_width) / 2;
+  screen.width = boot->width;
+  screen.height = boot->height;
+  screen.framebuffer = boot->framebuffer;
 
-  fill_box(boot, BLUE_GRAY_800, 0, 0, boot->width, boot->height);
-  fill_box(boot, BLUE_GRAY_500, 0, bar_y, boot->width, boot->height);
-  fill_box(boot, BLUE_GRAY_400, margin, bar_y + margin, margin + box_width * 2, bar_y + margin + box_width);
+  unsigned int bar_y = screen.height * 0.92;
+  unsigned int bar_height = screen.height - bar_y;
+  unsigned int box_width =  bar_height * 0.7;
+  unsigned int margin = (bar_height - box_width) / 2;
+
+  fill_box(BLUE_GRAY_800, 0, 0, screen.width, screen.height);
+  fill_box(BLUE_GRAY_500, 0, bar_y, screen.width, screen.height);
+  fill_box(BLUE_GRAY_400, margin, bar_y + margin, margin + box_width * 2, bar_y + margin + box_width);
+
+  put_s(10, 10, 0xFFFFFF, "MyOS");
 }
 
-void fill_box(BootInfo *boot, int color, UINTN start_x, UINTN start_y, UINTN end_x, UINTN end_y) {
+void set_color(EFI_GRAPHICS_OUTPUT_BLT_PIXEL *pixel, int color) {
+  pixel->Red   = (color >> 16) & 0xFF;
+  pixel->Green = (color >>  8) & 0xFF;
+  pixel->Blue  = (color      ) & 0xFF;
+}
+
+void fill_box(int color, unsigned int start_x, unsigned int start_y, unsigned int end_x, unsigned int end_y) {
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL *pixel;
-  UINTN x, y;
+  unsigned int x, y;
   for (y = start_y; y < end_y; y++) {
     for (x = start_x; x < end_x; x++) {
-      pixel = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)boot->framebuffer + (boot->width * y) + x;
-      pixel->Red   = (UINTN)(color >> 16) & 0xFF;
-      pixel->Green = (UINTN)(color >>  8) & 0xFF;
-      pixel->Blue  = (UINTN)(color      ) & 0xFF;
+      pixel = screen.framebuffer + (screen.width * y) + x;
+      set_color(pixel, color);
     }
   }
 }
 
+void put_c(int x, int y, int color, char c) {
+  char *font = FONT[(int)c];
+  int i;
+  for (i = 0; i < 16; i++) {
+    // 8x16 font
+    EFI_GRAPHICS_OUTPUT_BLT_PIXEL *pixel = screen.framebuffer + (y + i) * screen.width + x;
+    char data = font[i];
+
+    if ((data & 0x80) != 0) { set_color(&pixel[0], color); }
+    if ((data & 0x40) != 0) { set_color(&pixel[1], color); }
+    if ((data & 0x20) != 0) { set_color(&pixel[2], color); }
+    if ((data & 0x10) != 0) { set_color(&pixel[3], color); }
+    if ((data & 0x08) != 0) { set_color(&pixel[4], color); }
+    if ((data & 0x04) != 0) { set_color(&pixel[5], color); }
+    if ((data & 0x02) != 0) { set_color(&pixel[6], color); }
+    if ((data & 0x01) != 0) { set_color(&pixel[7], color); }
+  }
+}
+
+void put_s(int x, int y, int color, char *str) {
+  while (*str != '\0') {
+    put_c(x, y, color, *str);
+    str++;
+    x += 8;
+  }
+}
