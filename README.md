@@ -1,5 +1,6 @@
 # myos
 [![Build Status](https://travis-ci.com/bassaer/myos.svg?branch=master)](https://travis-ci.com/bassaer/myos)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/bassaer/myos)
 
 - x86 32bit OS
 - debian/ubuntu build

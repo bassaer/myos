@@ -5,20 +5,14 @@
 #include <echo.h>
 #include <exit.h>
 #include <free.h>
-#include <keyboard.h>
 #include <ls.h>
 #include <shutdown.h>
 #include <sleep.h>
-#include <lib/queue.h>
 #include <lib/string.h>
 
-#define PROMPT        "myos> "
+#include<uefi.h>
 
-int exit_status = EXIT_SUCCESS;
-int char_color = GRAY;
-int cur_line = 0;
-int selected_line = 0;
-int max_width = 0;
+#define PROMPT        L"myos> "
 
 /**
  * 入力情報
@@ -27,42 +21,48 @@ typedef struct {
   /**
    * 入力文字列
    */
-  char buf[CMD_LIMIT];
+  CHAR16 buf[CMD_LIMIT];
   /**
    * 現在の入力位置
    */
   int index;
 } entry_t;
 
-entry_t entries[SCREEN_HEIGHT];
+static entry_t entries[SCREEN_HEIGHT];
 
 /**
  * 入力履歴一時保存用
  */
-entry_t cache_entry;
+static entry_t cache_entry;
+
+static int exit_status = EXIT_SUCCESS;
+static int cur_line = 0;
+static int selected_line = 0;
+
+/**
+ * 起動フラグ
+ */
+static BOOLEAN running = false;
 
 void init_shell() {
-  init_console();
   cur_line = 0;
   selected_line = 0;
   int i;
   for (i = 0; i < SCREEN_HEIGHT; ++i) {
     entries[i].index = 0;
-    entries[i].buf[0] = '\0';
+    entries[i].buf[0] = L'\0';
   }
 
-  max_width = 256;
+  CHAR16 *os =
+    L"  __  __        ___  ____     \r\n"
+     " |  \\/  |_   _ / _ \\/ ___|  \r\n"
+     " | |\\/| | | | | | | \\___ \\ \r\n"
+     " | |  | | |_| | |_| |___) |   \r\n"
+     " |_|  |_|\\__, |\\___/|____/  \r\n"
+     "         |___/              \r\n\n";
+  put_str(os, WHITE);
 
-  char *os =
-    "  __  __        ___  ____     \n"
-    " |  \\/  |_   _ / _ \\/ ___|  \n"
-    " | |\\/| | | | | | | \\___ \\ \n"
-    " | |  | | |_| | |_| |___) |   \n"
-    " |_|  |_|\\__, |\\___/|____/  \n"
-    "         |___/              \n\n";
-
-  put_str(os, GRAY);
-  put_prompt();
+  running = true;
 }
 
 void put_prompt() {
@@ -71,6 +71,7 @@ void put_prompt() {
   } else {
     put_str(PROMPT, RED);
   }
+  set_color(GRAY);
 }
 
 void init_entry() {
@@ -83,15 +84,18 @@ void copy_entry(entry_t *src, entry_t *dst) {
     strcpy(src->buf, dst->buf);
 }
 
-void input_code(int code) {
-  if (code == BACKSPACE && entries[cur_line].index > 0) {
-    entries[cur_line].buf[--(entries[cur_line].index)] = '\0';
-    backspace();
-    return;
-  }
-  switch(code) {
+void put_text(CHAR16 *text) {
+  put_str(text, GRAY);
+}
+
+void newline() {
+  put_text(L"\r\n");
+}
+
+void eval_key(EFI_INPUT_KEY *key) {
+  switch(key->ScanCode) {
     // 入力履歴補完
-    case UP:
+    case CURSOR_UP:
       if(selected_line > 0) {
         if (cur_line == selected_line) {
           // 未実行の入力を一時保存
@@ -102,10 +106,10 @@ void input_code(int code) {
         selected_line--;
         entries[cur_line].index = entries[selected_line].index;
         strcpy(entries[selected_line].buf, entries[cur_line].buf);
-        put_str(entries[cur_line].buf, CHAR_COLOR);
+        put_str(entries[cur_line].buf, GRAY);
       }
       return;
-    case DOWN:
+    case CURSOR_DOWN:
       if (cur_line > selected_line ) {
         clear_line();
         put_prompt();
@@ -116,71 +120,63 @@ void input_code(int code) {
           entries[cur_line].index = entries[selected_line].index;
           strcpy(entries[selected_line].buf, entries[cur_line].buf);
         }
-        put_str(entries[cur_line].buf, CHAR_COLOR);
+        put_text(entries[cur_line].buf);
       }
       return;
   }
-  char key;
-  get_key(&key, code);
-  if (key == '\0' || key == 0) {
+  if (key->UnicodeChar == L'\0') {
     return;
   }
-  if (key == '\n') {
+  if (key->UnicodeChar == L'\r') {
     if (entries[cur_line].index > 0) {
       newline();
       exec_cmd();
       init_entry();
     }
     newline();
-
-    int diff = get_y() + 1 - ROWS;
-    while(diff > 0) {
-      scroll();
-      diff--;
-    }
-
     put_prompt();
-
     return;
   }
-  if (max_width <= entries[cur_line].index + 1) {
+  if (CMD_LIMIT <= entries[cur_line].index + 1) {
     // 入力サイズオーバー
     // 終端文字も含めるため+1
     return;
   }
-  entries[cur_line].buf[entries[cur_line].index++] = key;
-  entries[cur_line].buf[entries[cur_line].index] = '\0';
-  put_char(key, char_color);
+  entries[cur_line].buf[entries[cur_line].index++] = key->UnicodeChar;
+  entries[cur_line].buf[entries[cur_line].index] = L'\0';
+  put_char(key->UnicodeChar, GRAY);
 }
 
 void exec_cmd() {
-  entries[cur_line].buf[entries[cur_line].index] = '\0';
-  char *args[max_width];
-
+  entries[cur_line].buf[entries[cur_line].index] = L'\0';
+  CHAR16 *args[CMD_LIMIT];
   // 元の文字列を操作するため、一時配列を用意
-  char tmp[strlen(entries[cur_line].buf)];
+  CHAR16 tmp[strlen(entries[cur_line].buf)];
   strcpy(entries[cur_line].buf, tmp);
-
   // スペースで分割し、コマンドを取得
-  int split_count = split(tmp, args, ' ');
-  char *cmd = args[0];
-  if (strcmp(cmd, "echo") == 0) {
+  int split_count = split(tmp, args, L' ');
+  CHAR16 *cmd = args[0];
+  if (strcmp(cmd, L"echo") == 0) {
     exit_status = echo(args, split_count);
-  } else if (strcmp(cmd, "free") == 0) {
+  } else if (strcmp(cmd, L"free") == 0) {
     exit_status = free();
-  } else if (strcmp(cmd, "shutdown") == 0 || strcmp(cmd, "exit") == 0) {
-    exit_status = shutdown(args, split_count);
-  } else if(strcmp(cmd, "sleep") == 0) {
+  } else if (strcmp(cmd, L"shutdown") == 0 || strcmp(cmd, L"exit") == 0) {
+    running = false;
+  } else if(strcmp(cmd, L"sleep") == 0) {
     exit_status = sleep(args, split_count);
-  } else if (strcmp(cmd, "ls") == 0) {
+  } else if (strcmp(cmd, L"ls") == 0) {
     exit_status = ls();
   } else {
-    put_str("command not found", char_color);
+    put_text(L"command not found");
     exit_status = EXIT_FAILURE;
   }
 }
 
-void start_shell(queue_t *queue) {
-  int code = dequeue(queue);
-  input_code(code);
+void start_shell() {
+  EFI_INPUT_KEY key;
+  put_prompt();
+  while (running) {
+    read_key(&key);
+    eval_key(&key);
+  }
 }

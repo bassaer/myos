@@ -10,6 +10,7 @@
  * ICW(initial control word) : 初期化制御データ
  */
 void init_pic() {
+  /*
   outb_p(PIC0_IMR, 0xff);    // すべての割り込みを拒否
   outb_p(PIC1_IMR, 0xff);    // すべての割り込みを拒否
 
@@ -25,4 +26,5 @@ void init_pic() {
 
   outb_p(PIC0_IMR, 0xfb);    // PIC1以外すべて禁止
   outb_p(PIC1_IMR, 0xff);    // すべての割り込みを拒否
+  */
 }

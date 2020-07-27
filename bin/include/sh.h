@@ -6,8 +6,8 @@
 
 void init_shell();
 void init_entry();
-void input_code(int code);
 void exec_cmd();
+void put_prompt();
 void start_shell();
 
 #endif

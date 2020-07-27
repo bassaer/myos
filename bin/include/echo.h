@@ -1,6 +1,8 @@
 #ifndef MYOS_ECHO_H
 #define MYOS_ECHO_H
 
-int echo(char *args[], int size);
+#include <type.h>
+
+int echo(CHAR16 *args[], int size);
 
 #endif

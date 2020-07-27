@@ -11,7 +11,6 @@
 #define VMEM_KERN_START   0xc0000000
 #define VMEM_KERN_END     0xffffffff
 
-#define NULL              ((void*)0)
 #define MEM_SUCCESS       0
 #define MEM_ERROR         (-1)
 

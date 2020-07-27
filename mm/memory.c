@@ -13,7 +13,7 @@
 /**
  * 物理メモリの管理情報
  */
-mem_t mem;
+static mem_t mem;
 
 int init_mem_info() {
   mem.total_bytes = 0;
