@@ -63,10 +63,17 @@ void put_c(int x, int y, int color, char c) {
 }
 
 void put_s(int x, int y, int color, char *str) {
+  int next_x = x;
+  int next_y = y;
   while (*str != '\0') {
-    put_c(x, y, color, *str);
+    if (*str == '\n') {
+      next_x = x;
+      next_y += FONT_HEIGHT;
+    } else {
+      put_c(next_x, next_y, color, *str);
+      next_x += FONT_WIDTH;
+    }
     str++;
-    x += 8;
   }
 }
 
