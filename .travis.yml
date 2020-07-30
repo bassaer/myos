@@ -6,7 +6,7 @@ addons:
   apt:
     packages:
       - mtools
-script: make
+script: make clean package
 deploy:
   provider: script
   script: scripts/release.sh

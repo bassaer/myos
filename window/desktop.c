@@ -1,6 +1,9 @@
 #include <window/desktop.h>
 #include <window/font.h>
 
+#include <stdarg.h>
+#include <lib/string.h>
+
 struct {
   unsigned int width;
   unsigned int height;
@@ -20,8 +23,7 @@ void init_desktop(BootInfo *boot) {
   fill_box(BLUE_GRAY_800, 0, 0, screen.width, screen.height);
   fill_box(BLUE_GRAY_500, 0, bar_y, screen.width, screen.height);
   fill_box(BLUE_GRAY_400, margin, bar_y + margin, margin + box_width * 2, bar_y + margin + box_width);
-
-  put_s(10, 10, 0xFFFFFF, "MyOS");
+  printf(margin * 3 , bar_y + margin * 2.5, "MyOS");
 }
 
 void set_color(EFI_GRAPHICS_OUTPUT_BLT_PIXEL *pixel, int color) {
@@ -66,4 +68,13 @@ void put_s(int x, int y, int color, char *str) {
     str++;
     x += 8;
   }
+}
+
+void printf(int x, int y, char *format, ...) {
+  char buf[256];
+  va_list list;
+  va_start(list, format);
+  format_str(buf, format, &list);
+  put_s(x, y, WHITE, buf);
+  va_end(list);
 }

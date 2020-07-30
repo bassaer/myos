@@ -3,6 +3,7 @@ INCLUDE   = -I../include -I../window/include
 CFLAGS    = -c -Wall -Wextra $(INCLUDE) -nostdlib -fno-builtin
 KERN_OBJ  = main.o
 WIN_OBJ   = ../window/desktop.o
+LIB_OBJ   = ../lib/string.o
 
 .PHONY: build clean
 
@@ -11,7 +12,7 @@ build: vmmyos
 %.o: %.c
 	${CC} $(CFLAGS) -o $@ $*.c
 
-vmmyos: $(KERN_OBJ) $(WIN_OBJ)
+vmmyos: $(KERN_OBJ) $(WIN_OBJ) $(LIB_OBJ)
 	#ld $^ -T kernel.ld -Map kernel.map -o $@
 	ld $^ -Map kernel.map -o $@
 
