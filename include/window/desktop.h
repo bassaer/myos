@@ -13,4 +13,6 @@ void put_c(int x, int y, int color, char c);
 
 void put_s(int x, int y, int color, char *str);
 
+void printf(int x, int y, char *format, ...);
+
 #endif
