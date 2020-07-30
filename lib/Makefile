@@ -1,6 +1,6 @@
 TARGET  = lib.o
 CC      = gcc
-CFLAGS  = -c -Wall -I../include -fno-builtin
+CFLAGS  = -c -Wall -I../include -fno-pie -fno-builtin -nostdlib
 OBJ     = string.o \
           queue.o
 
