@@ -1,8 +1,9 @@
 CC        = gcc
 INCLUDE   = -I../include -I../include/window
-CFLAGS    = -c -Wall -Wextra $(INCLUDE) -nostdlib -fno-builtin
+CFLAGS    = -c -Wall -Wextra $(INCLUDE) -nostdlib -fno-builtin -fPIE
 
-WIN_OBJ   = screen.o
+WIN_OBJ   = cursor.o \
+            screen.o
 
 .PHONY: build clean
 

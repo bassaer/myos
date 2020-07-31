@@ -1,3 +1,4 @@
+#include <window/cursor.h>
 #include <window/desktop.h>
 #include <window/font.h>
 
@@ -24,6 +25,9 @@ void init_desktop(BootInfo *boot) {
   fill_box(BLUE_GRAY_500, 0, bar_y, screen.width, screen.height);
   fill_box(BLUE_GRAY_400, margin, bar_y + margin, margin + box_width * 2, bar_y + margin + box_width);
   printf(margin * 3 , bar_y + margin * 2.5, "MyOS");
+
+  init_cursor(100, 100, BLUE_GRAY_800);
+  update_cursor(100, 100);
 }
 
 void set_color(EFI_GRAPHICS_OUTPUT_BLT_PIXEL *pixel, int color) {
@@ -43,7 +47,18 @@ void fill_box(int color, unsigned int start_x, unsigned int start_y, unsigned in
   }
 }
 
-void put_c(int x, int y, int color, char c) {
+void put_block(unsigned int x, unsigned int y, unsigned int width, unsigned int height, int *buf) {
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL *pixel;
+  unsigned int i, j;
+  for (i = 0; i < width; i++) {
+    for (j = 0; j < height; j++) {
+      pixel = screen.framebuffer + (screen.width * (y + i)) + (x + j);
+      set_color(pixel, buf[i * width + j]);
+    }
+  }
+}
+
+void put_c(unsigned int x, unsigned int y, int color, char c) {
   char *font = FONT[(int)c];
   int i;
   for (i = 0; i < 16; i++) {
@@ -62,9 +77,9 @@ void put_c(int x, int y, int color, char c) {
   }
 }
 
-void put_s(int x, int y, int color, char *str) {
-  int next_x = x;
-  int next_y = y;
+void put_s(unsigned int x, unsigned int y, int color, char *str) {
+  unsigned int next_x = x;
+  unsigned int next_y = y;
   while (*str != '\0') {
     if (*str == '\n') {
       next_x = x;
@@ -77,7 +92,7 @@ void put_s(int x, int y, int color, char *str) {
   }
 }
 
-void printf(int x, int y, char *format, ...) {
+void printf(unsigned int x, unsigned int y, char *format, ...) {
   char buf[256];
   va_list list;
   va_start(list, format);

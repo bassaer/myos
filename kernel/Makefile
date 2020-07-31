@@ -1,8 +1,10 @@
 CC        = gcc
 INCLUDE   = -I../include -I../window/include
-CFLAGS    = -c -Wall -Wextra $(INCLUDE) -nostdlib -fno-builtin
+CFLAGS    = -c -Wall -Wextra $(INCLUDE) -nostdlib -fno-builtin -fPIE
 KERN_OBJ  = main.o
-WIN_OBJ   = ../window/desktop.o
+WIN_OBJ   = ../window/desktop.o \
+            ../window/cursor.o
+
 LIB_OBJ   = ../lib/string.o
 
 .PHONY: build clean
@@ -14,7 +16,7 @@ build: vmmyos
 
 vmmyos: $(KERN_OBJ) $(WIN_OBJ) $(LIB_OBJ)
 	#ld $^ -T kernel.ld -Map kernel.map -o $@
-	ld $^ -Map kernel.map -o $@
+	ld $^ -Map kernel.map -pie -o $@
 
 clean:
 	rm -rf *.img vmmyos *.o *.map

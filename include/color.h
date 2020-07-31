@@ -34,6 +34,7 @@
 #define BLUE_GRAY_500 0x607D8B
 #define BLUE_GRAY_800 0x37474F
 #define WHITE 0xFFFFFF
+#define BLACK 0x000000
 
 
 #endif
