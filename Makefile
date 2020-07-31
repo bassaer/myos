@@ -1,38 +1,5 @@
 VER       = $(shell ./scripts/changelog.sh -v)
 IMG       = myos-$(VER).img
-CC        = x86_64-w64-mingw32-gcc
-INCLUDE   = -Iinclude -Ibin/include
-CFLAGS    = -Wall -Wextra $(INCLUDE) -nostdlib -fno-builtin -Wl,--subsystem,10
-KERN_OBJ  = kernel/main.o \
-            kernel/console.o \
-
-LIB_OBJ   = lib/queue.o \
-            lib/string.o
-
-MM_OBJ    = mm/memory.o \
-            mm/pgtable.o
-
-DRV_OBJ   = drivers/cursor.o \
-            drivers/palette.o \
-            drivers/screen.o \
-            drivers/vram.o
-
-KERN_C    = $(wildcard kernel/*.c)
-
-LIB_C     = $(wildcard lib/*.c)
-
-BIN_C     = $(wildcard bin/*.c)
-
-MAKE      = make --no-print-directory
-
-ARCH_BOOT = arch/x86/boot
-
-ifeq ($(UI), CUI)
-	ARCH_HEAD = arch/x86/cui
-else
-	ARCH_HEAD = arch/x86/gui
-endif
-
 .PHONY: install img lib run package test clean
 
 all: package
@@ -54,15 +21,6 @@ img: arch/x86/BOOTX64.EFI kernel/vmmyos
 	mcopy -i $(IMG) $< ::/EFI/BOOT
 	mcopy -i $(IMG) kernel/vmmyos ::/
 
-%.o: %.c
-	${CC} $(CFLAGS) -o $@ $*.c
-
-%.bin: %.o
-	ld $(LDFLAGS) $^ -T $*.ld -o $@
-
-.s.o:
-	as --32 -o $@ $<
-
 font:
 	python scripts/font.py -f scripts/font.txt
 
@@ -71,12 +29,6 @@ lib:
 
 window:
 	@$(MAKE) -c window
-
-$(ARCH_BOOT)/ipl.bin: $(ARCH_BOOT)/ipl.o
-	ld $^ -T $(ARCH_BOOT)/ipl.ld -Map ipl.map -o $@
-
-$(ARCH_HEAD)/head.bin: $(ARCH_HEAD)/head.o
-	ld $^ -T $(ARCH_HEAD)/head.ld -Map head.map -o $@
 
 run: img
 	qemu-system-x86_64 -name myos \
@@ -108,9 +60,3 @@ clean:
 	@$(MAKE) clean -C kernel
 	@$(MAKE) clean -C lib
 	@$(MAKE) clean -C window
-
-# Makefile memo
-# B=$(A:%.bin=%.o) -> A=aaa.binのとき B=aaa.o となる
-# $< : 最初の依存するファイル
-# $^ : すべての依存するファイル
-# $* : サフィックスを除いたターゲット名

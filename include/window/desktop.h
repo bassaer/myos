@@ -9,10 +9,12 @@ void set_color(EFI_GRAPHICS_OUTPUT_BLT_PIXEL *pixel, int color);
 
 void fill_box(int color, unsigned int start_x, unsigned int start_y, unsigned int end_x, unsigned int end_y);
 
-void put_c(int x, int y, int color, char c);
+void put_block(unsigned int x, unsigned int y, unsigned int width, unsigned int height, int *buf);
 
-void put_s(int x, int y, int color, char *str);
+void put_c(unsigned int x, unsigned int y, int color, char c);
 
-void printf(int x, int y, char *format, ...);
+void put_s(unsigned int x, unsigned int y, int color, char *str);
+
+void printf(unsigned int x, unsigned int y, char *format, ...);
 
 #endif
