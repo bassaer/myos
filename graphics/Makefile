@@ -1,5 +1,5 @@
 CC        = gcc
-INCLUDE   = -I../include -I../include/window
+INCLUDE   = -I../include -I../include/graphics
 CFLAGS    = -c -Wall -Wextra $(INCLUDE) -nostdlib -fno-builtin -fPIE
 
 WIN_OBJ   = cursor.o \

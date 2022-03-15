@@ -1,5 +1,5 @@
-#include <window/cursor.h>
-#include <window/desktop.h>
+#include <graphics/cursor.h>
+#include <graphics/desktop.h>
 
 #define CURSOR_WIDTH 16
 
