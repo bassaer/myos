@@ -5,7 +5,7 @@ IMG       = myos-$(VER).img
 all: package
 
 prepare:
-	sudo apt install -y mtools qemu gcc-mingw-w64-x86-64 ovmf
+	sudo apt install -y mtools qemu gcc-mingw-w64-x86-64 ovmf qemu-system-x86
 
 kernel/vmmyos: window
 	@$(MAKE) build -C kernel
@@ -32,14 +32,12 @@ window:
 
 run: img
 	qemu-system-x86_64 -name myos \
-                     -localtime \
                      -monitor stdio \
                      -bios /usr/share/ovmf/OVMF.fd \
                      -net none \
-                     -usbdevice disk::$(IMG) \
+                     -drive format=raw,file=$(IMG) \
                      -d guest_errors \
                      || true
-
 
 usb: arch/x86/BOOTX64.EFI kernel/vmmyos
 	sudo mount /dev/sda /mnt

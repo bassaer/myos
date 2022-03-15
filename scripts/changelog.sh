@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# This script needs gawk not mawk.
+
 function usage {
   cat <<EOF
 Usage: $(basename "$0") [OPTION]...
