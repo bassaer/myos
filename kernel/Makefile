@@ -1,9 +1,10 @@
 CC        = gcc
-INCLUDE   = -I../include -I../graphics/include
+INCLUDE   = -I../include -I../graphics/include -I../drivers/include
 CFLAGS    = -c -Wall -Wextra $(INCLUDE) -nostdlib -fno-builtin -fPIE
 KERN_OBJ  = main.o
 WIN_OBJ   = ../graphics/desktop.o \
-            ../graphics/cursor.o
+            ../graphics/cursor.o \
+            ../drivers/xhci.o
 
 LIB_OBJ   = ../lib/string.o
 

@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## ver 2.1.0
+- find PCI devices
+
 ## ver 2.0.2
 - fix qemu option
 - fix dir name
