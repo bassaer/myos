@@ -1,5 +1,5 @@
-#ifndef MYOS_CONSOR_H
-#define MYOS_CONSOR_H
+#ifndef MYOS_XHCI_H
+#define MYOS_XHCI_H
 
 #include <type.h>
 
