@@ -3,6 +3,8 @@
 
 #define NULL ((void *)0)
 
+typedef int bool;
+
 #define	EFIAPI
 #define OUT
 #define IN

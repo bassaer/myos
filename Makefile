@@ -7,7 +7,7 @@ all: package
 prepare:
 	sudo apt install -y mtools qemu gcc-mingw-w64-x86-64 ovmf qemu-system-x86
 
-kernel/vmmyos: graphics
+kernel/vmmyos: graphics drivers
 	@$(MAKE) build -C kernel
 
 arch/x86/BOOTX64.EFI: lib
@@ -29,6 +29,9 @@ lib:
 
 graphics:
 	@$(MAKE) -c graphics
+
+drivers:
+	@$(MAKE) -c drivers
 
 run: img
 	qemu-system-x86_64 -name myos \
@@ -61,3 +64,4 @@ clean:
 	@$(MAKE) clean -C kernel
 	@$(MAKE) clean -C lib
 	@$(MAKE) clean -C graphics
+	@$(MAKE) clean -C drivers
