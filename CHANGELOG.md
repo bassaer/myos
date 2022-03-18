@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## ver 2.0.2
+- fix qemu option
+- fix dir name
+
 ## ver 2.0.1
 - fix paging
 - fix itoa

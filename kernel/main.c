@@ -8,7 +8,7 @@
 *---------------------------*/
 
 #include <uefi.h>
-#include <window/desktop.h>
+#include <graphics/desktop.h>
 
 void kernel_main(BootInfo *boot) {
   init_desktop(boot);

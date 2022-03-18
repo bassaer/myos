@@ -1,6 +1,6 @@
-#include <window/cursor.h>
-#include <window/desktop.h>
-#include <window/font.h>
+#include <graphics/cursor.h>
+#include <graphics/desktop.h>
+#include <graphics/font.h>
 
 #include <stdarg.h>
 #include <lib/string.h>

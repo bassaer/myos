@@ -75,7 +75,7 @@ def main():
     data = read(args.f).split()
     parsed = parse(data)
     header = build(parsed)
-    write('./include/window/font.h', header)
+    write('./include/graphics/font.h', header)
 
 
 if __name__ == '__main__':

@@ -5,9 +5,9 @@ IMG       = myos-$(VER).img
 all: package
 
 prepare:
-	sudo apt install -y mtools qemu gcc-mingw-w64-x86-64 ovmf
+	sudo apt install -y mtools qemu gcc-mingw-w64-x86-64 ovmf qemu-system-x86
 
-kernel/vmmyos: window
+kernel/vmmyos: graphics
 	@$(MAKE) build -C kernel
 
 arch/x86/BOOTX64.EFI: lib
@@ -27,19 +27,20 @@ font:
 lib:
 	@$(MAKE) -C lib
 
-window:
-	@$(MAKE) -c window
+graphics:
+	@$(MAKE) -c graphics
 
 run: img
 	qemu-system-x86_64 -name myos \
-                     -localtime \
                      -monitor stdio \
                      -bios /usr/share/ovmf/OVMF.fd \
                      -net none \
-                     -usbdevice disk::$(IMG) \
+                     -drive format=raw,file=$(IMG) \
+                     -device nec-usb-xhci,id=xhci \
+                     -device usb-mouse \
+                     -device usb-kbd \
                      -d guest_errors \
                      || true
-
 
 usb: arch/x86/BOOTX64.EFI kernel/vmmyos
 	sudo mount /dev/sda /mnt
@@ -59,4 +60,4 @@ clean:
 	@$(MAKE) clean -C arch/x86
 	@$(MAKE) clean -C kernel
 	@$(MAKE) clean -C lib
-	@$(MAKE) clean -C window
+	@$(MAKE) clean -C graphics
