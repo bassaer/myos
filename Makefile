@@ -36,6 +36,9 @@ run: img
                      -bios /usr/share/ovmf/OVMF.fd \
                      -net none \
                      -drive format=raw,file=$(IMG) \
+                     -device nec-usb-xhci,id=xhci \
+                     -device usb-mouse \
+                     -device usb-kbd \
                      -d guest_errors \
                      || true
 
