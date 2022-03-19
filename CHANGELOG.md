@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## ver 2.1.1
+- fix class code
+
 ## ver 2.1.0
 - find PCI devices
 
