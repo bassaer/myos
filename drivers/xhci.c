@@ -60,7 +60,7 @@ UINT16 get_vendor_id(UINT8 bus, UINT8 device, UINT8 function) {
 }
 
 STATUS add_device(UINT8 bus, UINT8 device, UINT8 function, UINT8 header_type, class_code_t class_code) {
-  if (device_num >= DEVICE_SIZE*2) {
+  if (device_num >= DEVICE_SIZE) {
     return ERROR;
   }
   device_t found_device = {bus, device, function, header_type, class_code};
