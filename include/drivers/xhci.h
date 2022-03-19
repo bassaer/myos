@@ -9,7 +9,9 @@
 
 typedef int STATUS;
 
-#define DEVICE_SIZE 32
+#define DEVICE_SIZE 64
+#define MAX_PCI_DEVICE_NUM 32
+#define MAX_FUNCTION_NUM 8
 #define CONVERT_STATUS(code) ((STATUS)code)
 #define OK CONVERT_STATUS(0)
 #define ERROR CONVERT_STATUS(1)
