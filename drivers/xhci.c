@@ -44,9 +44,9 @@ UINT8 read_header_type(UINT8 bus, UINT8 device, UINT8 function) {
 void read_class_code(UINT8 bus, UINT8 device, UINT8 function, class_code_t* class_code) {
   set_config_address(build_address(bus, device, function, 0x08));
   UINT32 data = read_data();
-  class_code->base = (data >> 24) && 0xFFU;
-  class_code->sub = (data >> 16) && 0xFFU;
-  class_code->interface = (data >> 8) && 0xFFU;
+  class_code->base = (data >> 24) & 0xFFU;
+  class_code->sub = (data >> 16) & 0xFFU;
+  class_code->interface = (data >> 8) & 0xFFU;
 }
 
 UINT32 read_bus_number(UINT8 bus, UINT8 device, UINT8 function) {
@@ -91,7 +91,7 @@ STATUS find_function(UINT8 bus, UINT8 device) {
 }
 
 STATUS find_device(UINT8 bus) {
-  for (UINT8 device = 0; device < 32; ++device) {
+  for (UINT8 device = 0; device < MAX_PCI_DEVICE_NUM; ++device) {
     if (get_vendor_id(bus, device, 0) == INVALID_ID) {
       continue;
     }
@@ -112,7 +112,7 @@ STATUS find_all_device() {
   if (is_single_function(header_type)) {
     return find_device(0);
   }
-  for (UINT8 function = 0; function < 8; ++function) {
+  for (UINT8 function = 0; function < MAX_FUNCTION_NUM; ++function) {
     if (get_vendor_id(0, 0, function) == INVALID_ID) {
       continue;
     }
@@ -124,20 +124,28 @@ STATUS find_all_device() {
   return OK;
 }
 
+bool is_xhci(class_code_t* code) {
+  return code->base == 0x0CU && code->sub == 0x03U && code->interface == 0x30U;
+}
+
 void init_xhci() {
-  STATUS status = find_all_device();
   int y = 0;
+  STATUS status = find_all_device();
   printf(0, y, "init xhci => %d\n", status);
   y += 20;
-  if (status != OK) {
-    return;
-  }
+  device_t* xhc_device = NULL;
   for(int i = 0; i < device_num; i++) {
     device_t device = device_list[i];
     UINT16 vendor_id = get_vendor_id(device.bus, device.device, device.function);
-    class_code_t class_code;
-    read_class_code(device.bus, device.device, device.function, &class_code);
-    printf(0, y, "bus: %d, device: %d, func: %d, vendor_id: %x, header: %x\n", device.bus, device.device, device.function, vendor_id, device.header_type);
+    if (is_xhci(&device.class_code)) {
+      printf(0, y, "bus: %d, device: %d, func: %d, base: %x, sub: %x, interface: %x, vendor_id: %x, header: %x\n",
+        device.bus, device.device, device.function, device.class_code.base, device.class_code.sub, device.class_code.interface, vendor_id, device.header_type);
+      xhc_device = &device;
+      y += 20;
+    }
+  }
+  if (xhc_device == NULL) {
+    printf(0, y, "not found\n");
     y += 20;
   }
   printf(0, y, "done xhci\n", status);

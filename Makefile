@@ -37,13 +37,13 @@ run: img
 	qemu-system-x86_64 -name myos \
                      -monitor stdio \
                      -bios /usr/share/ovmf/OVMF.fd \
-                     -net none \
                      -drive format=raw,file=$(IMG) \
                      -device nec-usb-xhci,id=xhci \
                      -device usb-mouse \
                      -device usb-kbd \
                      -d guest_errors \
                      || true
+
 
 usb: arch/x86/BOOTX64.EFI kernel/vmmyos
 	sudo mount /dev/sda /mnt
