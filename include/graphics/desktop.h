@@ -17,4 +17,6 @@ void put_s(unsigned int x, unsigned int y, int color, char *str);
 
 void printf(unsigned int x, unsigned int y, char *format, ...);
 
+void log(char *format, ...);
+
 #endif
