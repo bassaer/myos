@@ -67,11 +67,27 @@ typedef union {
 */
 
 typedef struct {
+  UINT32 number_of_device_slots: 8;
+  UINT32 number_of_interrupters: 11;
+  UINT32 : 5;
+  UINT32 number_of_ports: 8;
+} hcsparams1_t;
+
+typedef struct {
+  UINT32 isochronousSchedulingThreshold: 4;
+  UINT32 eventRingSegmentTableMax: 4;
+  UINT32 : 13;
+  UINT32 max_scratchpad_buffers_high: 5;
+  UINT32 scratchpad_restore: 1;
+  UINT32 max_scratchpad_buffers_low: 5;
+} hcsparams2_t;
+
+typedef struct {
   UINT8 CAPLENGTH;
   UINT8 : 8;
   UINT16 HCIVERSION;
-  UINT32 HCSPARAMS1;
-  UINT32 HCSPARAMS2;
+  hcsparams1_t HCSPARAMS1;
+  hcsparams2_t HCSPARAMS2;
   UINT32 HCSPARAMS3;
   UINT32 HCCPARAMS1;
   UINT32 DBOFF;
@@ -79,11 +95,9 @@ typedef struct {
   UINT32 HCCPARAMS2;
 } capability_registers_t;
 
-
-
 typedef struct {
   UINT32 runStop: 1;
-  UINT32 hostControllerRest: 1;
+  UINT32 hostControllerReset: 1;
   UINT32 interrupterEnable: 1;
   UINT32 hostSystemErrorEnable: 1;
   UINT32 : 3;
@@ -128,10 +142,15 @@ typedef struct {
 } crcr_t;
 
 typedef struct {
-
+  UINT32 : 6;
+  UINT64 dcbaa_pointer: 58;
 } dcbaap_t;
 
 typedef struct {
+  UINT32 max_device_slots_enabled: 8;
+  UINT32 u3_entry_enable: 1;
+  UINT32 configuration_information_enable: 1;
+  UINT32 : 12;
 } config_t;
 
 typedef struct {
@@ -142,8 +161,8 @@ typedef struct {
   UINT32 dnctrl; // dnctrl_t dnctrl;
   UINT32 crcr; //crcr_t crcr;
   UINT32 reserved_2[4];
-  UINT64 dcbaap;
-  config_t config;
-} __attribute__((packed)) operational_registers_t;
+  dcbaap_t DCBAAP;
+  config_t CONFIG;
+} operational_registers_t;
 
 #endif

@@ -142,6 +142,15 @@ void set_msi(device_t* dev) {
   UINT8 cap_pointer = read_config(dev->bus, dev->device, dev->function, 0x34);
 }
 
+void wait() {
+  unsigned long long a = 0;
+  while(1) {
+    if (++a == 1000000000) {
+      break;
+    }
+  }
+}
+
 void start_xhc(UINT64 mmio) {
   capability_registers_t *cr = (capability_registers_t *)mmio;
   log("mmio : %x\n", mmio + cr->CAPLENGTH);
@@ -159,14 +168,28 @@ void start_xhc(UINT64 mmio) {
       usbsts.controllerNotReady,
       usbsts.hostControllerError
   );
+  usbcmd_t usbcmd = (usbcmd_t)or->USBCMD;
   if (!usbsts.hcHalted) {
-    usbcmd_t usbcmd = (usbcmd_t)or->USBCMD;
     usbcmd.runStop = false;
     or->USBCMD = usbcmd;
-    log("write cmd\n");
-    usbsts = (usbsts_t)or->USBSTS;
-    while(!usbsts.hcHalted);
+    while(!usbsts.hcHalted) {
+      usbsts = (usbsts_t)or->USBSTS;
+    };
   }
+  usbcmd.hostControllerReset = true;
+  or->USBCMD = usbcmd;
+  while(usbcmd.hostControllerReset || usbsts.controllerNotReady) {
+    usbcmd = (usbcmd_t)or->USBCMD;
+    usbsts = (usbsts_t)or->USBSTS;
+  }
+  hcsparams1_t hcsparams1 = (hcsparams1_t)cr->HCSPARAMS1;
+  log("max_device_slots: %d\n", hcsparams1.number_of_device_slots);
+  config_t config = (config_t)or->CONFIG;
+  config.max_device_slots_enabled = 8;
+  or->CONFIG = config;
+
+
+  log("done xhc");
 }
 
 void init_xhci() {
