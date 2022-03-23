@@ -13,7 +13,8 @@
 
 void kernel_main(BootInfo *boot) {
   init_desktop(boot);
-  init_xhci();
+  device_context_t* device_context[MAX_DEVICE_SLOTS + 1];
+  init_xhci(&device_context);
   while (1) __asm__ volatile("hlt");
 }
 

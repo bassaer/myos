@@ -151,7 +151,7 @@ void wait() {
   }
 }
 
-void start_xhc(UINT64 mmio) {
+void start_xhc(UINT64 mmio, device_context_t** device_contexts) {
   capability_registers_t *cr = (capability_registers_t *)mmio;
   log("mmio : %x\n", mmio + cr->CAPLENGTH);
   log("CAPLENGTH : %d, HCIVERSION: %x, HCCPARAMS1: %x\n", cr->CAPLENGTH, cr->HCIVERSION, cr->HCCPARAMS1);
@@ -185,14 +185,19 @@ void start_xhc(UINT64 mmio) {
   hcsparams1_t hcsparams1 = (hcsparams1_t)cr->HCSPARAMS1;
   log("max_device_slots: %d\n", hcsparams1.number_of_device_slots);
   config_t config = (config_t)or->CONFIG;
-  config.max_device_slots_enabled = 8;
+  config.max_device_slots_enabled = MAX_DEVICE_SLOTS;
   or->CONFIG = config;
 
-
+  for (int i = 0; i <= MAX_DEVICE_SLOTS; i++) {
+    device_contexts[i] = NULL;
+  }
+  dcbaap_t dcbaap = (dcbaap_t)or->DCBAAP;
+  dcbaap.dcbaa_pointer = ((UINT64)device_contexts) >> 6;
+  or->DCBAAP = dcbaap;
   log("done xhc");
 }
 
-void init_xhci() {
+void init_xhci(device_context_t** device_contexts) {
   STATUS status = find_all_device();
   log("init xhci => %d\n", status);
   device_t* xhc_device = NULL;
@@ -212,6 +217,6 @@ void init_xhci() {
   UINT64 bar = read_bar(xhc_device, 0);
   UINT64 mmio = bar & ~0xFUL; // mask lower 4bit
   log("bar: %x, mmio: %x", bar, mmio);
-  start_xhc(mmio);
+  start_xhc(mmio, device_contexts);
   log("done xhci\n", status);
 }

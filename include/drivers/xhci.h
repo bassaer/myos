@@ -19,6 +19,8 @@ typedef int STATUS;
 #define BASE_CLASS 0x06U
 #define SUB_CLASS 0x04U
 
+#define MAX_DEVICE_SLOTS 8
+
 typedef struct {
   UINT8 base;
   UINT8 sub;
@@ -32,21 +34,6 @@ typedef struct {
   UINT8 header_type;
   class_code_t class_code;
 } device_t;
-
-void init_xhci();
-
-UINT32 build_address(UINT8 bus, UINT8 device, UINT8 function, UINT8 offset);
-void set_config_address(UINT32 address);
-void write_config_data(UINT32 data);
-void outl(CHAR16 port, UINT32 value);
-UINT32 inl(CHAR16 port);
-UINT8 read_header_type(UINT8 bus, UINT8 device, UINT8 function);
-void read_class_code(UINT8 bus, UINT8 device, UINT8 function, class_code_t* class_code);
-UINT32 read_bus_number(UINT8 bus, UINT8 device, UINT8 function);
-UINT16 get_vendor_id(UINT8 bus, UINT8 device, UINT8 function);
-STATUS add_device(UINT8 bus, UINT8 device, UINT8 function, UINT8 header_type, class_code_t class_code);
-STATUS find_function(UINT8 bus, UINT8 device);
-STATUS find_device(UINT8 bus);
 
 /*
 typedef union {
@@ -164,5 +151,70 @@ typedef struct {
   dcbaap_t DCBAAP;
   config_t CONFIG;
 } operational_registers_t;
+
+typedef struct {
+  UINT32 route_string: 20;
+  UINT32 speed: 4;
+  UINT32 : 1;
+  UINT32 multi_tt: 1;
+  UINT32 hub: 1;
+  UINT32 context_entries: 5;
+  UINT32 max_exit_latency: 16;
+  UINT32 root_hub_port_number: 8;
+  UINT32 number_of_ports: 8;
+  UINT32 parent_hub_slot_id: 8;
+  UINT32 parent_port_number: 8;
+  UINT32 tt_think_time: 2;
+  UINT32 : 4;
+  UINT32 interrupter_target: 10;
+  UINT32 usb_device_address: 8;
+  UINT32 : 19;
+  UINT32 slot_state: 5;
+  UINT32 reserved[4];
+} slot_context_t;
+
+typedef struct {
+  UINT32 endpoint_state: 3;
+  UINT32 : 5;
+  UINT32 mult: 2;
+  UINT32 max_primary_stream: 5;
+  UINT32 linear_stream_array: 1;
+  UINT32 interval: 8;
+  UINT32 max_esit_payload_hi: 8;
+  UINT32 : 1;
+  UINT32 error_count: 2;
+  UINT32 endpoint_type: 3;
+  UINT32 : 1;
+  UINT32 host_initiate_disable: 1;
+  UINT32 max_burst_size: 8;
+  UINT32 max_packet_size: 16;
+  UINT32 dequeue_cycle_state: 1;
+  UINT32 : 3;
+  UINT64 tr_dequeue_pointer: 60;
+  UINT32 average_trb_length: 16;
+  UINT32 max_esit_payload_lo: 16;
+  UINT32 reserved[3];
+} endpoint_context_t;
+
+typedef struct {
+  slot_context_t slot_context;
+  endpoint_context_t endpoint_context[31];
+} device_context_t;
+
+
+void init_xhci(device_context_t** device_contexts);
+
+UINT32 build_address(UINT8 bus, UINT8 device, UINT8 function, UINT8 offset);
+void set_config_address(UINT32 address);
+void write_config_data(UINT32 data);
+void outl(CHAR16 port, UINT32 value);
+UINT32 inl(CHAR16 port);
+UINT8 read_header_type(UINT8 bus, UINT8 device, UINT8 function);
+void read_class_code(UINT8 bus, UINT8 device, UINT8 function, class_code_t* class_code);
+UINT32 read_bus_number(UINT8 bus, UINT8 device, UINT8 function);
+UINT16 get_vendor_id(UINT8 bus, UINT8 device, UINT8 function);
+STATUS add_device(UINT8 bus, UINT8 device, UINT8 function, UINT8 header_type, class_code_t class_code);
+STATUS find_function(UINT8 bus, UINT8 device);
+STATUS find_device(UINT8 bus);
 
 #endif
