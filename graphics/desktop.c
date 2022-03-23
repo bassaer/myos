@@ -100,3 +100,14 @@ void printf(unsigned int x, unsigned int y, char *format, ...) {
   put_s(x, y, WHITE, buf);
   va_end(list);
 }
+
+int y = 0;
+void log(char *format, ...) {
+  char buf[256];
+  va_list list;
+  va_start(list, format);
+  format_str(buf, format, &list);
+  put_s(0, y, WHITE, buf);
+  y += 20;
+  va_end(list);
+}

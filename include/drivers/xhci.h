@@ -19,6 +19,8 @@ typedef int STATUS;
 #define BASE_CLASS 0x06U
 #define SUB_CLASS 0x04U
 
+#define MAX_DEVICE_SLOTS 8
+
 typedef struct {
   UINT8 base;
   UINT8 sub;
@@ -33,7 +35,174 @@ typedef struct {
   class_code_t class_code;
 } device_t;
 
-void init_xhci();
+/*
+typedef union {
+  UINT32 data[1];
+  struct {
+    UINT8 CAPLENGTH;
+    UINT8 : 8;
+    UINT16 HCIVERSION;
+    UINT32 HCSPARAMS1;
+    UINT32 HCSPARAMS2;
+    UINT32 HCSPARAMS3;
+    UINT32 HCCPARAMS1;
+    UINT32 DBOFF;
+    UINT32 RTSOFF;
+    UINT32 HCCPARAMS2;
+  } __attribute__((packed)) bits;
+} __attribute__((packed)) capability_registers_t;
+*/
+
+typedef struct {
+  UINT32 number_of_device_slots: 8;
+  UINT32 number_of_interrupters: 11;
+  UINT32 : 5;
+  UINT32 number_of_ports: 8;
+} hcsparams1_t;
+
+typedef struct {
+  UINT32 isochronousSchedulingThreshold: 4;
+  UINT32 eventRingSegmentTableMax: 4;
+  UINT32 : 13;
+  UINT32 max_scratchpad_buffers_high: 5;
+  UINT32 scratchpad_restore: 1;
+  UINT32 max_scratchpad_buffers_low: 5;
+} hcsparams2_t;
+
+typedef struct {
+  UINT8 CAPLENGTH;
+  UINT8 : 8;
+  UINT16 HCIVERSION;
+  hcsparams1_t HCSPARAMS1;
+  hcsparams2_t HCSPARAMS2;
+  UINT32 HCSPARAMS3;
+  UINT32 HCCPARAMS1;
+  UINT32 DBOFF;
+  UINT32 RTSOFF;
+  UINT32 HCCPARAMS2;
+} capability_registers_t;
+
+typedef struct {
+  UINT32 runStop: 1;
+  UINT32 hostControllerReset: 1;
+  UINT32 interrupterEnable: 1;
+  UINT32 hostSystemErrorEnable: 1;
+  UINT32 : 3;
+  UINT32 hightHostControllerRest: 1;
+  UINT32 controllerSaveState: 1;
+  UINT32 controllerRestoreState: 1;
+  UINT32 enableWrapEvent: 1;
+  UINT32 enableU3MfindexStop: 1;
+  UINT32 : 1;
+  UINT32 cemEnable: 1;
+  UINT32 extendedTbcEnable: 1;
+  UINT32 extendedTbcstatusEnable: 1;
+  UINT32 vtioEnable: 1;
+  UINT32 : 15;
+} usbcmd_t;
+
+typedef struct {
+  UINT32 hcHalted: 1;
+  UINT32 : 1;
+  UINT32 hostSystemError: 1;
+  UINT32 eventInterrupt: 1;
+  UINT32 portChangeDetect: 1;
+  UINT32 : 3;
+  UINT32 saveStateStatus: 1;
+  UINT32 restoreStateStatus: 1;
+  UINT32 saveRestoreError: 1;
+  UINT32 controllerNotReady: 1;
+  UINT32 hostControllerError: 1;
+  UINT32 : 19;
+} usbsts_t;
+
+typedef struct {
+
+} pagesize_t;
+
+typedef struct {
+
+} dnctrl_t;
+
+typedef struct {
+
+} crcr_t;
+
+typedef struct {
+  UINT32 : 6;
+  UINT64 dcbaa_pointer: 58;
+} dcbaap_t;
+
+typedef struct {
+  UINT32 max_device_slots_enabled: 8;
+  UINT32 u3_entry_enable: 1;
+  UINT32 configuration_information_enable: 1;
+  UINT32 : 12;
+} config_t;
+
+typedef struct {
+  usbcmd_t USBCMD;
+  usbsts_t USBSTS;
+  UINT32 pagesize; //pagesize_t pagesize;
+  UINT32 reserved_1[1];
+  UINT32 dnctrl; // dnctrl_t dnctrl;
+  UINT32 crcr; //crcr_t crcr;
+  UINT32 reserved_2[4];
+  dcbaap_t DCBAAP;
+  config_t CONFIG;
+} operational_registers_t;
+
+typedef struct {
+  UINT32 route_string: 20;
+  UINT32 speed: 4;
+  UINT32 : 1;
+  UINT32 multi_tt: 1;
+  UINT32 hub: 1;
+  UINT32 context_entries: 5;
+  UINT32 max_exit_latency: 16;
+  UINT32 root_hub_port_number: 8;
+  UINT32 number_of_ports: 8;
+  UINT32 parent_hub_slot_id: 8;
+  UINT32 parent_port_number: 8;
+  UINT32 tt_think_time: 2;
+  UINT32 : 4;
+  UINT32 interrupter_target: 10;
+  UINT32 usb_device_address: 8;
+  UINT32 : 19;
+  UINT32 slot_state: 5;
+  UINT32 reserved[4];
+} slot_context_t;
+
+typedef struct {
+  UINT32 endpoint_state: 3;
+  UINT32 : 5;
+  UINT32 mult: 2;
+  UINT32 max_primary_stream: 5;
+  UINT32 linear_stream_array: 1;
+  UINT32 interval: 8;
+  UINT32 max_esit_payload_hi: 8;
+  UINT32 : 1;
+  UINT32 error_count: 2;
+  UINT32 endpoint_type: 3;
+  UINT32 : 1;
+  UINT32 host_initiate_disable: 1;
+  UINT32 max_burst_size: 8;
+  UINT32 max_packet_size: 16;
+  UINT32 dequeue_cycle_state: 1;
+  UINT32 : 3;
+  UINT64 tr_dequeue_pointer: 60;
+  UINT32 average_trb_length: 16;
+  UINT32 max_esit_payload_lo: 16;
+  UINT32 reserved[3];
+} endpoint_context_t;
+
+typedef struct {
+  slot_context_t slot_context;
+  endpoint_context_t endpoint_context[31];
+} device_context_t;
+
+
+void init_xhci(device_context_t** device_contexts);
 
 UINT32 build_address(UINT8 bus, UINT8 device, UINT8 function, UINT8 offset);
 void set_config_address(UINT32 address);

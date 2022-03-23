@@ -35,6 +35,7 @@ drivers:
 
 run: img
 	qemu-system-x86_64 -name myos \
+                     -m 1G \
                      -monitor stdio \
                      -bios /usr/share/ovmf/OVMF.fd \
                      -drive format=raw,file=$(IMG) \
@@ -44,6 +45,8 @@ run: img
                      -d guest_errors \
                      || true
 
+                     #-bios /usr/share/ovmf/OVMF.fd \
+                     -drive file=/usr/share/ovmf/x86_64/bios.bin,format=raw,if=pflash,readonly
 
 usb: arch/x86/BOOTX64.EFI kernel/vmmyos
 	sudo mount /dev/sda /mnt
